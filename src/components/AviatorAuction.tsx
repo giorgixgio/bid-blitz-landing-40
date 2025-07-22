@@ -58,6 +58,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [showSlotAnimation, setShowSlotAnimation] = useState(false);
   const [coinCollectedThisRound, setCoinCollectedThisRound] = useState(false);
   const [showOtherPlayerBonusMessage, setShowOtherPlayerBonusMessage] = useState(false);
+  const [currentUserCollectedCoin, setCurrentUserCollectedCoin] = useState(false);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -78,6 +79,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     if (timeLeft === 10) { // When timer resets to full
       setMilliseconds(99);
       setCoinCollectedThisRound(false); // Reset coin collection status for new round
+      setCurrentUserCollectedCoin(false); // Reset current user collection status
     }
   }, [timeLeft]);
 
@@ -254,6 +256,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       // Collision detected by current user!
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
+      setCurrentUserCollectedCoin(true); // Mark that current user collected it
       setShowSlotAnimation(true);
       
       // Play winning sound for bonus collection
@@ -270,6 +273,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const handleCoinCollect = () => {
     setIsCoinVisible(false);
     setCoinCollectedThisRound(true);
+    setCurrentUserCollectedCoin(true); // Mark that current user collected it
     setShowSlotAnimation(true);
     playWinningSound();
     
@@ -280,12 +284,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // Simulate other player collecting coin (for demo purposes)
   useEffect(() => {
-    if (coinCollectedThisRound && !showSlotAnimation) {
+    if (coinCollectedThisRound && !currentUserCollectedCoin) {
       // Someone else collected the coin - show notification
       setShowOtherPlayerBonusMessage(true);
       setTimeout(() => setShowOtherPlayerBonusMessage(false), 3000);
     }
-  }, [coinCollectedThisRound, showSlotAnimation]);
+  }, [coinCollectedThisRound, currentUserCollectedCoin]);
 
   // Handle slot animation completion
   const handleSlotComplete = () => {
