@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Gavel, Users, Coins, Smartphone } from 'lucide-react';
 import { JetCat } from './JetCat';
+import confetti from 'canvas-confetti';
 
 interface AviatorAuctionProps {
   currentPrice: number;           // Current auction price
@@ -127,6 +128,40 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       }
     }
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
+
+  // CONFETTI EFFECT FOR AUCTION ENDED
+  useEffect(() => {
+    if (isAuctionEnded) {
+      const duration = 15 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        // since particles fall down, start a bit higher than random
+        confetti(Object.assign({}, defaults, { 
+          particleCount, 
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+        }));
+        confetti(Object.assign({}, defaults, { 
+          particleCount, 
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+        }));
+      }, 250);
+
+      return () => clearInterval(interval);
+    }
+  }, [isAuctionEnded]);
 
   return (
     <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-50">
@@ -274,61 +309,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           <span>{userBidCredits} ბიდი</span>
         </div>
       </div>
-
-      {/* CONFETTI ANIMATION FOR AUCTION ENDED - EXTREMELY SLOW */}
-      {isAuctionEnded && (
-        <>
-          <style>{`
-            @keyframes slowFadeIn {
-              0% { opacity: 0; transform: scale(0.5); }
-              20% { opacity: 1; transform: scale(1); }
-              80% { opacity: 1; transform: scale(1); }
-              100% { opacity: 0; transform: scale(0.5); }
-            }
-            @keyframes verySlowFloat {
-              0% { transform: translateY(0px) rotate(0deg); }
-              25% { transform: translateY(-3px) rotate(2deg); }
-              50% { transform: translateY(-5px) rotate(0deg); }
-              75% { transform: translateY(-3px) rotate(-2deg); }
-              100% { transform: translateY(0px) rotate(0deg); }
-            }
-          `}</style>
-          
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-            {/* Only 4 confetti pieces with VERY slow animation */}
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute text-xl"
-                style={{
-                  left: `${25 + (i * 15)}%`,
-                  top: `${30 + (i * 10)}%`,
-                  animation: `slowFadeIn 8s infinite`,
-                  animationDelay: `${i * 3}s`,
-                }}
-              >
-                {['🎉', '✨', '🌟', '💫'][i]}
-              </div>
-            ))}
-            
-            {/* 2 very slow floating stars */}
-            {[...Array(2)].map((_, i) => (
-              <div
-                key={`float-${i}`}
-                className="absolute text-lg"
-                style={{
-                  left: `${40 + (i * 20)}%`,
-                  top: `${45 + (i * 5)}%`,
-                  animation: `verySlowFloat 12s infinite`,
-                  animationDelay: `${i * 6}s`,
-                }}
-              >
-                ⭐
-              </div>
-            ))}
-          </div>
-        </>
-      )}
 
       {/* CRASH WARNING */}
       {timeLeft <= 3 && !isAuctionEnded && (
