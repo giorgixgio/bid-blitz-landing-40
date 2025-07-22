@@ -17,6 +17,12 @@ import {
   Zap
 } from 'lucide-react';
 
+// Import product images
+import galaxyMainImage from '@/assets/samsung-galaxy-s25-ultra.jpg';
+import galaxyBackImage from '@/assets/samsung-galaxy-s25-ultra-back.jpg';
+import galaxySideImage from '@/assets/samsung-galaxy-s25-ultra-side.jpg';
+import galaxySPenImage from '@/assets/samsung-galaxy-s25-ultra-spen.jpg';
+
 const Auction = () => {
   const [currentPrice, setCurrentPrice] = useState(0.01); // Penny auction starts at 1 cent
   const [userBidCredits, setUserBidCredits] = useState(45); // User's remaining bids
@@ -32,12 +38,12 @@ const Auction = () => {
   const PRICE_INCREMENT = 0.01; // Each bid increases price by 1 cent
   const TIME_EXTENSION = 15; // Seconds added per bid
 
-  // Mock product images
+  // Product images - Samsung Galaxy S25 Ultra
   const productImages = [
-    '/placeholder.svg', // Main product image
-    '/placeholder.svg',
-    '/placeholder.svg',
-    '/placeholder.svg'
+    galaxyMainImage,
+    galaxyBackImage, 
+    galaxySideImage,
+    galaxySPenImage
   ];
 
   // Mock recent bidders for penny auction
