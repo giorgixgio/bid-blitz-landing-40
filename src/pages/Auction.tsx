@@ -421,7 +421,7 @@ const Auction = () => {
                     onClick={handleBid}
                     className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden ${
                       userJustBid 
-                        ? 'bg-gradient-to-r from-red-300/50 to-red-400/50' // Lighter background when winning
+                        ? 'bg-gradient-to-r from-red-300/60 to-red-400/60' // Lighter red background when filling
                         : 'bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90'
                     } disabled:from-muted disabled:to-muted`}
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
@@ -440,9 +440,9 @@ const Auction = () => {
                     )}
                   </Button>
                   
-                  {/* Progress overlay - always show when user just bid */}
+                  {/* Progress overlay - filled part has original button colors */}
                   {userJustBid && (
-                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-primary to-destructive rounded-md overflow-hidden">
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
                       <div 
                         className="h-full bg-gradient-to-r from-primary to-destructive transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
