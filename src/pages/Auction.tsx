@@ -393,11 +393,7 @@ const Auction = () => {
                 <div className="relative">
                   <Button 
                     onClick={handleBid}
-                    className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden ${
-                      userJustBid 
-                        ? 'bg-gradient-to-r from-green-200/30 to-green-300/30' // Very light green background when filling
-                        : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500'
-                    } disabled:from-muted disabled:to-muted`}
+                    className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 disabled:from-muted disabled:to-muted`}
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
@@ -420,7 +416,7 @@ const Auction = () => {
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md z-0">
                       <div 
-                        className="h-full bg-green-400/30 transition-all duration-1000 ease-linear"
+                        className="h-full bg-gradient-to-r from-green-300 to-green-400 transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
                       />
                     </div>
