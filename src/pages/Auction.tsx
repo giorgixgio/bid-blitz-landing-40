@@ -98,10 +98,10 @@ const Auction = () => {
   useEffect(() => {
     if (timeLeft <= 0) return;
 
-    const shouldBid = Math.random() < 0.6; // 60% chance to bid each second (increased)
-    const minTimeForBid = 1; // Reduced minimum time to keep bidding active longer
+    const shouldBid = Math.random() < 0.7; // 70% chance to bid each second in final moments
+    const minTimeForBid = 1; // Don't bid if less than 1 second left
     
-    if (shouldBid && timeLeft > minTimeForBid && timeLeft < 14) { // Extended range
+    if (shouldBid && timeLeft > minTimeForBid && timeLeft <= 4) { // Only bid in last 2-4 seconds
       const timer = setTimeout(() => {
         // Select random bidder
         const randomBidder = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
