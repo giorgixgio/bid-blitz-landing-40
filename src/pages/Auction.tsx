@@ -495,6 +495,9 @@ const Auction = () => {
               userJustBid={userJustBid}
               bidProgress={bidProgress}
               isAuctionEnded={isAuctionEnded}
+              onBonusBidCollected={() => {
+                setUserBidCredits(prev => prev + 1);
+              }}
             />
 
             {/* User's Bid Credits Display */}

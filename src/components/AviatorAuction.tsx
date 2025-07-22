@@ -14,6 +14,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Gavel, Users, Coins, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { JetCat } from './JetCat';
+import { LuckyCoin } from './LuckyCoin';
+import { SlotAnimation } from './SlotAnimation';
 import confetti from 'canvas-confetti';
 
 interface AviatorAuctionProps {
@@ -25,6 +27,7 @@ interface AviatorAuctionProps {
   userJustBid: boolean;          // Whether user just placed a bid
   bidProgress: number;           // Progress percentage (0-100)
   isAuctionEnded?: boolean;      // Whether auction has ended
+  onBonusBidCollected?: () => void; // Callback when bonus bid is collected
 }
 
 export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
@@ -35,7 +38,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   userBidCredits,
   userJustBid,
   bidProgress,
-  isAuctionEnded = false
+  isAuctionEnded = false,
+  onBonusBidCollected
 }) => {
   // ANIMATION STATE
   const [jetPosition, setJetPosition] = useState({ x: 10, y: 85 }); // Jet position (x: left-right, y: top-bottom)
@@ -47,6 +51,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [isExploding, setIsExploding] = useState(false); // Explosion state
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
   const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
+  
+  // LUCKY COIN STATE
+  const [coinPosition, setCoinPosition] = useState({ x: 50, y: 50 });
+  const [isCoinVisible, setIsCoinVisible] = useState(false);
+  const [showSlotAnimation, setShowSlotAnimation] = useState(false);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -193,6 +202,74 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
 
+  // LUCKY COIN SPAWNING - Randomly spawn coins on the jet's path
+  useEffect(() => {
+    if (isAuctionEnded || isCoinVisible) return;
+    
+    const spawnCoin = () => {
+      // 5% chance to spawn a coin every 3 seconds
+      if (Math.random() < 0.05) {
+        // Spawn coin randomly along the jet's path
+        const randomX = 20 + Math.random() * 60; // Between 20% and 80%
+        const randomY = 30 + Math.random() * 50; // Between 30% and 80%
+        
+        setCoinPosition({ x: randomX, y: randomY });
+        setIsCoinVisible(true);
+        
+        // Auto-hide coin after 8 seconds if not collected
+        setTimeout(() => {
+          setIsCoinVisible(false);
+        }, 8000);
+      }
+    };
+    
+    const interval = setInterval(spawnCoin, 3000);
+    return () => clearInterval(interval);
+  }, [isAuctionEnded, isCoinVisible]);
+
+  // COLLISION DETECTION - Check if jet hits the coin
+  useEffect(() => {
+    if (!isCoinVisible) return;
+    
+    const jetX = isAuctionEnded ? 90 : jetPosition.x;
+    const jetY = isAuctionEnded ? 15 : jetPosition.y;
+    
+    // Simple collision detection (within 8% distance)
+    const distance = Math.sqrt(
+      Math.pow(jetX - coinPosition.x, 2) + Math.pow(jetY - coinPosition.y, 2)
+    );
+    
+    if (distance < 8) {
+      // Collision detected!
+      setIsCoinVisible(false);
+      setShowSlotAnimation(true);
+      
+      // Play winning sound for bonus collection
+      playWinningSound();
+      
+      // Notify parent component about bonus collection
+      if (onBonusBidCollected) {
+        onBonusBidCollected();
+      }
+    }
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected]);
+
+  // Handle coin collection
+  const handleCoinCollect = () => {
+    setIsCoinVisible(false);
+    setShowSlotAnimation(true);
+    playWinningSound();
+    
+    if (onBonusBidCollected) {
+      onBonusBidCollected();
+    }
+  };
+
+  // Handle slot animation completion
+  const handleSlotComplete = () => {
+    setShowSlotAnimation(false);
+  };
+
   // CONFETTI EFFECT FOR AUCTION ENDED
   useEffect(() => {
     if (isAuctionEnded) {
@@ -297,6 +374,14 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
             </div>
           ))}
         </div>
+
+        {/* LUCKY COIN */}
+        <LuckyCoin
+          x={coinPosition.x}
+          y={coinPosition.y}
+          isVisible={isCoinVisible && !isAuctionEnded}
+          onCollect={handleCoinCollect}
+        />
 
         {/* FLYING JET CAT */}
         <div className="absolute inset-0">
@@ -404,6 +489,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         </div>
       )}
+
+      {/* SLOT ANIMATION OVERLAY */}
+      <SlotAnimation 
+        isVisible={showSlotAnimation}
+        onComplete={handleSlotComplete}
+      />
     </Card>
   );
 };
