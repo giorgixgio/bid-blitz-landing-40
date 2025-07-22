@@ -38,6 +38,12 @@ const Auction = () => {
   const PRICE_INCREMENT = 0.01; // Each bid increases price by 1 cent
   const TIME_EXTENSION = 15; // Seconds added per bid
 
+  // Dummy bidders pool
+  const dummyBidders = [
+    'nika23', 'data77', 'mari_ge', 'luka2024', 'ana_k', 'saba99', 'nino_t', 'giorgi_m',
+    'keti15', 'temo88', 'sophie_g', 'alex_tbilisi', 'maka_cute', 'oto_king', 'nata_geo'
+  ];
+
   // Product images - Samsung Galaxy S25 Ultra
   const productImages = [
     galaxyMainImage,
@@ -46,14 +52,83 @@ const Auction = () => {
     galaxySPenImage
   ];
 
-  // Mock recent bidders for penny auction
-  const recentBidders = [
-    { id: 1, name: 'vako12', bidNumber: totalBidsPlaced, time: '2 წამის წინ', avatar: '/placeholder.svg' },
-    { id: 2, name: 'zukito24', bidNumber: totalBidsPlaced - 1, time: '18 წამის წინ', avatar: '/placeholder.svg' },
-    { id: 3, name: 'rezman777', bidNumber: totalBidsPlaced - 2, time: '35 წამის წინ', avatar: '/placeholder.svg' },
-    { id: 4, name: 'Roma17', bidNumber: totalBidsPlaced - 3, time: '52 წამის წინ', avatar: '/placeholder.svg' },
-    { id: 5, name: 'jemiko10', bidNumber: totalBidsPlaced - 4, time: '1 წუთის წინ', avatar: '/placeholder.svg' },
-  ];
+  // Generate initial bidders history
+  const generateBidHistory = (totalBids) => {
+    const history = [];
+    const usedNames = new Set();
+    
+    for (let i = 0; i < Math.min(10, totalBids); i++) {
+      let bidderName;
+      do {
+        bidderName = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
+      } while (usedNames.has(bidderName) && usedNames.size < dummyBidders.length);
+      
+      usedNames.add(bidderName);
+      
+      const timeAgo = i === 0 ? '2 წამის წინ' : 
+                     i === 1 ? '18 წამის წინ' :
+                     i === 2 ? '35 წამის წინ' :
+                     i === 3 ? '52 წამის წინ' :
+                     `${Math.floor(Math.random() * 5) + 1} წუთის წინ`;
+      
+      history.push({
+        id: totalBids - i,
+        name: bidderName,
+        bidNumber: totalBids - i,
+        time: timeAgo,
+        avatar: '/placeholder.svg'
+      });
+    }
+    
+    return history;
+  };
+
+  const [recentBidders, setRecentBidders] = useState(() => generateBidHistory(totalBidsPlaced));
+
+  // Automatic bidding system
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+
+    const shouldBid = Math.random() < 0.3; // 30% chance to bid each second
+    const minTimeForBid = 3; // Don't bid if less than 3 seconds left
+    
+    if (shouldBid && timeLeft > minTimeForBid && timeLeft < 12) {
+      const timer = setTimeout(() => {
+        // Select random bidder
+        const randomBidder = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
+        
+        // Place automated bid
+        setCurrentPrice(prev => prev + PRICE_INCREMENT);
+        setTotalBidsPlaced(prev => prev + 1);
+        setTimeLeft(TIME_EXTENSION);
+        setLastBidder(randomBidder);
+        
+        // Update bid history
+        setRecentBidders(prev => {
+          const newBidder = {
+            id: totalBidsPlaced + 1,
+            name: randomBidder,
+            bidNumber: totalBidsPlaced + 1,
+            time: 'ახლა',
+            avatar: '/placeholder.svg'
+          };
+          
+          const updated = [newBidder, ...prev.slice(0, 9)];
+          // Update timestamps
+          return updated.map((bidder, index) => ({
+            ...bidder,
+            time: index === 0 ? 'ახლა' :
+                  index === 1 ? '15 წამის წინ' :
+                  index === 2 ? '30 წამის წინ' :
+                  `${index * 15} წამის წინ`
+          }));
+        });
+        
+      }, Math.random() * 2000 + 1000); // Random delay between 1-3 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft, totalBidsPlaced]);
 
   // Scroll detection for sticky bar
   useEffect(() => {
@@ -101,12 +176,32 @@ const Auction = () => {
       return;
     }
 
-    // Place bid
+    // Place user bid
     setCurrentPrice(prev => prev + PRICE_INCREMENT);
     setUserBidCredits(prev => prev - 1);
     setTotalBidsPlaced(prev => prev + 1);
     setTimeLeft(TIME_EXTENSION); // Reset timer
     setLastBidder('შენ'); // You are now the highest bidder
+
+    // Update bid history with user bid
+    setRecentBidders(prev => {
+      const newBidder = {
+        id: totalBidsPlaced + 1,
+        name: 'შენ',
+        bidNumber: totalBidsPlaced + 1,
+        time: 'ახლა',
+        avatar: '/placeholder.svg'
+      };
+      
+      const updated = [newBidder, ...prev.slice(0, 9)];
+      return updated.map((bidder, index) => ({
+        ...bidder,
+        time: index === 0 ? 'ახლა' :
+              index === 1 ? '15 წამის წინ' :
+              index === 2 ? '30 წამის წინ' :
+              `${index * 15} წამის წინ`
+      }));
+    });
 
     toast({
       title: "ბიდი წარმატებით განთავსდა!",
