@@ -389,13 +389,6 @@ const Auction = () => {
                   </p>
                 </div>
                 
-                {/* You Are Winning text above button */}
-                {userJustBid && (
-                  <div className="text-center mb-2">
-                    <span className="text-yellow-400 font-bold text-lg animate-pulse">YOU ARE WINNING!</span>
-                  </div>
-                )}
-                
                 {/* Extra large mobile-friendly BID button with progress */}
                 <div className="relative">
                   <Button 
@@ -409,7 +402,7 @@ const Auction = () => {
                       ) : userBidCredits <= 0 ? (
                         "არ გაქვს ბიდები"
                       ) : userJustBid ? (
-                        <span className="opacity-50">ბიდი ({BID_COST} ₾)</span>
+                        "YOU ARE WINNING!"
                       ) : (
                         <>
                           <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
