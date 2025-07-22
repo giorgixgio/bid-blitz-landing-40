@@ -254,8 +254,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           ) : (
             <>
               <div className={`text-4xl sm:text-6xl font-bold ${timeLeft <= 3 ? 'text-red-400 animate-pulse' : 'text-white'} drop-shadow-lg flex items-center justify-center gap-1`}>
-                <span>{String(timeLeft).padStart(2, '0')}</span>
-                <span className="text-2xl sm:text-3xl text-white/70">.{String(milliseconds).padStart(2, '0')}</span>
+                <span className="tabular-nums">{String(timeLeft).padStart(2, '0')}</span>
+                <span className="text-2xl sm:text-3xl text-white/70 tabular-nums">.{String(milliseconds).padStart(2, '0')}</span>
               </div>
               <div className="text-xs sm:text-sm text-white/80 mt-1">SECONDS</div>
             </>
