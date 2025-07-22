@@ -90,46 +90,52 @@ const Auction = () => {
   useEffect(() => {
     if (timeLeft <= 0) return;
 
-    const shouldBid = Math.random() < 0.3; // 30% chance to bid each second
-    const minTimeForBid = 3; // Don't bid if less than 3 seconds left
+    const shouldBid = Math.random() < 0.4; // 40% chance to bid each second
+    const minTimeForBid = 2; // Don't bid if less than 2 seconds left
     
-    if (shouldBid && timeLeft > minTimeForBid && timeLeft < 12) {
+    if (shouldBid && timeLeft > minTimeForBid && timeLeft < 13) {
       const timer = setTimeout(() => {
         // Select random bidder
         const randomBidder = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
         
+        console.log(`Dummy bidder ${randomBidder} placing bid at ${timeLeft} seconds left`);
+        
         // Place automated bid
         setCurrentPrice(prev => prev + PRICE_INCREMENT);
-        setTotalBidsPlaced(prev => prev + 1);
+        setTotalBidsPlaced(prev => {
+          const newTotal = prev + 1;
+          
+          // Update bid history
+          setRecentBidders(prevBidders => {
+            const newBidder = {
+              id: newTotal,
+              name: randomBidder,
+              bidNumber: newTotal,
+              time: 'ახლა',
+              avatar: '/placeholder.svg'
+            };
+            
+            const updated = [newBidder, ...prevBidders.slice(0, 9)];
+            // Update timestamps
+            return updated.map((bidder, index) => ({
+              ...bidder,
+              time: index === 0 ? 'ახლა' :
+                    index === 1 ? '15 წამის წინ' :
+                    index === 2 ? '30 წამის წინ' :
+                    `${index * 15} წამის წინ`
+            }));
+          });
+          
+          return newTotal;
+        });
         setTimeLeft(TIME_EXTENSION);
         setLastBidder(randomBidder);
         
-        // Update bid history
-        setRecentBidders(prev => {
-          const newBidder = {
-            id: totalBidsPlaced + 1,
-            name: randomBidder,
-            bidNumber: totalBidsPlaced + 1,
-            time: 'ახლა',
-            avatar: '/placeholder.svg'
-          };
-          
-          const updated = [newBidder, ...prev.slice(0, 9)];
-          // Update timestamps
-          return updated.map((bidder, index) => ({
-            ...bidder,
-            time: index === 0 ? 'ახლა' :
-                  index === 1 ? '15 წამის წინ' :
-                  index === 2 ? '30 წამის წინ' :
-                  `${index * 15} წამის წინ`
-          }));
-        });
-        
-      }, Math.random() * 2000 + 1000); // Random delay between 1-3 seconds
+      }, Math.random() * 1000 + 500); // Random delay between 0.5-1.5 seconds
       
       return () => clearTimeout(timer);
     }
-  }, [timeLeft, totalBidsPlaced]);
+  }, [timeLeft]); // Only depend on timeLeft
 
   // Scroll detection for sticky bar
   useEffect(() => {
