@@ -46,7 +46,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         const targetX = 10 + (80 * progress / 100); // Move across screen
         const targetY = 85 - (70 * progress / 100); // Move up screen
         setCatPosition({ x: targetX, y: targetY });
-        setZoomLevel(1 + (progress / 100) * 0.5); // Zoom effect
+        setZoomLevel(1 + (progress / 100) * 0.2); // Reduced zoom effect
       }, 100);
 
       return () => clearTimeout(animationTimer);
@@ -60,7 +60,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       const targetX = 10 + (80 * progress / 100);
       const targetY = 85 - (70 * progress / 100);
       setCatPosition({ x: targetX, y: targetY });
-      setZoomLevel(1 + (progress / 100) * 0.8); // More dramatic zoom for user
+      setZoomLevel(1 + (progress / 100) * 0.3); // Reduced zoom to prevent UI issues
       
       // Add trail points
       setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
@@ -70,7 +70,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       const targetX = 10 + (80 * timeProgress / 100);
       const targetY = 85 - (70 * timeProgress / 100);
       setCatPosition({ x: targetX, y: targetY });
-      setZoomLevel(1 + (timeProgress / 100) * 0.6); // Moderate zoom for others
+      setZoomLevel(1 + (timeProgress / 100) * 0.2); // Reduced zoom for others
       
       // Add trail points
       setTrailPoints(prev => [...prev.slice(-4), { x: targetX, y: targetY, id: Date.now() }]);
@@ -80,58 +80,61 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   return (
     <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden">
       {/* Aviator Game Area */}
-      <div 
-        className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden transition-transform duration-1000 ease-out"
-        style={{ transform: `scale(${zoomLevel})` }}
-      >
-        {/* Grid pattern background with zoom effect */}
+      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden">
+        {/* Zoom container - only affects background elements */}
         <div 
-          className="absolute inset-0 opacity-20 transition-transform duration-1000"
-          style={{ transform: `scale(${zoomLevel * 1.2})` }}
+          className="absolute inset-0 transition-transform duration-1000 ease-out origin-bottom-left"
+          style={{ transform: `scale(${zoomLevel})` }}
         >
-          <svg width="100%" height="100%" className="w-full h-full">
-            <defs>
-              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.5"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
+          {/* Grid pattern background with zoom effect */}
+          <div className="absolute inset-0 opacity-20">
+            <svg width="100%" height="100%" className="w-full h-full">
+              <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.5"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+          </div>
         </div>
 
-        {/* Finish Line */}
-        <div className="absolute top-2 right-2 flex flex-col items-center text-white/80">
+        {/* Fixed UI Elements - Stay on top and unaffected by zoom */}
+        <div className="absolute top-2 right-2 flex flex-col items-center text-white/80 z-20">
           <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center mb-1">
             🏁
           </div>
           <span className="text-xs font-bold">FINISH</span>
         </div>
 
-        {/* Trail Effect */}
-        {trailPoints.map((point, index) => (
-          <div
-            key={point.id}
-            className="absolute transition-all duration-1000 pointer-events-none"
-            style={{
-              left: `${point.x}%`,
-              top: `${point.y}%`,
-              transform: 'translate(-50%, -50%)',
-              opacity: (index + 1) / trailPoints.length * 0.6
+        {/* Trail Effect - In game space */}
+        <div className="absolute inset-0">
+          {trailPoints.map((point, index) => (
+            <div
+              key={point.id}
+              className="absolute transition-all duration-1000 pointer-events-none"
+              style={{
+                left: `${point.x}%`,
+                top: `${point.y}%`,
+                transform: 'translate(-50%, -50%)',
+                opacity: (index + 1) / trailPoints.length * 0.6
+              }}
+            >
+              <div className="w-3 h-3 bg-yellow-400/60 rounded-full animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Flying Cat Player - In game space */}
+        <div className="absolute inset-0">
+          <div 
+            className="absolute transition-all duration-1000 ease-out transform"
+            style={{ 
+              left: `${catPosition.x}%`, 
+              top: `${catPosition.y}%`,
+              transform: 'translate(-50%, -50%)'
             }}
           >
-            <div className="w-3 h-3 bg-yellow-400/60 rounded-full animate-pulse"></div>
-          </div>
-        ))}
-
-        {/* Flying Cat Player */}
-        <div 
-          className="absolute transition-all duration-1000 ease-out transform"
-          style={{ 
-            left: `${catPosition.x}%`, 
-            top: `${catPosition.y}%`,
-            transform: 'translate(-50%, -50%)'
-          }}
-        >
           <div className="relative">
             {/* Flying Cat with Flapping Ears */}
             <div className="text-2xl sm:text-3xl relative">
@@ -157,27 +160,30 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
               </>
             )}
           </div>
+          </div>
         </div>
 
-        {/* Multiplier Display */}
-        <div className="absolute top-4 left-4 text-white">
+        {/* Multiplier Display - Fixed position, unaffected by zoom */}
+        <div className="absolute top-4 left-4 text-white z-20">
           <div className="text-lg sm:text-xl font-bold">
             {(currentPrice * 100).toFixed(0)}x
           </div>
           <div className="text-xs opacity-80">მრავლისაძღვნა</div>
         </div>
 
-        {/* Progress Line */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-          <path
-            d={`M 10% 85% Q ${catPosition.x}% ${catPosition.y}% 90% 15%`}
-            stroke="rgba(255, 255, 255, 0.5)"
-            strokeWidth="2"
-            fill="none"
-            strokeDasharray="5,5"
-            className="animate-pulse"
-          />
-        </svg>
+        {/* Progress Line - In game space */}
+        <div className="absolute inset-0">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none">
+            <path
+              d={`M 10% 85% Q ${catPosition.x}% ${catPosition.y}% 90% 15%`}
+              stroke="rgba(255, 255, 255, 0.5)"
+              strokeWidth="2"
+              fill="none"
+              strokeDasharray="5,5"
+              className="animate-pulse"
+            />
+          </svg>
+        </div>
       </div>
 
       {/* Game Stats */}
