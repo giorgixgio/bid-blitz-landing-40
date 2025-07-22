@@ -32,41 +32,22 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
 
   return (
     <div className="relative">
-      {/* Jet body - 25% bigger with forced desktop emoji style */}
+      {/* Jet body - 25% bigger with consistent emoji font */}
       <div className="text-4xl sm:text-5xl relative">
-        {/* Force desktop-style emoji rendering */}
-        <span 
-          className="inline-block"
-          style={{ 
-            fontFamily: '"Segoe UI Emoji", "Apple Color Emoji"',
-            fontSize: 'inherit',
-            lineHeight: 1,
-            fontFeatureSettings: '"cmap" 1',
-            textRendering: 'optimizeLegibility'
-          }}
-        >
+        {/* Force consistent emoji rendering with Noto Color Emoji */}
+        <span className="emoji-consistent inline-block">
           🚀
         </span>
         {/* Cat inside jet - more visible with background */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg bg-white/20 rounded-full px-1 backdrop-blur-sm border border-white/30">
-          <span 
-            style={{ 
-              fontFamily: '"Segoe UI Emoji", "Apple Color Emoji"',
-              fontFeatureSettings: '"cmap" 1'
-            }}
-          >
+          <span className="emoji-consistent">
             🐱
           </span>
         </div>
         {/* Crown for user or winner */}
         {(isUser || isAuctionEnded) && (
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xl animate-bounce">
-            <span 
-              style={{ 
-                fontFamily: '"Segoe UI Emoji", "Apple Color Emoji"',
-                fontFeatureSettings: '"cmap" 1'
-              }}
-            >
+            <span className="emoji-consistent">
               👑
             </span>
           </div>
