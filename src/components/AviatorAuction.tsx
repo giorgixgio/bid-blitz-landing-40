@@ -137,7 +137,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       
       if (currentLeader) {
         setIsExploding(true);
-        playExplosionSound(); // Play explosion sound when jet explodes
         
         // Stop explosion after animation
         setTimeout(() => {
