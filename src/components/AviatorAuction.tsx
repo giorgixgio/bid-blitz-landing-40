@@ -127,9 +127,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
 
   return (
-    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden">
+    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-50">
       {/* GAME AREA */}
-      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden">
+      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-50">
         
         {/* Background with zoom effect */}
         <div 
@@ -151,10 +151,10 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
         {/* FINISH LINE */}
         <div className="absolute top-2 right-2 flex flex-col items-center text-white/80 z-20">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-1 shadow-lg border-2 border-white/20">
-            <Smartphone className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center mb-1">
+            🏁
           </div>
-          <span className="text-xs font-bold">PRODUCT</span>
+          <span className="text-xs font-bold">FINISH</span>
         </div>
 
         {/* TRAIL EFFECTS */}
