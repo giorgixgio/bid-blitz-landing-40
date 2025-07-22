@@ -173,8 +173,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         
         {/* "YOU BLEW UP JET" MESSAGE - At the very top center of animation */}
         {showBlowUpMessage && (
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 animate-bounce flex justify-center w-full">
-            <div className="bg-red-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-red-400 text-center">
+          <div className="absolute top-2 inset-x-0 z-40 animate-bounce">
+            <div className="mx-auto w-fit bg-red-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-red-400">
               <span className="emoji-consistent mr-1">💥</span>
               YOU BLEW UP JET
               <span className="emoji-consistent ml-1">🚀💨</span>
