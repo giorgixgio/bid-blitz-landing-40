@@ -361,7 +361,7 @@ const Auction = () => {
           {/* Mobile-first: Bidding section (appears first on mobile) */}
           <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
             {/* Mobile-optimized Timer and Current Price */}
-            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-slate-700 to-slate-800 border-slate-600/20 shadow-lg">
+            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-blue-600/80 to-blue-700/80 border-blue-500/20 shadow-lg">
               <div className="space-y-3 sm:space-y-4">
                 <div className="text-center">
                   <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
@@ -390,7 +390,7 @@ const Auction = () => {
             </Card>
 
             {/* Mobile-optimized User Bid Credits */}
-            <Card className="p-3 sm:p-4 bg-gradient-to-r from-slate-600 to-slate-700 border-slate-500/20 shadow-lg">
+            <Card className="p-3 sm:p-4 bg-gradient-to-r from-orange-500/70 to-orange-600/70 border-orange-400/20 shadow-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -420,8 +420,8 @@ const Auction = () => {
                     onClick={handleBid}
                     className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden ${
                       userJustBid 
-                        ? 'bg-gradient-to-r from-red-200/40 to-red-300/40' // Much lighter red background when filling
-                        : 'bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600'
+                        ? 'bg-gradient-to-r from-green-300/50 to-green-400/50' // Light green background when filling
+                        : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500'
                     } disabled:from-muted disabled:to-muted`}
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
@@ -445,7 +445,7 @@ const Auction = () => {
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md z-0">
                       <div 
-                        className="h-full bg-gradient-to-r from-slate-600 to-slate-700 transition-all duration-1000 ease-linear"
+                        className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
                       />
                     </div>
@@ -460,7 +460,7 @@ const Auction = () => {
                   </div>
                 )}
 
-                <Button variant="outline" className="w-full h-12 text-sm sm:text-base">
+                <Button variant="outline" className="w-full h-12 text-sm sm:text-base border-orange-400/30 hover:bg-orange-500/10">
                   <Coins className="w-4 h-4 mr-2" />
                   ბიდების შეძენა
                 </Button>
@@ -535,7 +535,7 @@ const Auction = () => {
               onClick={handleBid}
               disabled={userBidCredits <= 0 || timeLeft <= 0}
               size="sm"
-              className="bg-slate-600 hover:bg-slate-500 text-white font-bold px-4"
+              className="bg-green-500 hover:bg-green-400 text-white font-bold px-4"
             >
               ბიდი
             </Button>
