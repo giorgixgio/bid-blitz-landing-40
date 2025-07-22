@@ -437,7 +437,7 @@ const Auction = () => {
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
                       <div 
-                        className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-linear"
+                        className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-linear rounded-md"
                         style={{ width: `${bidProgress}%` }}
                       />
                     </div>
