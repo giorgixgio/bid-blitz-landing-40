@@ -207,8 +207,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     if (isAuctionEnded || isCoinVisible) return;
     
     const spawnCoin = () => {
-      // 5% chance to spawn a coin every 3 seconds
-      if (Math.random() < 0.05) {
+      // 80% chance to spawn a coin every 1 second (for testing)
+      if (Math.random() < 0.8) {
         // Spawn coin randomly along the jet's path
         const randomX = 20 + Math.random() * 60; // Between 20% and 80%
         const randomY = 30 + Math.random() * 50; // Between 30% and 80%
@@ -216,14 +216,14 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         setCoinPosition({ x: randomX, y: randomY });
         setIsCoinVisible(true);
         
-        // Auto-hide coin after 8 seconds if not collected
+        // Auto-hide coin after 5 seconds if not collected (shorter for testing)
         setTimeout(() => {
           setIsCoinVisible(false);
-        }, 8000);
+        }, 5000);
       }
     };
     
-    const interval = setInterval(spawnCoin, 3000);
+    const interval = setInterval(spawnCoin, 1000); // Check every 1 second
     return () => clearInterval(interval);
   }, [isAuctionEnded, isCoinVisible]);
 
