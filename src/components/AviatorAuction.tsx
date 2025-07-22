@@ -25,6 +25,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentLeader, setCurrentLeader] = useState(lastBidder);
   const [previousLeader, setPreviousLeader] = useState('');
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [trailPoints, setTrailPoints] = useState<Array<{x: number, y: number, id: number}>>([]);
 
   // Update cat animation when bidder changes
   useEffect(() => {
@@ -35,6 +37,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       // Reset cat to start position when new bidder takes lead
       setCatPosition({ x: 10, y: 85 });
       setIsAnimating(true);
+      setZoomLevel(1);
+      setTrailPoints([]);
       
       // Start animation to finish line
       const animationTimer = setTimeout(() => {
@@ -42,6 +46,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         const targetX = 10 + (80 * progress / 100); // Move across screen
         const targetY = 85 - (70 * progress / 100); // Move up screen
         setCatPosition({ x: targetX, y: targetY });
+        setZoomLevel(1 + (progress / 100) * 0.5); // Zoom effect
       }, 100);
 
       return () => clearTimeout(animationTimer);
@@ -55,21 +60,35 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       const targetX = 10 + (80 * progress / 100);
       const targetY = 85 - (70 * progress / 100);
       setCatPosition({ x: targetX, y: targetY });
+      setZoomLevel(1 + (progress / 100) * 0.8); // More dramatic zoom for user
+      
+      // Add trail points
+      setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
     } else if (lastBidder !== 'შენ' && timeLeft > 0) {
       // For other bidders, animate based on remaining time
       const timeProgress = (15 - timeLeft) / 15 * 100;
       const targetX = 10 + (80 * timeProgress / 100);
       const targetY = 85 - (70 * timeProgress / 100);
       setCatPosition({ x: targetX, y: targetY });
+      setZoomLevel(1 + (timeProgress / 100) * 0.6); // Moderate zoom for others
+      
+      // Add trail points
+      setTrailPoints(prev => [...prev.slice(-4), { x: targetX, y: targetY, id: Date.now() }]);
     }
   }, [timeLeft, bidProgress, userJustBid, lastBidder]);
 
   return (
     <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden">
       {/* Aviator Game Area */}
-      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden">
-        {/* Grid pattern background */}
-        <div className="absolute inset-0 opacity-20">
+      <div 
+        className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden transition-transform duration-1000 ease-out"
+        style={{ transform: `scale(${zoomLevel})` }}
+      >
+        {/* Grid pattern background with zoom effect */}
+        <div 
+          className="absolute inset-0 opacity-20 transition-transform duration-1000"
+          style={{ transform: `scale(${zoomLevel * 1.2})` }}
+        >
           <svg width="100%" height="100%" className="w-full h-full">
             <defs>
               <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -88,7 +107,23 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           <span className="text-xs font-bold">FINISH</span>
         </div>
 
-        {/* Cat Player */}
+        {/* Trail Effect */}
+        {trailPoints.map((point, index) => (
+          <div
+            key={point.id}
+            className="absolute transition-all duration-1000 pointer-events-none"
+            style={{
+              left: `${point.x}%`,
+              top: `${point.y}%`,
+              transform: 'translate(-50%, -50%)',
+              opacity: (index + 1) / trailPoints.length * 0.6
+            }}
+          >
+            <div className="w-3 h-3 bg-yellow-400/60 rounded-full animate-pulse"></div>
+          </div>
+        ))}
+
+        {/* Flying Cat Player */}
         <div 
           className="absolute transition-all duration-1000 ease-out transform"
           style={{ 
@@ -98,14 +133,28 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           }}
         >
           <div className="relative">
-            <div className="text-2xl sm:text-3xl animate-bounce">🐱</div>
+            {/* Flying Cat with Flapping Ears */}
+            <div className="text-2xl sm:text-3xl relative">
+              🐱
+              {/* Flapping ear effects */}
+              <div className="absolute -top-1 -left-1 text-lg animate-pulse">👂</div>
+              <div className="absolute -top-1 -right-1 text-lg animate-pulse" style={{ animationDelay: '0.1s' }}>👂</div>
+              {/* Wing flap effect */}
+              <div className="absolute inset-0 animate-bounce" style={{ animationDuration: '0.5s' }}>
+                <div className="absolute -left-2 top-1 text-sm opacity-70 animate-ping">✨</div>
+                <div className="absolute -right-2 top-1 text-sm opacity-70 animate-ping" style={{ animationDelay: '0.2s' }}>✨</div>
+              </div>
+            </div>
             {/* Player name bubble */}
             <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white/90 text-black px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
               {lastBidder}
             </div>
-            {/* Trail effect when moving */}
+            {/* Enhanced trail effect when moving */}
             {isAnimating && (
-              <div className="absolute inset-0 bg-yellow-300/30 rounded-full animate-ping"></div>
+              <>
+                <div className="absolute inset-0 bg-yellow-300/30 rounded-full animate-ping"></div>
+                <div className="absolute inset-0 bg-blue-300/20 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
+              </>
             )}
           </div>
         </div>
