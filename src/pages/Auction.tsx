@@ -76,7 +76,7 @@ const Auction = () => {
   const [autoBidderEnabled, setAutoBidderEnabled] = useState(false); // Auto-bidding toggle
   
   // AUCTION ENDED STATE (temporary for testing)
-  const isAuctionEnded = true; // Set to true to see ended state
+  const isAuctionEnded = false; // Set to false to resume bidding
 
   // TOAST NOTIFICATIONS
   const { toast } = useToast();
@@ -494,7 +494,7 @@ const Auction = () => {
               userBidCredits={userBidCredits}
               userJustBid={userJustBid}
               bidProgress={bidProgress}
-              isAuctionEnded={true}
+              isAuctionEnded={isAuctionEnded}
             />
 
             {/* User's Bid Credits Display */}
