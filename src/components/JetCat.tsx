@@ -32,14 +32,17 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
 
   return (
     <div className="relative">
-      {/* Jet body - 25% bigger with emoji fallback system */}
+      {/* Jet body - 25% bigger with forced desktop emoji style */}
       <div className="text-4xl sm:text-5xl relative">
-        {/* Force consistent emoji rendering across devices */}
+        {/* Force desktop-style emoji rendering */}
         <span 
+          className="inline-block"
           style={{ 
-            fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif',
+            fontFamily: '"Segoe UI Emoji", "Apple Color Emoji"',
             fontSize: 'inherit',
-            lineHeight: 1
+            lineHeight: 1,
+            fontFeatureSettings: '"cmap" 1',
+            textRendering: 'optimizeLegibility'
           }}
         >
           🚀
@@ -48,7 +51,8 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg bg-white/20 rounded-full px-1 backdrop-blur-sm border border-white/30">
           <span 
             style={{ 
-              fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif'
+              fontFamily: '"Segoe UI Emoji", "Apple Color Emoji"',
+              fontFeatureSettings: '"cmap" 1'
             }}
           >
             🐱
@@ -59,7 +63,8 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xl animate-bounce">
             <span 
               style={{ 
-                fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif'
+                fontFamily: '"Segoe UI Emoji", "Apple Color Emoji"',
+                fontFeatureSettings: '"cmap" 1'
               }}
             >
               👑
