@@ -160,9 +160,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   }, [isAuctionEnded]);
 
   return (
-    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-50">
+    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10">
       {/* GAME AREA */}
-      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-50">
+      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-10">
         
         {/* Background with zoom effect */}
         <div 
@@ -211,7 +211,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         {/* FLYING JET CAT */}
         <div className="absolute inset-0">
           <div 
-            className="absolute transition-all duration-1000 ease-out transform z-30"
+            className="absolute transition-all duration-1000 ease-out transform z-20"
             style={{ 
               left: isAuctionEnded ? '90%' : `${jetPosition.x}%`, 
               top: isAuctionEnded ? '15%' : `${jetPosition.y}%`,
