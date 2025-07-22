@@ -27,6 +27,28 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [previousLeader, setPreviousLeader] = useState('');
   const [zoomLevel, setZoomLevel] = useState(1);
   const [trailPoints, setTrailPoints] = useState<Array<{x: number, y: number, id: number}>>([]);
+  const [milliseconds, setMilliseconds] = useState(0);
+
+  // Milliseconds countdown effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMilliseconds(prev => {
+        if (prev <= 0) {
+          return 99; // Reset to 99 when reaching 0
+        }
+        return prev - 1;
+      });
+    }, 10); // Update every 10ms for smooth animation
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Reset milliseconds when timer resets
+  useEffect(() => {
+    if (timeLeft === 10) { // When timer resets to full
+      setMilliseconds(99);
+    }
+  }, [timeLeft]);
 
   // Update cat animation when bidder changes
   useEffect(() => {
@@ -179,8 +201,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
         {/* Center Timer Display - Aviator style */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-30">
-          <div className={`text-4xl sm:text-6xl font-bold ${timeLeft <= 3 ? 'text-red-400 animate-pulse' : 'text-white'} drop-shadow-lg`}>
-            {String(timeLeft).padStart(2, '0')}
+          <div className={`text-4xl sm:text-6xl font-bold ${timeLeft <= 3 ? 'text-red-400 animate-pulse' : 'text-white'} drop-shadow-lg flex items-center justify-center gap-1`}>
+            <span>{String(timeLeft).padStart(2, '0')}</span>
+            <span className="text-2xl sm:text-3xl text-white/70">.{String(milliseconds).padStart(2, '0')}</span>
           </div>
           <div className="text-xs sm:text-sm text-white/80 mt-1">SECONDS</div>
         </div>
