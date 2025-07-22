@@ -481,6 +481,7 @@ const Auction = () => {
               userBidCredits={userBidCredits}
               userJustBid={userJustBid}
               bidProgress={bidProgress}
+              isAuctionEnded={true}
             />
 
             {/* User's Bid Credits Display */}
