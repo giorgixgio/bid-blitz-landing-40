@@ -234,10 +234,7 @@ const Auction = () => {
       }));
     });
 
-    toast({
-      title: "ბიდი წარმატებით განთავსდა!",
-      description: `ახალი ფასი: ${(currentPrice + PRICE_INCREMENT).toFixed(2)} ₾`,
-    });
+    // Removed toast notification for smoother UX
   };
 
   const nextImage = () => {
@@ -512,9 +509,9 @@ const Auction = () => {
           </div>
         </div>
 
-        {/* Sticky Bottom Bar */}
-        <div className={`fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-3 shadow-lg transition-transform duration-300 z-50 ${
-          showStickyBar ? 'translate-y-0' : 'translate-y-full'
+        {/* Sticky Top Bar - below header */}
+        <div className={`fixed top-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-3 shadow-lg transition-transform duration-300 z-40 ${
+          showStickyBar ? 'translate-y-0' : '-translate-y-full'
         }`}>
           <div className="container mx-auto flex items-center gap-3">
             <div className="flex-shrink-0">
