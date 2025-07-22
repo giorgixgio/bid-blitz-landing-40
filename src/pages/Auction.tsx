@@ -25,6 +25,7 @@ const Auction = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [lastBidder, setLastBidder] = useState('vako12');
+  const [showStickyBar, setShowStickyBar] = useState(true);
   const { toast } = useToast();
 
   const BID_COST = 0.60; // Cost per bid in ₾
@@ -47,6 +48,23 @@ const Auction = () => {
     { id: 4, name: 'Roma17', bidNumber: totalBidsPlaced - 3, time: '52 წამის წინ', avatar: '/placeholder.svg' },
     { id: 5, name: 'jemiko10', bidNumber: totalBidsPlaced - 4, time: '1 წუთის წინ', avatar: '/placeholder.svg' },
   ];
+
+  // Scroll detection for sticky bar
+  useEffect(() => {
+    const handleScroll = () => {
+      const productSection = document.getElementById('product-images');
+      if (productSection) {
+        const rect = productSection.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+        setShowStickyBar(!isVisible);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Timer countdown effect - resets to TIME_EXTENSION when bid is placed
   useEffect(() => {
@@ -106,7 +124,7 @@ const Auction = () => {
           {/* Mobile-first: Bidding section comes first on mobile */}
           <div className="order-2 lg:order-1 space-y-4 sm:space-y-6">{/* Left Column - Product Details */}
             {/* Product Images - Mobile optimized */}
-            <Card className="overflow-hidden">
+            <Card id="product-images" className="overflow-hidden">
               <div className="relative aspect-square bg-muted/10">
                 <img
                   src={productImages[currentImageIndex]} 
@@ -338,6 +356,37 @@ const Auction = () => {
                 ))}
               </div>
             </Card>
+          </div>
+        </div>
+
+        {/* Sticky Bottom Bar */}
+        <div className={`fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-3 shadow-lg transition-transform duration-300 z-50 ${
+          showStickyBar ? 'translate-y-0' : 'translate-y-full'
+        }`}>
+          <div className="container mx-auto flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <img 
+                src={productImages[currentImageIndex]} 
+                alt="Samsung Galaxy S25 Ultra"
+                className="w-12 h-12 rounded-lg object-cover border border-border"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm truncate">Samsung S938B Galaxy S25 Ultra</h3>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="font-bold text-primary">{currentPrice.toFixed(2)} ₾</span>
+                <span>•</span>
+                <span>{String(timeLeft).padStart(2, '0')} წამი</span>
+              </div>
+            </div>
+            <Button 
+              onClick={handleBid}
+              disabled={userBidCredits <= 0 || timeLeft <= 0}
+              size="sm"
+              className="bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90 text-white font-bold px-4"
+            >
+              ბიდი
+            </Button>
           </div>
         </div>
       </div>
