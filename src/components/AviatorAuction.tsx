@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Gavel, Users, Coins, Smartphone } from 'lucide-react';
+import { Gavel, Users, Coins, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { JetCat } from './JetCat';
 import confetti from 'canvas-confetti';
 
@@ -46,6 +46,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [milliseconds, setMilliseconds] = useState(0); // Millisecond counter
   const [isExploding, setIsExploding] = useState(false); // Explosion state
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
+  const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -68,6 +69,61 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [timeLeft]);
 
+  // SOUND EFFECTS FUNCTIONS
+  const playExplosionSound = () => {
+    if (!soundEnabled) return;
+    try {
+      // Create explosion sound using Web Audio API
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Explosion sound - low frequency burst
+      oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.1);
+      oscillator.type = 'sawtooth';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (error) {
+      console.log('Audio not supported');
+    }
+  };
+
+  const playWinningSound = () => {
+    if (!soundEnabled) return;
+    try {
+      // Create winning swoosh sound
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Winning swoosh - rising frequency
+      oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.3);
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+      console.log('Audio not supported');
+    }
+  };
+
   // JET ANIMATION - Update position when bidder changes
   useEffect(() => {
     if (lastBidder !== currentLeader) {
@@ -75,11 +131,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       if (currentLeader && lastBidder === 'შენ') {
         // Show "YOU BLEW UP JET" message when user bids
         setShowBlowUpMessage(true);
+        playWinningSound(); // Play winning sound when user becomes leader
         setTimeout(() => setShowBlowUpMessage(false), 3000); // Hide after 3 seconds
       }
       
       if (currentLeader) {
         setIsExploding(true);
+        playExplosionSound(); // Play explosion sound when jet explodes
         
         // Stop explosion after animation
         setTimeout(() => {
@@ -168,6 +226,20 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   return (
     <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
+      {/* SOUND TOGGLE - Top left corner */}
+      <div className="absolute top-2 left-2 z-50">
+        <button
+          onClick={() => setSoundEnabled(!soundEnabled)}
+          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-2 transition-colors"
+        >
+          {soundEnabled ? (
+            <Volume2 className="w-4 h-4 text-white" />
+          ) : (
+            <VolumeX className="w-4 h-4 text-white/60" />
+          )}
+        </button>
+      </div>
+
       {/* GAME AREA */}
       <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-10">
         
