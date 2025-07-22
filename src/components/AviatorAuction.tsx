@@ -134,8 +134,14 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       const audioContext = new AudioContext();
       musicContextRef.current = audioContext;
 
-      // Create aviator-style ambient background music
-      const createAmbientTone = (frequency: number, duration: number, delay: number = 0) => {
+      // Musical notes frequencies (in Hz)
+      const notes = {
+        C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
+        C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99
+      };
+
+      // Create a musical note
+      const playNote = (frequency: number, startTime: number, duration: number, volume: number = 0.1) => {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         const filterNode = audioContext.createBiquadFilter();
@@ -144,47 +150,61 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         filterNode.connect(gainNode);
         gainNode.connect(audioContext.destination);
         
-        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + delay);
-        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(frequency, startTime);
+        oscillator.type = 'triangle'; // Warmer sound than sine
         
-        // Low-pass filter for ambient feel
+        // Add some warmth with low-pass filter
         filterNode.type = 'lowpass';
-        filterNode.frequency.setValueAtTime(800, audioContext.currentTime + delay);
+        filterNode.frequency.setValueAtTime(2000, startTime);
         
-        // Gentle fade in/out
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime + delay);
-        gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + delay + 1);
-        gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + delay + duration - 1);
-        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + delay + duration);
+        // Smooth envelope
+        gainNode.gain.setValueAtTime(0, startTime);
+        gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.1);
+        gainNode.gain.linearRampToValueAtTime(volume * 0.7, startTime + duration - 0.2);
+        gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
         
-        oscillator.start(audioContext.currentTime + delay);
-        oscillator.stop(audioContext.currentTime + delay + duration);
+        oscillator.start(startTime);
+        oscillator.stop(startTime + duration);
         
         return oscillator;
       };
 
-      // Create layered ambient music
-      const playAmbientLoop = () => {
+      // Positive uplifting melody pattern
+      const playMelodyLoop = () => {
         if (!musicEnabled) return;
         
-        // Base drone
-        createAmbientTone(110, 8, 0); // A2
-        createAmbientTone(165, 6, 2); // E3
-        createAmbientTone(220, 4, 4); // A3
+        const currentTime = audioContext.currentTime;
+        const noteDuration = 0.6;
         
-        // Subtle harmony
-        createAmbientTone(132, 5, 1); // C3
-        createAmbientTone(196, 3, 5); // G3
+        // Main melody - uplifting progression
+        const melody = [
+          notes.C4, notes.E4, notes.G4, notes.C5,  // C major chord arpeggio
+          notes.A4, notes.C5, notes.E5, notes.A4,  // A minor chord arpeggio  
+          notes.F4, notes.A4, notes.C5, notes.F5,  // F major chord arpeggio
+          notes.G4, notes.B4, notes.D5, notes.G4   // G major chord arpeggio
+        ];
+        
+        // Play melody
+        melody.forEach((note, index) => {
+          playNote(note, currentTime + (index * noteDuration), noteDuration, 0.08);
+        });
+        
+        // Add harmonic bass notes (played softer and longer)
+        const bassNotes = [notes.C4, notes.A4, notes.F4, notes.G4];
+        bassNotes.forEach((note, index) => {
+          playNote(note * 0.5, currentTime + (index * noteDuration * 4), noteDuration * 4, 0.04); // Octave lower
+        });
         
         // Schedule next loop
+        const loopDuration = melody.length * noteDuration * 1000; // Convert to milliseconds
         setTimeout(() => {
           if (musicEnabled && musicContextRef.current) {
-            playAmbientLoop();
+            playMelodyLoop();
           }
-        }, 8000);
+        }, loopDuration);
       };
 
-      playAmbientLoop();
+      playMelodyLoop();
     } catch (error) {
       console.log('Background music not supported');
     }
