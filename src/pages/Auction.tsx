@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Clock, 
@@ -33,6 +34,8 @@ const Auction = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [lastBidder, setLastBidder] = useState('vako12');
   const [showStickyBar, setShowStickyBar] = useState(true);
+  const [bidProgress, setBidProgress] = useState(0); // Progress bar for user bid
+  const [userJustBid, setUserJustBid] = useState(false); // Track if user just placed a bid
   const { toast } = useToast();
 
   const BID_COST = 0.60; // Cost per bid in ₾
@@ -131,6 +134,10 @@ const Auction = () => {
         setTimeLeft(TIME_EXTENSION);
         setLastBidder(randomBidder);
         
+        // Reset user bid progress when someone else bids
+        setBidProgress(0);
+        setUserJustBid(false);
+        
       }, Math.random() * 1000 + 500); // Random delay between 0.5-1.5 seconds
       
       return () => clearTimeout(timer);
@@ -164,6 +171,19 @@ const Auction = () => {
     }
   }, [timeLeft]);
 
+  // Bid progress effect - fills up over time when user bids
+  useEffect(() => {
+    if (userJustBid && bidProgress < 100) {
+      const progressTimer = setTimeout(() => {
+        setBidProgress(prev => {
+          const increment = 100 / TIME_EXTENSION; // Fill over the countdown duration
+          return Math.min(prev + increment, 100);
+        });
+      }, 1000);
+      return () => clearTimeout(progressTimer);
+    }
+  }, [userJustBid, bidProgress]);
+
   const handleBid = () => {
     if (userBidCredits <= 0) {
       toast({
@@ -189,6 +209,10 @@ const Auction = () => {
     setTotalBidsPlaced(prev => prev + 1);
     setTimeLeft(TIME_EXTENSION); // Reset timer
     setLastBidder('შენ'); // You are now the highest bidder
+    
+    // Start bid progress animation
+    setBidProgress(0);
+    setUserJustBid(true);
 
     // Update bid history with user bid
     setRecentBidders(prev => {
@@ -391,23 +415,39 @@ const Auction = () => {
                   </p>
                 </div>
                 
-                {/* Extra large mobile-friendly BID button */}
-                <Button 
-                  onClick={handleBid}
-                  className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90 disabled:from-muted disabled:to-muted shadow-lg text-white transform transition-transform active:scale-95"
-                  disabled={userBidCredits <= 0 || timeLeft <= 0}
-                >
-                  {timeLeft <= 0 ? (
-                    "აუქციონი დასრულდა"
-                  ) : userBidCredits <= 0 ? (
-                    "არ გაქვს ბიდები"
-                  ) : (
-                    <>
-                      <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                      ბიდი ({BID_COST} ₾)
-                    </>
+                {/* Extra large mobile-friendly BID button with progress */}
+                <div className="relative">
+                  <Button 
+                    onClick={handleBid}
+                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90 disabled:from-muted disabled:to-muted shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden"
+                    disabled={userBidCredits <= 0 || timeLeft <= 0}
+                  >
+                    {timeLeft <= 0 ? (
+                      "აუქციონი დასრულდა"
+                    ) : userBidCredits <= 0 ? (
+                      "არ გაქვს ბიდები"
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                        ბიდი ({BID_COST} ₾)
+                      </>
+                    )}
+                  </Button>
+                  
+                  {/* Progress overlay - only show when user just bid */}
+                  {userJustBid && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      <Progress 
+                        value={bidProgress} 
+                        className="h-full bg-transparent"
+                        style={{
+                          '--progress-background': 'rgba(255, 255, 255, 0.2)',
+                          '--progress-foreground': 'rgba(255, 255, 255, 0.4)'
+                        } as React.CSSProperties}
+                      />
+                    </div>
                   )}
-                </Button>
+                </div>
 
                 {userBidCredits <= 5 && userBidCredits > 0 && (
                   <div className="text-center p-3 bg-destructive/10 rounded-lg border border-destructive/20">
