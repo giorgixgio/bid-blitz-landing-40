@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Clock, 
@@ -18,7 +19,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Coins,
-  Zap
+  Zap,
+  Bot
 } from 'lucide-react';
 
 // Import product images
@@ -41,6 +43,7 @@ const Auction = () => {
   const [bidProgress, setBidProgress] = useState(0); // Progress bar for user bid
   const [userJustBid, setUserJustBid] = useState(false); // Track if user just placed a bid
   const [showBuyBidsSheet, setShowBuyBidsSheet] = useState(false); // Control buy bids sheet
+  const [autoBidderEnabled, setAutoBidderEnabled] = useState(false); // Autobidder toggle
   const { toast } = useToast();
 
   const BID_COST = 0.60; // Cost per bid in ₾
@@ -104,7 +107,20 @@ const Auction = () => {
 
   const [recentBidders, setRecentBidders] = useState(() => generateBidHistory(totalBidsPlaced));
 
-  // Automatic bidding system
+  // Autobidder functionality
+  useEffect(() => {
+    if (!autoBidderEnabled) return;
+    
+    const autoBidInterval = setInterval(() => {
+      if (timeLeft > 0 && timeLeft <= 3 && userBidCredits > 0) {
+        handleBid();
+      }
+    }, Math.random() * 2000 + 1000); // Random interval between 1-3 seconds
+    
+    return () => clearInterval(autoBidInterval);
+  }, [autoBidderEnabled, timeLeft, userBidCredits]);
+
+  // Automatic bidding system (dummy bids)
   useEffect(() => {
     if (timeLeft <= 0) return;
 
@@ -164,11 +180,18 @@ const Auction = () => {
     setShowStickyBar(true); // Always show sticky bar
   }, []);
 
-  // Timer countdown effect - resets to TIME_EXTENSION when bid is placed
+  // Timer countdown effect - modified for testing (extends forever)
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => {
-        setTimeLeft(prev => prev - 1);
+        setTimeLeft(prev => {
+          const newTime = prev - 1;
+          // For testing: automatically extend time when it gets to 1 second
+          if (newTime <= 1) {
+            return TIME_EXTENSION; // Reset to full time for testing
+          }
+          return newTime;
+        });
       }, 1000);
       return () => clearTimeout(timer);
     }
@@ -522,6 +545,22 @@ const Auction = () => {
                     </div>
                   </SheetContent>
                 </Sheet>
+
+                {/* Autobidder Toggle */}
+                <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border">
+                  <div className="flex items-center gap-2">
+                    <Bot className="w-4 h-4 text-primary" />
+                    <div>
+                      <p className="font-medium text-sm">ავტო-ბიდერი</p>
+                      <p className="text-xs text-muted-foreground">ავტომატურად განათავსებს ბიდებს</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={autoBidderEnabled}
+                    onCheckedChange={setAutoBidderEnabled}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                </div>
 
                 <p className="text-xs text-muted-foreground text-center">
                   ტაიმერი განახლდება ყოველი ბიდის შემდეგ {TIME_EXTENSION} წამით
