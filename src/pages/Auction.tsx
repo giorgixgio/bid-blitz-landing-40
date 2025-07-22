@@ -389,11 +389,18 @@ const Auction = () => {
                   </p>
                 </div>
                 
+                {/* You Are Winning text above button */}
+                {userJustBid && (
+                  <div className="text-center mb-2">
+                    <span className="text-yellow-400 font-bold text-lg animate-pulse">YOU ARE WINNING!</span>
+                  </div>
+                )}
+                
                 {/* Extra large mobile-friendly BID button with progress */}
                 <div className="relative">
                   <Button 
                     onClick={handleBid}
-                    className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 disabled:from-muted disabled:to-muted`}
+                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden bg-gradient-to-r from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted"
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
@@ -402,7 +409,7 @@ const Auction = () => {
                       ) : userBidCredits <= 0 ? (
                         "არ გაქვს ბიდები"
                       ) : userJustBid ? (
-                        "YOU ARE WINNING!"
+                        <span className="opacity-50">ბიდი ({BID_COST} ₾)</span>
                       ) : (
                         <>
                           <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -416,7 +423,7 @@ const Auction = () => {
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md z-0">
                       <div 
-                        className="h-full bg-gradient-to-r from-green-300 to-green-400 transition-all duration-1000 ease-linear"
+                        className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
                       />
                     </div>
