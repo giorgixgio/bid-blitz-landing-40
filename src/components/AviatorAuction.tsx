@@ -275,42 +275,54 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </div>
       </div>
 
-      {/* CONFETTI ANIMATION FOR AUCTION ENDED */}
+      {/* CONFETTI ANIMATION FOR AUCTION ENDED - VERY SLOW LIKE FIREWORKS */}
       {isAuctionEnded && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-          {/* Slow continuous confetti with firework-like timing */}
-          {[...Array(15)].map((_, i) => (
+          {/* Super slow confetti - like real fireworks */}
+          {[...Array(8)].map((_, i) => (
             <div
               key={i}
-              className="absolute animate-pulse opacity-60"
+              className="absolute opacity-70"
               style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-                animationDelay: `${Math.random() * 10}s`,
-                animationDuration: `${6 + Math.random() * 4}s`,
-                fontSize: `${14 + Math.random() * 6}px`
+                left: `${20 + Math.random() * 60}%`,
+                top: `${20 + Math.random() * 60}%`,
+                animation: `fadeInOut ${15 + Math.random() * 10}s infinite`,
+                animationDelay: `${Math.random() * 20}s`,
+                fontSize: `${16 + Math.random() * 4}px`
               }}
             >
               {['🎉', '🎊', '✨', '🌟', '💫'][Math.floor(Math.random() * 5)]}
             </div>
           ))}
           
-          {/* Even slower floating elements */}
-          {[...Array(8)].map((_, i) => (
+          {/* Ultra slow floating elements */}
+          {[...Array(5)].map((_, i) => (
             <div
-              key={`slow-${i}`}
-              className="absolute animate-bounce opacity-40"
+              key={`ultra-slow-${i}`}
+              className="absolute opacity-50"
               style={{
-                left: `${15 + Math.random() * 70}%`,
-                top: `${15 + Math.random() * 70}%`,
-                animationDelay: `${Math.random() * 15}s`,
-                animationDuration: `${8 + Math.random() * 6}s`,
-                fontSize: `${12 + Math.random() * 4}px`
+                left: `${30 + Math.random() * 40}%`,
+                top: `${30 + Math.random() * 40}%`,
+                animation: `gentleFloat ${20 + Math.random() * 15}s infinite`,
+                animationDelay: `${Math.random() * 25}s`,
+                fontSize: `${14 + Math.random() * 3}px`
               }}
             >
-              {['⭐', '💰', '🥇', '🎁', '💎'][Math.floor(Math.random() * 5)]}
+              {['⭐', '💰', '🥇'][Math.floor(Math.random() * 3)]}
             </div>
           ))}
+          
+          {/* Add custom CSS animations for very slow movement */}
+          <style>{`
+            @keyframes fadeInOut {
+              0%, 100% { opacity: 0; transform: translateY(0px); }
+              50% { opacity: 0.7; transform: translateY(-10px); }
+            }
+            @keyframes gentleFloat {
+              0%, 100% { opacity: 0; transform: translateY(0px) rotate(0deg); }
+              50% { opacity: 0.5; transform: translateY(-5px) rotate(5deg); }
+            }
+          `}</style>
         </div>
       )}
 
