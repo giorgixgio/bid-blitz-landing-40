@@ -426,23 +426,25 @@ const Auction = () => {
                     } disabled:from-muted disabled:to-muted`}
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
-                    {timeLeft <= 0 ? (
-                      "აუქციონი დასრულდა"
-                    ) : userBidCredits <= 0 ? (
-                      "არ გაქვს ბიდები"
-                    ) : userJustBid ? (
-                      "YOU ARE WINNING!"
-                    ) : (
-                      <>
-                        <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                        ბიდი ({BID_COST} ₾)
-                      </>
-                    )}
+                    <span className="relative z-10">
+                      {timeLeft <= 0 ? (
+                        "აუქციონი დასრულდა"
+                      ) : userBidCredits <= 0 ? (
+                        "არ გაქვს ბიდები"
+                      ) : userJustBid ? (
+                        "YOU ARE WINNING!"
+                      ) : (
+                        <>
+                          <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                          ბიდი ({BID_COST} ₾)
+                        </>
+                      )}
+                    </span>
                   </Button>
                   
                   {/* Progress overlay - filled part has original button colors */}
                   {userJustBid && (
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md z-0">
                       <div 
                         className="h-full bg-gradient-to-r from-primary to-destructive transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
