@@ -278,37 +278,37 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       {/* CONFETTI ANIMATION FOR AUCTION ENDED */}
       {isAuctionEnded && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-          {/* Continuous confetti with staggered timing */}
-          {[...Array(30)].map((_, i) => (
+          {/* Slow continuous confetti with firework-like timing */}
+          {[...Array(15)].map((_, i) => (
             <div
               key={i}
-              className="absolute animate-bounce opacity-80"
+              className="absolute animate-pulse opacity-60"
               style={{
                 left: `${10 + Math.random() * 80}%`,
                 top: `${10 + Math.random() * 80}%`,
-                animationDelay: `${Math.random() * 4}s`,
-                animationDuration: `${3 + Math.random() * 2}s`,
-                fontSize: `${12 + Math.random() * 8}px`
+                animationDelay: `${Math.random() * 10}s`,
+                animationDuration: `${6 + Math.random() * 4}s`,
+                fontSize: `${14 + Math.random() * 6}px`
               }}
             >
-              {['🎉', '🎊', '✨', '🌟', '💫', '🔥', '💎', '🏆'][Math.floor(Math.random() * 8)]}
+              {['🎉', '🎊', '✨', '🌟', '💫'][Math.floor(Math.random() * 5)]}
             </div>
           ))}
           
-          {/* Floating confetti with different animation */}
-          {[...Array(20)].map((_, i) => (
+          {/* Even slower floating elements */}
+          {[...Array(8)].map((_, i) => (
             <div
-              key={`float-${i}`}
-              className="absolute animate-pulse opacity-60"
+              key={`slow-${i}`}
+              className="absolute animate-bounce opacity-40"
               style={{
-                left: `${5 + Math.random() * 90}%`,
-                top: `${5 + Math.random() * 90}%`,
-                animationDelay: `${Math.random() * 6}s`,
-                animationDuration: `${4 + Math.random() * 3}s`,
-                fontSize: `${10 + Math.random() * 6}px`
+                left: `${15 + Math.random() * 70}%`,
+                top: `${15 + Math.random() * 70}%`,
+                animationDelay: `${Math.random() * 15}s`,
+                animationDuration: `${8 + Math.random() * 6}s`,
+                fontSize: `${12 + Math.random() * 4}px`
               }}
             >
-              {['⭐', '💰', '🥇', '🎁', '💝'][Math.floor(Math.random() * 5)]}
+              {['⭐', '💰', '🥇', '🎁', '💎'][Math.floor(Math.random() * 5)]}
             </div>
           ))}
         </div>
