@@ -98,10 +98,10 @@ const Auction = () => {
   useEffect(() => {
     if (timeLeft <= 0) return;
 
-    const shouldBid = Math.random() < 0.4; // 40% chance to bid each second
-    const minTimeForBid = 2; // Don't bid if less than 2 seconds left
+    const shouldBid = Math.random() < 0.6; // 60% chance to bid each second (increased)
+    const minTimeForBid = 1; // Reduced minimum time to keep bidding active longer
     
-    if (shouldBid && timeLeft > minTimeForBid && timeLeft < 13) {
+    if (shouldBid && timeLeft > minTimeForBid && timeLeft < 14) { // Extended range
       const timer = setTimeout(() => {
         // Select random bidder
         const randomBidder = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
@@ -420,7 +420,7 @@ const Auction = () => {
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md z-0">
                       <div 
-                        className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-linear"
+                        className="h-full bg-green-400/30 transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
                       />
                     </div>
