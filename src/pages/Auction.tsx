@@ -419,13 +419,19 @@ const Auction = () => {
                 <div className="relative">
                   <Button 
                     onClick={handleBid}
-                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90 disabled:from-muted disabled:to-muted shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden"
+                    className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden ${
+                      userJustBid 
+                        ? 'bg-gradient-to-r from-red-300/50 to-red-400/50' // Lighter background when winning
+                        : 'bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90'
+                    } disabled:from-muted disabled:to-muted`}
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
                     {timeLeft <= 0 ? (
                       "აუქციონი დასრულდა"
                     ) : userBidCredits <= 0 ? (
                       "არ გაქვს ბიდები"
+                    ) : userJustBid ? (
+                      "YOU ARE WINNING!"
                     ) : (
                       <>
                         <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
@@ -434,16 +440,12 @@ const Auction = () => {
                     )}
                   </Button>
                   
-                  {/* Progress overlay - only show when user just bid */}
+                  {/* Progress overlay - always show when user just bid */}
                   {userJustBid && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      <Progress 
-                        value={bidProgress} 
-                        className="h-full bg-transparent"
-                        style={{
-                          '--progress-background': 'rgba(255, 255, 255, 0.2)',
-                          '--progress-foreground': 'rgba(255, 255, 255, 0.4)'
-                        } as React.CSSProperties}
+                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-primary to-destructive rounded-md overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-primary to-destructive transition-all duration-1000 ease-linear"
+                        style={{ width: `${bidProgress}%` }}
                       />
                     </div>
                   )}
