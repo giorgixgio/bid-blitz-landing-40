@@ -1,17 +1,35 @@
+/**
+ * AUCTION PAGE COMPONENT
+ * ======================
+ * 
+ * This is the main auction page where users can:
+ * 1. View product details and images
+ * 2. Place bids on items
+ * 3. Buy additional bid credits
+ * 4. Enable/disable autobidder
+ * 5. View recent bidders
+ * 
+ * PENNY AUCTION MECHANICS:
+ * - Each bid costs 0.60₾ and increases the item price by 0.01₾
+ * - Timer resets to 10 seconds after each bid
+ * - Last bidder when timer hits 0 wins the item
+ * - Timer automatically extends forever for testing purposes
+ */
+
 import React, { useState, useEffect } from 'react';
+
+// UI Component Imports
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+
+// Icon Imports
 import { 
   Clock, 
-  Gavel, 
   TrendingUp, 
   Users, 
   Heart,
@@ -23,40 +41,58 @@ import {
   Bot
 } from 'lucide-react';
 
-// Import product images
+// Asset Imports - Samsung Galaxy S25 Ultra Images
 import galaxyMainImage from '@/assets/samsung-galaxy-s25-ultra.jpg';
 import galaxyBackImage from '@/assets/samsung-galaxy-s25-ultra-back.jpg';
 import galaxySideImage from '@/assets/samsung-galaxy-s25-ultra-side.jpg';
 import galaxySPenImage from '@/assets/samsung-galaxy-s25-ultra-spen.jpg';
+
+// Component Imports
 import Header from '@/components/Header';
 import { AviatorAuction } from '@/components/AviatorAuction';
 
 const Auction = () => {
-  const [currentPrice, setCurrentPrice] = useState(0.01); // Penny auction starts at 1 cent
+  /* ================================
+   * STATE MANAGEMENT
+   * ================================ */
+
+  // AUCTION CORE STATE
+  const [currentPrice, setCurrentPrice] = useState(0.01); // Starting price (1 cent)
   const [userBidCredits, setUserBidCredits] = useState(45); // User's remaining bids
-  const [timeLeft, setTimeLeft] = useState(10); // Seconds left
-  const [totalBidsPlaced, setTotalBidsPlaced] = useState(847);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [lastBidder, setLastBidder] = useState('vako12');
-  const [showStickyBar, setShowStickyBar] = useState(true);
-  const [bidProgress, setBidProgress] = useState(0); // Progress bar for user bid
-  const [userJustBid, setUserJustBid] = useState(false); // Track if user just placed a bid
-  const [showBuyBidsSheet, setShowBuyBidsSheet] = useState(false); // Control buy bids sheet
-  const [autoBidderEnabled, setAutoBidderEnabled] = useState(false); // Autobidder toggle
+  const [timeLeft, setTimeLeft] = useState(10); // Countdown timer in seconds
+  const [totalBidsPlaced, setTotalBidsPlaced] = useState(847); // Total bids on this item
+  const [lastBidder, setLastBidder] = useState('vako12'); // Current highest bidder
+
+  // UI STATE
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // Product image carousel
+  const [isLiked, setIsLiked] = useState(false); // Heart/favorite status
+  const [showBuyBidsSheet, setShowBuyBidsSheet] = useState(false); // Bid purchase modal
+
+  // BID PROGRESS ANIMATION STATE
+  const [bidProgress, setBidProgress] = useState(0); // Progress bar fill percentage (0-100)
+  const [userJustBid, setUserJustBid] = useState(false); // Tracks if user just placed a bid
+
+  // AUTOBIDDER STATE
+  const [autoBidderEnabled, setAutoBidderEnabled] = useState(false); // Auto-bidding toggle
+
+  // TOAST NOTIFICATIONS
   const { toast } = useToast();
 
-  const BID_COST = 0.60; // Cost per bid in ₾
-  const PRICE_INCREMENT = 0.01; // Each bid increases price by 1 cent
-  const TIME_EXTENSION = 10; // Seconds added per bid
+  /* ================================
+   * CONSTANTS & CONFIGURATION
+   * ================================ */
 
-  // Dummy bidders pool
+  const BID_COST = 0.60; // Cost per bid in Georgian Lari (₾)
+  const PRICE_INCREMENT = 0.01; // Item price increase per bid (1 cent)
+  const TIME_EXTENSION = 10; // Seconds added when bid is placed
+
+  // Pool of dummy bidder names for automated bids
   const dummyBidders = [
     'nika23', 'data77', 'mari_ge', 'luka2024', 'ana_k', 'saba99', 'nino_t', 'giorgi_m',
     'keti15', 'temo88', 'sophie_g', 'alex_tbilisi', 'maka_cute', 'oto_king', 'nata_geo'
   ];
 
-  // Product images - Samsung Galaxy S25 Ultra
+  // Product image array for carousel
   const productImages = [
     galaxyMainImage,
     galaxyBackImage, 
@@ -64,13 +100,22 @@ const Auction = () => {
     galaxySPenImage
   ];
 
-  // Generate initial bidders history
+  /* ================================
+   * HELPER FUNCTIONS
+   * ================================ */
+
+  /**
+   * Generates realistic bid history with timestamps
+   * Creates fake historical bids to populate the recent bidders list
+   */
   const generateBidHistory = (totalBids) => {
     const history = [];
     const usedNames = new Set();
     const now = new Date();
     
+    // Generate up to 10 historical bids
     for (let i = 0; i < Math.min(10, totalBids); i++) {
+      // Select unique bidder name
       let bidderName;
       do {
         bidderName = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
@@ -78,8 +123,8 @@ const Auction = () => {
       
       usedNames.add(bidderName);
       
-      // Generate timestamps going backwards
-      const secondsAgo = i === 0 ? 2 : 
+      // Generate realistic timestamps going backwards
+      const secondsAgo = i === 0 ? 2 :
                         i === 1 ? 18 :
                         i === 2 ? 35 :
                         i === 3 ? 52 :
@@ -105,13 +150,22 @@ const Auction = () => {
     return history;
   };
 
+  // Initialize recent bidders with generated history
   const [recentBidders, setRecentBidders] = useState(() => generateBidHistory(totalBidsPlaced));
 
-  // Autobidder functionality
+  /* ================================
+   * EFFECT HOOKS
+   * ================================ */
+
+  /**
+   * AUTOBIDDER FUNCTIONALITY
+   * Automatically places bids when enabled and conditions are met
+   */
   useEffect(() => {
     if (!autoBidderEnabled) return;
     
     const autoBidInterval = setInterval(() => {
+      // Only bid if time is low (last 3 seconds) and user has credits
       if (timeLeft > 0 && timeLeft <= 3 && userBidCredits > 0) {
         handleBid();
       }
@@ -120,26 +174,30 @@ const Auction = () => {
     return () => clearInterval(autoBidInterval);
   }, [autoBidderEnabled, timeLeft, userBidCredits]);
 
-  // Automatic bidding system (dummy bids)
+  /**
+   * DUMMY BIDDER SYSTEM
+   * Creates AI competitors that bid in the final seconds
+   */
   useEffect(() => {
     if (timeLeft <= 0) return;
 
-    const shouldBid = Math.random() < 0.7; // 70% chance to bid each second in final moments
+    const shouldBid = Math.random() < 0.7; // 70% chance to bid each second
     const minTimeForBid = 1; // Don't bid if less than 1 second left
     
-    if (shouldBid && timeLeft > minTimeForBid && timeLeft <= 4) { // Only bid in last 2-4 seconds
+    // Only bid in the final 2-4 seconds to create tension
+    if (shouldBid && timeLeft > minTimeForBid && timeLeft <= 4) {
       const timer = setTimeout(() => {
-        // Select random bidder
+        // Select random bidder from pool
         const randomBidder = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
         
         console.log(`Dummy bidder ${randomBidder} placing bid at ${timeLeft} seconds left`);
         
-        // Place automated bid
+        // Execute the automated bid
         setCurrentPrice(prev => prev + PRICE_INCREMENT);
         setTotalBidsPlaced(prev => {
           const newTotal = prev + 1;
           
-          // Update bid history
+          // Add to bid history with current timestamp
           setRecentBidders(prevBidders => {
             const now = new Date();
             const timeString = now.toLocaleTimeString('en-GB', { 
@@ -157,11 +215,14 @@ const Auction = () => {
               avatar: '/placeholder.svg'
             };
             
+            // Keep only latest 10 bidders
             return [newBidder, ...prevBidders.slice(0, 9)];
           });
           
           return newTotal;
         });
+        
+        // Reset timer and update game state
         setTimeLeft(TIME_EXTENSION);
         setLastBidder(randomBidder);
         
@@ -173,22 +234,20 @@ const Auction = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [timeLeft]); // Only depend on timeLeft
+  }, [timeLeft]);
 
-  // Sticky bar always visible
-  useEffect(() => {
-    setShowStickyBar(true); // Always show sticky bar
-  }, []);
-
-  // Timer countdown effect - modified for testing (extends forever)
+  /**
+   * COUNTDOWN TIMER
+   * Modified for testing - automatically extends when reaching 1 second
+   */
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => {
         setTimeLeft(prev => {
           const newTime = prev - 1;
-          // For testing: automatically extend time when it gets to 1 second
+          // FOR TESTING: Auto-extend timer to prevent crashes
           if (newTime <= 1) {
-            return TIME_EXTENSION; // Reset to full time for testing
+            return TIME_EXTENSION; // Reset to full time
           }
           return newTime;
         });
@@ -197,12 +256,15 @@ const Auction = () => {
     }
   }, [timeLeft]);
 
-  // Bid progress effect - fills up over time when user bids
+  /**
+   * BID PROGRESS ANIMATION
+   * Fills the progress bar gradually when user places a bid
+   */
   useEffect(() => {
     if (userJustBid && bidProgress < 100) {
       const progressTimer = setTimeout(() => {
         setBidProgress(prev => {
-          const increment = 100 / TIME_EXTENSION; // Fill over the countdown duration
+          const increment = 100 / TIME_EXTENSION; // Fill over countdown duration
           return Math.min(prev + increment, 100);
         });
       }, 1000);
@@ -210,7 +272,16 @@ const Auction = () => {
     }
   }, [userJustBid, bidProgress]);
 
+  /* ================================
+   * EVENT HANDLERS
+   * ================================ */
+
+  /**
+   * MAIN BID HANDLER
+   * Processes user bid placement with validation and state updates
+   */
   const handleBid = () => {
+    // Validation: Check if user has enough credits
     if (userBidCredits <= 0) {
       toast({
         title: "არ გაქვს საკმარისი ბიდები",
@@ -220,6 +291,7 @@ const Auction = () => {
       return;
     }
 
+    // Validation: Check if auction is still active
     if (timeLeft <= 0) {
       toast({
         title: "აუქციონი დასრულებულია",
@@ -229,18 +301,18 @@ const Auction = () => {
       return;
     }
 
-    // Place user bid
-    setCurrentPrice(prev => prev + PRICE_INCREMENT);
-    setUserBidCredits(prev => prev - 1);
-    setTotalBidsPlaced(prev => prev + 1);
-    setTimeLeft(TIME_EXTENSION); // Reset timer
-    setLastBidder('შენ'); // You are now the highest bidder
+    // Execute the bid
+    setCurrentPrice(prev => prev + PRICE_INCREMENT); // Increase item price
+    setUserBidCredits(prev => prev - 1); // Deduct bid credit
+    setTotalBidsPlaced(prev => prev + 1); // Increment total bids
+    setTimeLeft(TIME_EXTENSION); // Reset countdown timer
+    setLastBidder('შენ'); // Set user as highest bidder (Georgian: "You")
     
-    // Start bid progress animation
+    // Start progress animation
     setBidProgress(0);
     setUserJustBid(true);
 
-    // Update bid history with user bid
+    // Add user's bid to history
     setRecentBidders(prev => {
       const now = new Date();
       const timeString = now.toLocaleTimeString('en-GB', { 
@@ -252,7 +324,7 @@ const Auction = () => {
       
       const newBidder = {
         id: totalBidsPlaced + 1,
-        name: 'შენ',
+        name: 'შენ', // Georgian: "You"
         bidNumber: totalBidsPlaced + 1,
         time: timeString,
         avatar: '/placeholder.svg'
@@ -260,10 +332,11 @@ const Auction = () => {
       
       return [newBidder, ...prev.slice(0, 9)];
     });
-
-    // Removed toast notification for smoother UX
   };
 
+  /**
+   * IMAGE CAROUSEL HANDLERS
+   */
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
   };
@@ -272,25 +345,33 @@ const Auction = () => {
     setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
   };
 
+  /* ================================
+   * RENDER COMPONENT
+   * ================================ */
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+      {/* Site Header */}
       <Header />
+      
       <div className="container mx-auto p-3 sm:p-4 lg:p-8">
-        {/* Add top padding when sticky bar is visible */}
-        <div className={`transition-all duration-300 ${showStickyBar ? 'pt-16' : 'pt-0'}`}>
+        {/* Main Content Grid - Mobile-first responsive layout */}
         <div className="grid gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto lg:grid-cols-2">
           
-          {/* Mobile-first: Bidding section comes first on mobile */}
-          <div className="order-2 lg:order-1 space-y-4 sm:space-y-6">{/* Left Column - Product Details */}
-            {/* Product Images - Mobile optimized */}
-            <Card id="product-images" className="overflow-hidden">
+          {/* LEFT COLUMN - Product Details (Order 2 on mobile, 1 on desktop) */}
+          <div className="order-2 lg:order-1 space-y-4 sm:space-y-6">
+            
+            {/* Product Image Carousel */}
+            <Card className="overflow-hidden">
               <div className="relative aspect-square bg-muted/10">
+                {/* Main Product Image */}
                 <img
                   src={productImages[currentImageIndex]} 
                   alt="Samsung Galaxy S25 Ultra"
                   className="w-full h-full object-cover"
                 />
-                {/* Mobile-friendly navigation buttons */}
+                
+                {/* Carousel Navigation Buttons */}
                 <Button 
                   variant="ghost" 
                   size="icon"
@@ -308,7 +389,7 @@ const Auction = () => {
                   <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                 </Button>
                 
-                {/* Mobile-optimized action buttons */}
+                {/* Action Buttons (Heart/Share) */}
                 <div className="absolute top-3 right-3 flex gap-2">
                   <Button 
                     variant="ghost" 
@@ -328,7 +409,7 @@ const Auction = () => {
                 </div>
               </div>
               
-              {/* Mobile-optimized thumbnail navigation */}
+              {/* Thumbnail Navigation */}
               <div className="p-3 sm:p-4 border-t">
                 <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                   {productImages.map((img, index) => (
@@ -346,48 +427,52 @@ const Auction = () => {
               </div>
             </Card>
 
-            {/* Mobile-optimized Product Info */}
+            {/* Product Information */}
             <Card className="p-4 sm:p-6">
               <div className="space-y-3 sm:space-y-4">
+                {/* Product Title and Badge */}
                 <div className="flex items-start justify-between gap-2">
                   <h1 className="text-lg sm:text-2xl font-bold leading-tight">Samsung S938B Galaxy S25 Ultra</h1>
                   <Badge variant="secondary" className="ml-2 text-xs">
                     <TrendingUp className="w-3 h-3 mr-1" />
-                    ტოპ
+                    ტოპ {/* Georgian: "Top" */}
                   </Badge>
                 </div>
                 
+                {/* Product Specifications Grid */}
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                   <div>
-                    <span className="font-medium">საცალო ფასი:</span> 3599 ₾
+                    <span className="font-medium">საცალო ფასი:</span> 3599 ₾ {/* Retail Price */}
                   </div>
                   <div>
-                    <span className="font-medium">მდგომარეობა:</span> ახალი
+                    <span className="font-medium">მდგომარეობა:</span> ახალი {/* Condition: New */}
                   </div>
                   <div>
-                    <span className="font-medium">კატეგორია:</span> სმარტფონები
+                    <span className="font-medium">კატეგორია:</span> სმარტფონები {/* Category: Smartphones */}
                   </div>
                   <div>
-                    <span className="font-medium">ბრენდი:</span> Samsung
+                    <span className="font-medium">ბრენდი:</span> Samsung {/* Brand */}
                   </div>
                 </div>
 
+                {/* Features List */}
                 <div className="pt-3 sm:pt-4 border-t">
-                  <h3 className="font-semibold mb-2 text-sm sm:text-base">მახასიათებლები</h3>
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">მახასიათებლები</h3> {/* Features */}
                   <ul className="text-xs sm:text-sm text-muted-foreground space-y-1">
-                    <li>• 256GB მეხსიერება</li>
+                    <li>• 256GB მეხსიერება</li> {/* Storage */}
                     <li>• 12GB RAM</li>
-                    <li>• 200MP კამერა</li>
-                    <li>• S Pen-ით</li>
+                    <li>• 200MP კამერა</li> {/* Camera */}
+                    <li>• S Pen-ით</li> {/* With S Pen */}
                   </ul>
                 </div>
               </div>
             </Card>
           </div>
 
-          {/* Mobile-first: Bidding section (appears first on mobile) */}
+          {/* RIGHT COLUMN - Bidding Interface (Order 1 on mobile, 2 on desktop) */}
           <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
-            {/* Aviator Style Game */}
+            
+            {/* Aviator-Style Game Component */}
             <AviatorAuction
               currentPrice={currentPrice}
               timeLeft={timeLeft}
@@ -398,42 +483,43 @@ const Auction = () => {
               bidProgress={bidProgress}
             />
 
-            {/* Mobile-optimized User Bid Credits */}
+            {/* User's Bid Credits Display */}
             <Card className="p-3 sm:p-4 bg-gradient-to-r from-orange-500/70 to-orange-600/70 border-orange-400/20 shadow-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  <span className="font-medium text-sm sm:text-base text-white">შენი ბიდები</span>
+                  <span className="font-medium text-sm sm:text-base text-white">შენი ბიდები</span> {/* Your Bids */}
                 </div>
                 <div className="text-right">
                   <p className="text-xl sm:text-2xl font-bold text-white">{userBidCredits}</p>
-                  <p className="text-xs text-white/80">დარჩენილი</p>
+                  <p className="text-xs text-white/80">დარჩენილი</p> {/* Remaining */}
                 </div>
               </div>
             </Card>
 
-            {/* Mobile-optimized Bid Placement */}
+            {/* Bid Placement Interface */}
             <Card className="p-4 sm:p-6">
               <div className="space-y-3 sm:space-y-4">
+                {/* Section Header */}
                 <div className="text-center space-y-2">
-                  <h3 className="text-base sm:text-lg font-semibold">ბიდის განთავსება</h3>
+                  <h3 className="text-base sm:text-lg font-semibold">ბიდის განთავსება</h3> {/* Place Bid */}
                   <p className="text-xs sm:text-sm text-muted-foreground">
                     ყოველი ბიდი: <span className="font-bold text-primary">{BID_COST} ₾</span> | 
                     ფასი იზრდება: <span className="font-bold text-primary">+{PRICE_INCREMENT.toFixed(2)} ₾</span>
                   </p>
                 </div>
                 
-                {/* Extra large mobile-friendly BID button with progress */}
+                {/* Main Bid Button with Progress Animation */}
                 <div className="relative overflow-hidden rounded-md">
                   <Button 
                     onClick={handleBid}
                     className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative bg-gradient-to-r from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted rounded-md"
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
-                    {/* Empty button - text is positioned absolutely outside */}
+                    {/* Button content is handled by absolute positioned text below */}
                   </Button>
                   
-                  {/* Progress overlay - contained within parent container */}
+                  {/* Progress Animation Overlay */}
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none">
                       <div 
@@ -443,67 +529,71 @@ const Auction = () => {
                     </div>
                   )}
                   
-                  {/* Text positioned absolutely on top of everything */}
+                  {/* Button Text - Positioned Above Everything */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
                     <span className="flex items-center justify-center gap-2 text-lg sm:text-xl font-bold text-white drop-shadow-lg">
                       {timeLeft <= 0 ? (
-                        "აუქციონი დასრულდა"
+                        "აუქციონი დასრულდა" /* Auction Ended */
                       ) : userBidCredits <= 0 ? (
-                        "არ გაქვს ბიდები"
+                        "არ გაქვს ბიდები" /* No Bids */
                       ) : userJustBid ? (
                         "YOU ARE WINNING!"
                        ) : (
                          <>
                            <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
-                           <span>ბიდი ({BID_COST} ₾)</span>
+                           <span>ბიდი ({BID_COST} ₾)</span> {/* Bid */}
                          </>
                        )}
                      </span>
                    </div>
                  </div>
 
+                {/* Low Credits Warning */}
                 {userBidCredits <= 5 && userBidCredits > 0 && (
                   <div className="text-center p-3 bg-destructive/10 rounded-lg border border-destructive/20">
                     <p className="text-xs sm:text-sm text-destructive font-medium">
-                      ⚠️ მალე ბიდები დამთავრდება! შეიძინე ახალი ბიდები
+                      ⚠️ მალე ბიდები დამთავრდება! შეიძინე ახალი ბიდები {/* Bids running low! Buy new bids */}
                     </p>
                   </div>
                 )}
 
+                {/* Buy Bids Sheet Modal */}
                 <Sheet open={showBuyBidsSheet} onOpenChange={setShowBuyBidsSheet}>
                   <SheetTrigger asChild>
                     <Button variant="outline" className="w-full h-12 text-sm sm:text-base border-orange-400/30 hover:bg-orange-500/10">
                       <Coins className="w-4 h-4 mr-2" />
-                      ბიდების შეძენა
+                      ბიდების შეძენა {/* Buy Bids */}
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl overflow-y-auto">
                     <SheetHeader className="text-center pb-6">
-                      <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle>
-                      <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p>
+                      <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle> {/* Buy Bids */}
+                      <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p> {/* Choose bid package */}
                     </SheetHeader>
 
                     <div className="space-y-6 max-w-md mx-auto pb-8">
-                      {/* Bid Packages */}
+                      {/* Bid Package Options */}
                       <div className="grid gap-3">
+                        {/* Popular Package - Highlighted */}
                         <div className="p-4 border-2 border-orange-400 bg-orange-50 rounded-lg">
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-bold text-lg">50 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">ყველაზე პოპულარული</p>
+                              <p className="text-sm text-muted-foreground">ყველაზე პოპულარული</p> {/* Most Popular */}
                             </div>
                             <div className="text-right">
                               <p className="text-2xl font-bold text-orange-600">30₾</p>
-                              <p className="text-xs text-muted-foreground">0.60₾ თითო ბიდი</p>
+                              <p className="text-xs text-muted-foreground">0.60₾ თითო ბიდი</p> {/* Per bid */}
                             </div>
                           </div>
                         </div>
                         
+                        {/* Starter Package */}
                         <div className="p-4 border border-gray-200 rounded-lg">
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-bold">25 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">დამწყებთათვის</p>
+                              <p className="text-sm text-muted-foreground">დამწყებთათვის</p> {/* For Beginners */}
                             </div>
                             <div className="text-right">
                               <p className="text-xl font-bold">16₾</p>
@@ -512,11 +602,12 @@ const Auction = () => {
                           </div>
                         </div>
 
+                        {/* Value Package */}
                         <div className="p-4 border border-gray-200 rounded-lg">
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-bold">100 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">ყველაზე ოპტიმალური</p>
+                              <p className="text-sm text-muted-foreground">ყველაზე ოპტიმალური</p> {/* Most Optimal */}
                             </div>
                             <div className="text-right">
                               <p className="text-xl font-bold">55₾</p>
@@ -531,11 +622,12 @@ const Auction = () => {
                         <Button 
                           className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white shadow-lg"
                           onClick={() => {
+                            // Mock payment - adds 50 bids to user account
                             setUserBidCredits(prev => prev + 50);
                             setShowBuyBidsSheet(false);
                             toast({
-                              title: "ბიდები წარმატებით შეძენილია!",
-                              description: "50 ბიდი დაემატა თქვენს ანგარიშს",
+                              title: "ბიდები წარმატებით შეძენილია!", // Bids purchased successfully!
+                              description: "50 ბიდი დაემატა თქვენს ანგარიშს", // 50 bids added to your account
                             });
                           }}
                         >
@@ -551,8 +643,8 @@ const Auction = () => {
                   <div className="flex items-center gap-2">
                     <Bot className="w-4 h-4 text-primary" />
                     <div>
-                      <p className="font-medium text-sm">ავტო-ბიდერი</p>
-                      <p className="text-xs text-muted-foreground">ავტომატურად განათავსებს ბიდებს</p>
+                      <p className="font-medium text-sm">ავტო-ბიდერი</p> {/* Auto-bidder */}
+                      <p className="text-xs text-muted-foreground">ავტომატურად განათავსებს ბიდებს</p> {/* Automatically places bids */}
                     </div>
                   </div>
                   <Switch 
@@ -562,17 +654,18 @@ const Auction = () => {
                   />
                 </div>
 
+                {/* Timer Extension Info */}
                 <p className="text-xs text-muted-foreground text-center">
-                  ტაიმერი განახლდება ყოველი ბიდის შემდეგ {TIME_EXTENSION} წამით
+                  ტაიმერი განახლდება ყოველი ბიდის შემდეგ {TIME_EXTENSION} წამით {/* Timer extends by X seconds after each bid */}
                 </p>
               </div>
             </Card>
 
-            {/* Mobile-optimized Recent Bidders */}
+            {/* Recent Bidders List */}
             <Card className="p-4 sm:p-6">
               <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                ბოლო ბიდერები
+                ბოლო ბიდერები {/* Recent Bidders */}
               </h3>
               
               <div className="space-y-2 sm:space-y-3 max-h-60 sm:max-h-80 overflow-y-auto">
@@ -584,20 +677,22 @@ const Auction = () => {
                           <AvatarImage src={bidder.avatar} />
                           <AvatarFallback className="text-xs">{bidder.name.slice(0, 2)}</AvatarFallback>
                         </Avatar>
+                        {/* Online indicator for latest bidder */}
                         {index === 0 && (
                           <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-primary rounded-full animate-pulse" />
                         )}
                       </div>
                       <div>
                         <p className="font-medium text-xs sm:text-sm">{bidder.name}</p>
-                        <p className="text-xs text-muted-foreground">{bidder.time}</p>
+                        <p className="text-xs text-muted-foreground">{bidder.time}</p> {/* Timestamp */}
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-xs sm:text-sm">ბიდი #{bidder.bidNumber}</p>
+                      <p className="font-semibold text-xs sm:text-sm">ბიდი #{bidder.bidNumber}</p> {/* Bid # */}
+                      {/* Leader badge for top bidder */}
                       {index === 0 && (
                         <Badge variant="secondary" className="text-xs px-1 py-0">
-                          წამყვანი
+                          წამყვანი {/* Leader */}
                         </Badge>
                       )}
                     </div>
@@ -608,11 +703,10 @@ const Auction = () => {
           </div>
         </div>
 
-        {/* Sticky Top Bar - closer to header */}
-        <div className={`fixed top-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-2 shadow-lg transition-transform duration-300 z-40 ${
-          showStickyBar ? 'translate-y-0' : '-translate-y-full'
-        }`}>
+        {/* Sticky Top Bar - Quick Bidding Interface */}
+        <div className="fixed top-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-2 shadow-lg transition-transform duration-300 z-40">
           <div className="container mx-auto flex items-center gap-3">
+            {/* Product Thumbnail */}
             <div className="flex-shrink-0">
               <img 
                 src={productImages[currentImageIndex]} 
@@ -620,24 +714,27 @@ const Auction = () => {
                 className="w-12 h-12 rounded-lg object-cover border border-border"
               />
             </div>
+            
+            {/* Product Info */}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate">Samsung S938B Galaxy S25 Ultra</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="font-bold text-foreground">{currentPrice.toFixed(2)} ₾</span>
                 <span>•</span>
-                <span>{String(timeLeft).padStart(2, '0')} წამი</span>
+                <span>{String(timeLeft).padStart(2, '0')} წამი</span> {/* seconds */}
               </div>
             </div>
+            
+            {/* Quick Bid Button */}
             <Button 
               onClick={handleBid}
               disabled={userBidCredits <= 0 || timeLeft <= 0}
               size="sm"
               className="bg-green-500 hover:bg-green-400 text-white font-bold px-4"
             >
-              ბიდი
+              ბიდი {/* Bid */}
             </Button>
           </div>
-        </div>
         </div>
       </div>
     </div>
