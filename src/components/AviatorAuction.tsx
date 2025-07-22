@@ -134,7 +134,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     if (isAuctionEnded) {
       const duration = 15 * 1000;
       const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
 
       function randomInRange(min, max) {
         return Math.random() * (max - min) + min;
@@ -148,14 +148,10 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         }
 
         const particleCount = 50 * (timeLeft / duration);
-        // since particles fall down, start a bit higher than random
+        // Create confetti over the game area
         confetti(Object.assign({}, defaults, { 
           particleCount, 
-          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
-        }));
-        confetti(Object.assign({}, defaults, { 
-          particleCount, 
-          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+          origin: { x: randomInRange(0.1, 0.9), y: 0.1 } 
         }));
       }, 250);
 
