@@ -391,7 +391,15 @@ const Auction = () => {
                 
                 {/* Extra large mobile-friendly BID button with progress */}
                 <div className="relative">
-                  {/* Progress overlay - behind everything */}
+                  <Button 
+                    onClick={handleBid}
+                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative bg-gradient-to-r from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted"
+                    disabled={userBidCredits <= 0 || timeLeft <= 0}
+                  >
+                    {/* Empty button - text is positioned absolutely outside */}
+                  </Button>
+                  
+                  {/* Progress overlay */}
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
                       <div 
@@ -401,27 +409,24 @@ const Auction = () => {
                     </div>
                   )}
                   
-                  <Button 
-                    onClick={handleBid}
-                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative bg-gradient-to-r from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted"
-                    disabled={userBidCredits <= 0 || timeLeft <= 0}
-                  >
-                    <span className="relative z-30 flex items-center justify-center gap-2">
+                  {/* Text positioned absolutely on top of everything */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
+                    <span className="flex items-center justify-center gap-2 text-lg sm:text-xl font-bold text-white drop-shadow-lg">
                       {timeLeft <= 0 ? (
                         "აუქციონი დასრულდა"
                       ) : userBidCredits <= 0 ? (
                         "არ გაქვს ბიდები"
                       ) : userJustBid ? (
                         "YOU ARE WINNING!"
-                      ) : (
-                        <>
-                          <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
-                          <span>ბიდი ({BID_COST} ₾)</span>
-                        </>
-                      )}
-                    </span>
-                  </Button>
-                </div>
+                       ) : (
+                         <>
+                           <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+                           <span>ბიდი ({BID_COST} ₾)</span>
+                         </>
+                       )}
+                     </span>
+                   </div>
+                 </div>
 
                 {userBidCredits <= 5 && userBidCredits > 0 && (
                   <div className="text-center p-3 bg-destructive/10 rounded-lg border border-destructive/20">
