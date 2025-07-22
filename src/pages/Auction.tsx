@@ -100,64 +100,65 @@ const Auction = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <div className="container mx-auto p-4 lg:p-8">
-        <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      <div className="container mx-auto p-3 sm:p-4 lg:p-8">
+        <div className="grid gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto lg:grid-cols-2">
           
-          {/* Left Column - Product Details */}
-          <div className="space-y-6">
-            {/* Product Images */}
+          {/* Mobile-first: Bidding section comes first on mobile */}
+          <div className="order-2 lg:order-1 space-y-4 sm:space-y-6">{/* Left Column - Product Details */}
+            {/* Product Images - Mobile optimized */}
             <Card className="overflow-hidden">
               <div className="relative aspect-square bg-muted/10">
-                <img 
+                <img
                   src={productImages[currentImageIndex]} 
                   alt="Samsung Galaxy S25 Ultra"
                   className="w-full h-full object-cover"
                 />
+                {/* Mobile-friendly navigation buttons */}
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/90 hover:bg-background h-10 w-10 sm:h-12 sm:w-12"
                   onClick={prevImage}
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </Button>
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/90 hover:bg-background h-10 w-10 sm:h-12 sm:w-12"
                   onClick={nextImage}
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                 </Button>
                 
-                {/* Action buttons */}
-                <div className="absolute top-4 right-4 flex gap-2">
+                {/* Mobile-optimized action buttons */}
+                <div className="absolute top-3 right-3 flex gap-2">
                   <Button 
                     variant="ghost" 
                     size="icon"
-                    className="bg-background/80 hover:bg-background"
+                    className="bg-background/90 hover:bg-background h-9 w-9 sm:h-10 sm:w-10"
                     onClick={() => setIsLiked(!isLiked)}
                   >
-                    <Heart className={`w-4 h-4 ${isLiked ? 'fill-destructive text-destructive' : ''}`} />
+                    <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isLiked ? 'fill-destructive text-destructive' : ''}`} />
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="icon"
-                    className="bg-background/80 hover:bg-background"
+                    className="bg-background/90 hover:bg-background h-9 w-9 sm:h-10 sm:w-10"
                   >
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   </Button>
                 </div>
               </div>
               
-              {/* Thumbnail navigation */}
-              <div className="p-4 border-t">
-                <div className="flex gap-2 overflow-x-auto">
+              {/* Mobile-optimized thumbnail navigation */}
+              <div className="p-3 sm:p-4 border-t">
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                   {productImages.map((img, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
+                      className={`flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-md overflow-hidden border-2 transition-colors ${
                         index === currentImageIndex ? 'border-primary' : 'border-border hover:border-muted-foreground'
                       }`}
                     >
@@ -168,20 +169,20 @@ const Auction = () => {
               </div>
             </Card>
 
-            {/* Product Info */}
-            <Card className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <h1 className="text-2xl font-bold">Samsung S938B Galaxy S25 Ultra</h1>
-                  <Badge variant="secondary" className="ml-2">
+            {/* Mobile-optimized Product Info */}
+            <Card className="p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex items-start justify-between gap-2">
+                  <h1 className="text-lg sm:text-2xl font-bold leading-tight">Samsung S938B Galaxy S25 Ultra</h1>
+                  <Badge variant="secondary" className="ml-2 text-xs">
                     <TrendingUp className="w-3 h-3 mr-1" />
-                    ტოპ აუქციონი
+                    ტოპ
                   </Badge>
                 </div>
                 
-                <div className="grid sm:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                   <div>
-                    <span className="font-medium">სამყაროს ფასი:</span> 3599 ₾
+                    <span className="font-medium">საცალო ფასი:</span> 3599 ₾
                   </div>
                   <div>
                     <span className="font-medium">მდგომარეობა:</span> ახალი
@@ -194,9 +195,9 @@ const Auction = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t">
-                  <h3 className="font-semibold mb-2">მახასიათებლები</h3>
-                  <ul className="text-sm text-muted-foreground space-y-1">
+                <div className="pt-3 sm:pt-4 border-t">
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">მახასიათებლები</h3>
+                  <ul className="text-xs sm:text-sm text-muted-foreground space-y-1">
                     <li>• 256GB მეხსიერება</li>
                     <li>• 12GB RAM</li>
                     <li>• 200MP კამერა</li>
@@ -207,65 +208,66 @@ const Auction = () => {
             </Card>
           </div>
 
-          {/* Right Column - Bidding Section */}
-          <div className="space-y-6">
-            {/* Timer and Current Price */}
-            <Card className="p-6 text-center bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
-              <div className="space-y-4">
+          {/* Mobile-first: Bidding section (appears first on mobile) */}
+          <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
+            {/* Mobile-optimized Timer and Current Price */}
+            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">მიმდინარე ფასი</p>
-                  <p className="text-4xl font-bold text-primary">{currentPrice.toFixed(2)} ₾</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">მიმდინარე ფასი</p>
+                  <p className="text-3xl sm:text-4xl font-bold text-primary">{currentPrice.toFixed(2)} ₾</p>
                   <p className="text-xs text-muted-foreground">საცალო ფასი: 3599 ₾</p>
                 </div>
                 
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">დარჩენილი დრო</p>
-                  <div className={`text-3xl font-bold ${timeLeft <= 5 ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
+                  <p className="text-xs sm:text-sm text-muted-foreground">დარჩენილი დრო</p>
+                  <div className={`text-2xl sm:text-3xl font-bold ${timeLeft <= 5 ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
                     {String(timeLeft).padStart(2, '0')} წამი
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-center gap-4 text-sm">
+                <div className="flex items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div className="flex items-center gap-1 text-muted-foreground">
-                    <Gavel className="w-4 h-4" />
-                    <span>{totalBidsPlaced} ბიდი განთავსდა</span>
+                    <Gavel className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>{totalBidsPlaced} ბიდი</span>
                   </div>
                   <div className="flex items-center gap-1 text-muted-foreground">
-                    <Users className="w-4 h-4" />
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>წამყვანი: {lastBidder}</span>
                   </div>
                 </div>
               </div>
             </Card>
 
-            {/* User Bid Credits */}
-            <Card className="p-4 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/20">
+            {/* Mobile-optimized User Bid Credits */}
+            <Card className="p-3 sm:p-4 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Coins className="w-5 h-5 text-primary" />
-                  <span className="font-medium">შენი ბიდები</span>
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  <span className="font-medium text-sm sm:text-base">შენი ბიდები</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-primary">{userBidCredits}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-primary">{userBidCredits}</p>
                   <p className="text-xs text-muted-foreground">დარჩენილი</p>
                 </div>
               </div>
             </Card>
 
-            {/* Bid Placement */}
-            <Card className="p-6">
-              <div className="space-y-4">
+            {/* Mobile-optimized Bid Placement */}
+            <Card className="p-4 sm:p-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="text-center space-y-2">
-                  <h3 className="text-lg font-semibold">ბიდის განთავსება</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="text-base sm:text-lg font-semibold">ბიდის განთავსება</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     ყოველი ბიდი: <span className="font-bold text-primary">{BID_COST} ₾</span> | 
                     ფასი იზრდება: <span className="font-bold text-primary">+{PRICE_INCREMENT.toFixed(2)} ₾</span>
                   </p>
                 </div>
                 
+                {/* Extra large mobile-friendly BID button */}
                 <Button 
                   onClick={handleBid}
-                  className="w-full h-16 text-xl font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 disabled:from-muted disabled:to-muted"
+                  className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 disabled:from-muted disabled:to-muted shadow-lg"
                   disabled={userBidCredits <= 0 || timeLeft <= 0}
                 >
                   {timeLeft <= 0 ? (
@@ -274,7 +276,7 @@ const Auction = () => {
                     "არ გაქვს ბიდები"
                   ) : (
                     <>
-                      <Zap className="w-6 h-6 mr-2" />
+                      <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
                       ბიდი ({BID_COST} ₾)
                     </>
                   )}
@@ -282,13 +284,13 @@ const Auction = () => {
 
                 {userBidCredits <= 5 && userBidCredits > 0 && (
                   <div className="text-center p-3 bg-destructive/10 rounded-lg border border-destructive/20">
-                    <p className="text-sm text-destructive font-medium">
+                    <p className="text-xs sm:text-sm text-destructive font-medium">
                       ⚠️ მალე ბიდები დამთავრდება! შეიძინე ახალი ბიდები
                     </p>
                   </div>
                 )}
 
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full h-12 text-sm sm:text-base">
                   <Coins className="w-4 h-4 mr-2" />
                   ბიდების შეძენა
                 </Button>
@@ -299,33 +301,33 @@ const Auction = () => {
               </div>
             </Card>
 
-            {/* Recent Bidders */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5" />
+            {/* Mobile-optimized Recent Bidders */}
+            <Card className="p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                 ბოლო ბიდერები
               </h3>
               
-              <div className="space-y-3 max-h-80 overflow-y-auto">
+              <div className="space-y-2 sm:space-y-3 max-h-60 sm:max-h-80 overflow-y-auto">
                 {recentBidders.map((bidder, index) => (
-                  <div key={bidder.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-3">
+                  <div key={bidder.id} className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <div className="relative">
-                        <Avatar className="w-8 h-8">
+                        <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
                           <AvatarImage src={bidder.avatar} />
                           <AvatarFallback className="text-xs">{bidder.name.slice(0, 2)}</AvatarFallback>
                         </Avatar>
                         {index === 0 && (
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
+                          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-primary rounded-full animate-pulse" />
                         )}
                       </div>
                       <div>
-                        <p className="font-medium text-sm">{bidder.name}</p>
+                        <p className="font-medium text-xs sm:text-sm">{bidder.name}</p>
                         <p className="text-xs text-muted-foreground">{bidder.time}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-sm">ბიდი #{bidder.bidNumber}</p>
+                      <p className="font-semibold text-xs sm:text-sm">ბიდი #{bidder.bidNumber}</p>
                       {index === 0 && (
                         <Badge variant="secondary" className="text-xs px-1 py-0">
                           წამყვანი
