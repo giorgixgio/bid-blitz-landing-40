@@ -71,7 +71,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // JET COMBAT ANIMATION - Triggered when bidder changes
   useEffect(() => {
-    if (lastBidder !== currentLeader && currentLeader !== '') {
+    if (lastBidder !== currentLeader && currentLeader !== '' && battlePhase === 'idle') {
       console.log(`Battle initiated: ${currentLeader} vs ${lastBidder}`);
       
       // Phase 1: Launch missile attack
@@ -117,7 +117,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         clearTimeout(victoryTimer);
       };
     }
-  }, [lastBidder, currentLeader, jetPosition, bidProgress, timeLeft]);
+  }, [lastBidder, currentLeader, battlePhase]);
 
   // CONTINUOUS FLIGHT ANIMATION - Update jet position
   useEffect(() => {
