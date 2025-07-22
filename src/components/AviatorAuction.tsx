@@ -10,9 +10,9 @@
  * - Visual effects like trails and crash warnings
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
-import { Gavel, Users, Coins, Smartphone, Volume2, VolumeX } from 'lucide-react';
+import { Gavel, Users, Coins, Smartphone, Volume2, VolumeX, Music, Music2 } from 'lucide-react';
 import { JetCat } from './JetCat';
 import confetti from 'canvas-confetti';
 
@@ -47,6 +47,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [isExploding, setIsExploding] = useState(false); // Explosion state
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
   const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
+  const [musicEnabled, setMusicEnabled] = useState(false); // Background music toggle
+  const musicContextRef = useRef<AudioContext | null>(null);
+  const musicSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -123,6 +126,93 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       console.log('Audio not supported');
     }
   };
+
+  // BACKGROUND MUSIC FUNCTIONS
+  const startBackgroundMusic = async () => {
+    try {
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      const audioContext = new AudioContext();
+      musicContextRef.current = audioContext;
+
+      // Create aviator-style ambient background music
+      const createAmbientTone = (frequency: number, duration: number, delay: number = 0) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const filterNode = audioContext.createBiquadFilter();
+        
+        oscillator.connect(filterNode);
+        filterNode.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + delay);
+        oscillator.type = 'sine';
+        
+        // Low-pass filter for ambient feel
+        filterNode.type = 'lowpass';
+        filterNode.frequency.setValueAtTime(800, audioContext.currentTime + delay);
+        
+        // Gentle fade in/out
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime + delay);
+        gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + delay + 1);
+        gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + delay + duration - 1);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + delay + duration);
+        
+        oscillator.start(audioContext.currentTime + delay);
+        oscillator.stop(audioContext.currentTime + delay + duration);
+        
+        return oscillator;
+      };
+
+      // Create layered ambient music
+      const playAmbientLoop = () => {
+        if (!musicEnabled) return;
+        
+        // Base drone
+        createAmbientTone(110, 8, 0); // A2
+        createAmbientTone(165, 6, 2); // E3
+        createAmbientTone(220, 4, 4); // A3
+        
+        // Subtle harmony
+        createAmbientTone(132, 5, 1); // C3
+        createAmbientTone(196, 3, 5); // G3
+        
+        // Schedule next loop
+        setTimeout(() => {
+          if (musicEnabled && musicContextRef.current) {
+            playAmbientLoop();
+          }
+        }, 8000);
+      };
+
+      playAmbientLoop();
+    } catch (error) {
+      console.log('Background music not supported');
+    }
+  };
+
+  const stopBackgroundMusic = () => {
+    if (musicContextRef.current) {
+      musicContextRef.current.close();
+      musicContextRef.current = null;
+    }
+    if (musicSourceRef.current) {
+      musicSourceRef.current.stop();
+      musicSourceRef.current = null;
+    }
+  };
+
+  // Handle music toggle
+  useEffect(() => {
+    if (musicEnabled) {
+      startBackgroundMusic();
+    } else {
+      stopBackgroundMusic();
+    }
+    
+    return () => {
+      stopBackgroundMusic();
+    };
+  }, [musicEnabled]);
 
   // JET ANIMATION - Update position when bidder changes
   useEffect(() => {
@@ -226,16 +316,31 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   return (
     <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
-      {/* SOUND TOGGLE - Top left corner */}
-      <div className="absolute top-2 left-2 z-50">
+      {/* AUDIO CONTROLS - Top left corner */}
+      <div className="absolute top-2 left-2 z-50 flex gap-2">
+        {/* Sound Effects Toggle */}
         <button
           onClick={() => setSoundEnabled(!soundEnabled)}
           className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-2 transition-colors"
+          title={soundEnabled ? "Disable sound effects" : "Enable sound effects"}
         >
           {soundEnabled ? (
             <Volume2 className="w-4 h-4 text-white" />
           ) : (
             <VolumeX className="w-4 h-4 text-white/60" />
+          )}
+        </button>
+        
+        {/* Background Music Toggle */}
+        <button
+          onClick={() => setMusicEnabled(!musicEnabled)}
+          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-2 transition-colors"
+          title={musicEnabled ? "Disable background music" : "Enable background music"}
+        >
+          {musicEnabled ? (
+            <Music className="w-4 h-4 text-white" />
+          ) : (
+            <Music className="w-4 h-4 text-white/60" />
           )}
         </button>
       </div>
