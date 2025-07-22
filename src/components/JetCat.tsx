@@ -11,21 +11,37 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
   if (isExploding) {
     return (
       <div className="relative">
-        {/* Explosion effects */}
+        {/* Main explosion - bigger and more dramatic */}
         <div className="absolute inset-0 animate-ping">
-          <div className="text-4xl">💥</div>
+          <div className="text-6xl sm:text-7xl">💥</div>
         </div>
+        
+        {/* Secondary explosion effects */}
         <div className="absolute inset-0 animate-pulse" style={{ animationDelay: '0.1s' }}>
-          <div className="text-3xl opacity-80">🔥</div>
+          <div className="text-5xl sm:text-6xl opacity-90">🔥</div>
         </div>
+        
         <div className="absolute inset-0 animate-bounce" style={{ animationDelay: '0.2s' }}>
-          <div className="text-2xl opacity-60">💨</div>
+          <div className="text-4xl sm:text-5xl opacity-80">💨</div>
         </div>
-        {/* Debris */}
-        <div className="absolute -top-2 -left-2 animate-ping text-sm opacity-70">⚡</div>
-        <div className="absolute -top-2 -right-2 animate-ping text-sm opacity-70" style={{ animationDelay: '0.15s' }}>⚡</div>
-        <div className="absolute -bottom-2 -left-2 animate-ping text-sm opacity-70" style={{ animationDelay: '0.3s' }}>💫</div>
-        <div className="absolute -bottom-2 -right-2 animate-ping text-sm opacity-70" style={{ animationDelay: '0.45s' }}>💫</div>
+        
+        {/* Multiple explosion bursts */}
+        <div className="absolute -top-4 -left-4 animate-ping text-3xl opacity-80">💥</div>
+        <div className="absolute -top-4 -right-4 animate-ping text-3xl opacity-80" style={{ animationDelay: '0.15s' }}>💥</div>
+        <div className="absolute -bottom-4 -left-4 animate-ping text-3xl opacity-80" style={{ animationDelay: '0.3s' }}>💥</div>
+        <div className="absolute -bottom-4 -right-4 animate-ping text-3xl opacity-80" style={{ animationDelay: '0.45s' }}>💥</div>
+        
+        {/* Flying debris */}
+        <div className="absolute -top-6 left-0 animate-bounce text-2xl opacity-70" style={{ animationDelay: '0.1s' }}>⚡</div>
+        <div className="absolute -top-6 right-0 animate-bounce text-2xl opacity-70" style={{ animationDelay: '0.25s' }}>⚡</div>
+        <div className="absolute -bottom-6 left-0 animate-bounce text-2xl opacity-70" style={{ animationDelay: '0.4s' }}>💫</div>
+        <div className="absolute -bottom-6 right-0 animate-bounce text-2xl opacity-70" style={{ animationDelay: '0.55s' }}>💫</div>
+        
+        {/* Scattered jet pieces */}
+        <div className="absolute -top-8 -left-8 animate-spin text-xl opacity-60" style={{ animationDelay: '0.2s' }}>🔩</div>
+        <div className="absolute -top-8 -right-8 animate-spin text-xl opacity-60" style={{ animationDelay: '0.35s' }}>⚙️</div>
+        <div className="absolute -bottom-8 -left-8 animate-bounce text-xl opacity-60" style={{ animationDelay: '0.5s' }}>🔥</div>
+        <div className="absolute -bottom-8 -right-8 animate-bounce text-xl opacity-60" style={{ animationDelay: '0.65s' }}>💨</div>
       </div>
     );
   }
