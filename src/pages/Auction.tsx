@@ -74,6 +74,9 @@ const Auction = () => {
 
   // AUTOBIDDER STATE
   const [autoBidderEnabled, setAutoBidderEnabled] = useState(false); // Auto-bidding toggle
+  
+  // AUCTION ENDED STATE (temporary for testing)
+  const isAuctionEnded = true; // Set to true to see ended state
 
   // TOAST NOTIFICATIONS
   const { toast } = useToast();
@@ -514,8 +517,12 @@ const Auction = () => {
                 <div className="relative overflow-hidden rounded-md">
                   <Button 
                     onClick={handleBid}
-                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative bg-gradient-to-r from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted rounded-md"
-                    disabled={userBidCredits <= 0 || timeLeft <= 0}
+                    className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative bg-gradient-to-r rounded-md ${
+                      isAuctionEnded 
+                        ? 'from-gray-400 to-gray-500 opacity-50 cursor-not-allowed' 
+                        : 'from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted'
+                    }`}
+                    disabled={userBidCredits <= 0 || timeLeft <= 0 || isAuctionEnded}
                   >
                     {/* Button content is handled by absolute positioned text below */}
                   </Button>
@@ -533,7 +540,9 @@ const Auction = () => {
                   {/* Button Text - Positioned Above Everything */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
                     <span className="flex items-center justify-center gap-2 text-lg sm:text-xl font-bold text-white drop-shadow-lg">
-                      {timeLeft <= 0 ? (
+                      {isAuctionEnded ? (
+                        "აუქციონი დასრულდა" /* Auction Ended */
+                      ) : timeLeft <= 0 ? (
                         "აუქციონი დასრულდა" /* Auction Ended */
                       ) : userBidCredits <= 0 ? (
                         "არ გაქვს ბიდები" /* No Bids */

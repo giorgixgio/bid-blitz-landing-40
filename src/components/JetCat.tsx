@@ -4,9 +4,10 @@ interface JetCatProps {
   bidder: string;
   isUser: boolean;
   isExploding: boolean;
+  isAuctionEnded?: boolean;
 }
 
-export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding }) => {
+export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isAuctionEnded = false }) => {
   if (isExploding) {
     return (
       <div className="relative">
@@ -38,8 +39,8 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding }) =
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg bg-white/20 rounded-full px-1 backdrop-blur-sm border border-white/30">
           🐱
         </div>
-        {/* Crown for user */}
-        {isUser && (
+        {/* Crown for user or winner */}
+        {(isUser || isAuctionEnded) && (
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xl animate-bounce">
             👑
           </div>

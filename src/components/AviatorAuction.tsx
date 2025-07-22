@@ -182,8 +182,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           <div 
             className="absolute transition-all duration-1000 ease-out transform"
             style={{ 
-              left: `${jetPosition.x}%`, 
-              top: `${jetPosition.y}%`,
+              left: isAuctionEnded ? '90%' : `${jetPosition.x}%`, 
+              top: isAuctionEnded ? '15%' : `${jetPosition.y}%`,
               transform: 'translate(-50%, -50%)'
             }}
           >
@@ -192,9 +192,10 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
                 bidder={currentLeader} 
                 isUser={currentLeader === 'შენ'} 
                 isExploding={isExploding}
+                isAuctionEnded={isAuctionEnded}
               />
               {/* Movement effects */}
-              {isAnimating && !isExploding && (
+              {isAnimating && !isExploding && !isAuctionEnded && (
                 <>
                   <div className={`absolute inset-0 rounded-full animate-ping ${
                     currentLeader === 'შენ' ? 'bg-yellow-300/50' : 'bg-blue-300/30'
@@ -277,18 +278,37 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       {/* CONFETTI ANIMATION FOR AUCTION ENDED */}
       {isAuctionEnded && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-          {[...Array(20)].map((_, i) => (
+          {/* Continuous confetti with staggered timing */}
+          {[...Array(30)].map((_, i) => (
             <div
               key={i}
-              className="absolute animate-bounce text-2xl"
+              className="absolute animate-bounce opacity-80"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
+                left: `${10 + Math.random() * 80}%`,
+                top: `${10 + Math.random() * 80}%`,
+                animationDelay: `${Math.random() * 4}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
+                fontSize: `${12 + Math.random() * 8}px`
               }}
             >
-              {['🎉', '🎊', '✨', '🌟', '💫'][Math.floor(Math.random() * 5)]}
+              {['🎉', '🎊', '✨', '🌟', '💫', '🔥', '💎', '🏆'][Math.floor(Math.random() * 8)]}
+            </div>
+          ))}
+          
+          {/* Floating confetti with different animation */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={`float-${i}`}
+              className="absolute animate-pulse opacity-60"
+              style={{
+                left: `${5 + Math.random() * 90}%`,
+                top: `${5 + Math.random() * 90}%`,
+                animationDelay: `${Math.random() * 6}s`,
+                animationDuration: `${4 + Math.random() * 3}s`,
+                fontSize: `${10 + Math.random() * 6}px`
+              }}
+            >
+              {['⭐', '💰', '🥇', '🎁', '💝'][Math.floor(Math.random() * 5)]}
             </div>
           ))}
         </div>
