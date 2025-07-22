@@ -148,23 +148,9 @@ const Auction = () => {
     }
   }, [timeLeft]); // Only depend on timeLeft
 
-  // Scroll detection for sticky bar - show it earlier and keep it longer
+  // Sticky bar always visible
   useEffect(() => {
-    const handleScroll = () => {
-      const productSection = document.getElementById('product-images');
-      if (productSection) {
-        const rect = productSection.getBoundingClientRect();
-        // Show sticky bar when top 60% of product section is scrolled past
-        const threshold = window.innerHeight * 0.4; // Show when 60% scrolled past
-        const shouldShow = rect.top < threshold;
-        setShowStickyBar(shouldShow);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check initial state
-
-    return () => window.removeEventListener('scroll', handleScroll);
+    setShowStickyBar(true); // Always show sticky bar
   }, []);
 
   // Timer countdown effect - resets to TIME_EXTENSION when bid is placed
