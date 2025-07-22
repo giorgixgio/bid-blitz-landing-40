@@ -74,12 +74,14 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Reset milliseconds when main timer resets
+  // Reset states when main timer resets
   useEffect(() => {
     if (timeLeft === 10) { // When timer resets to full
       setMilliseconds(99);
-      setCoinCollectedThisRound(false); // Reset coin collection status for new round
-      setCurrentUserCollectedCoin(false); // Reset current user collection status
+      setCoinCollectedThisRound(false);
+      setCurrentUserCollectedCoin(false);
+      setShowSlotAnimation(false);
+      setShowOtherPlayerBonusMessage(false);
     }
   }, [timeLeft]);
 
@@ -284,13 +286,15 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // Simulate other player collecting coin - for testing
   useEffect(() => {
-    if (isCoinVisible && timeLeft <= 2 && Math.random() < 0.3) {
-      // 30% chance someone else grabs the coin when 2 seconds left
+    if (!isCoinVisible || coinCollectedThisRound || currentUserCollectedCoin) return;
+    
+    if (timeLeft <= 2 && Math.random() < 0.3) {
+      // Someone else collected the coin
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
-      // Don't set currentUserCollectedCoin to true, so this simulates "other player"
+      // currentUserCollectedCoin stays FALSE
       
-      // Show notification for other player collection
+      // Show ONLY the small notification
       setShowOtherPlayerBonusMessage(true);
       setTimeout(() => setShowOtherPlayerBonusMessage(false), 3000);
       
@@ -298,7 +302,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         onBonusBidCollected(false); // false = other player collected
       }
     }
-  }, [timeLeft, isCoinVisible, onBonusBidCollected]);
+  }, [timeLeft, isCoinVisible, coinCollectedThisRound, currentUserCollectedCoin, onBonusBidCollected]);
 
   // Handle slot animation completion
   const handleSlotComplete = () => {
