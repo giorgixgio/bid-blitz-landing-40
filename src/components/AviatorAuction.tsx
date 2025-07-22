@@ -27,7 +27,7 @@ interface AviatorAuctionProps {
   userJustBid: boolean;          // Whether user just placed a bid
   bidProgress: number;           // Progress percentage (0-100)
   isAuctionEnded?: boolean;      // Whether auction has ended
-  onBonusBidCollected?: () => void; // Callback when bonus bid is collected
+  onBonusBidCollected?: (isCurrentUser: boolean) => void; // Callback when bonus bid is collected
 }
 
 export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
@@ -56,6 +56,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [coinPosition, setCoinPosition] = useState({ x: 50, y: 50 });
   const [isCoinVisible, setIsCoinVisible] = useState(false);
   const [showSlotAnimation, setShowSlotAnimation] = useState(false);
+  const [coinCollectedThisRound, setCoinCollectedThisRound] = useState(false);
+  const [showOtherPlayerBonusMessage, setShowOtherPlayerBonusMessage] = useState(false);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -75,6 +77,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   useEffect(() => {
     if (timeLeft === 10) { // When timer resets to full
       setMilliseconds(99);
+      setCoinCollectedThisRound(false); // Reset coin collection status for new round
     }
   }, [timeLeft]);
 
@@ -202,13 +205,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
 
-  // LUCKY COIN SPAWNING - Only appear in last 4-5 seconds
+  // LUCKY COIN SPAWNING - Only appear in last 4-5 seconds if not collected this round
   useEffect(() => {
-    if (isAuctionEnded || isCoinVisible || timeLeft > 5 || timeLeft <= 0) return;
+    if (isAuctionEnded || isCoinVisible || timeLeft > 5 || timeLeft <= 0 || coinCollectedThisRound) return;
     
     const spawnCoin = () => {
-      // Only spawn during last 4-5 seconds (timeLeft 1-5)
-      if (timeLeft >= 1 && timeLeft <= 5) {
+      // Only spawn during last 4-5 seconds (timeLeft 1-5) and if no coin collected this round
+      if (timeLeft >= 1 && timeLeft <= 5 && !coinCollectedThisRound) {
         // Spawn coin ahead of the jet on its path
         const currentJetX = jetPosition.x;
         const currentJetY = jetPosition.y;
@@ -233,11 +236,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     // Spawn coin immediately when entering the 1-5 second window
     spawnCoin();
     
-  }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft]);
+  }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
   // COLLISION DETECTION - Check if jet hits the coin
   useEffect(() => {
-    if (!isCoinVisible) return;
+    if (!isCoinVisible || coinCollectedThisRound) return;
     
     const jetX = isAuctionEnded ? 90 : jetPosition.x;
     const jetY = isAuctionEnded ? 15 : jetPosition.y;
@@ -248,30 +251,41 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     );
     
     if (distance < 8) {
-      // Collision detected!
+      // Collision detected by current user!
       setIsCoinVisible(false);
+      setCoinCollectedThisRound(true);
       setShowSlotAnimation(true);
       
       // Play winning sound for bonus collection
       playWinningSound();
       
-      // Notify parent component about bonus collection
+      // Notify parent component about bonus collection (current user)
       if (onBonusBidCollected) {
-        onBonusBidCollected();
+        onBonusBidCollected(true); // true = current user collected
       }
     }
-  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected]);
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected, coinCollectedThisRound]);
 
   // Handle coin collection
   const handleCoinCollect = () => {
     setIsCoinVisible(false);
+    setCoinCollectedThisRound(true);
     setShowSlotAnimation(true);
     playWinningSound();
     
     if (onBonusBidCollected) {
-      onBonusBidCollected();
+      onBonusBidCollected(true); // true = current user collected
     }
   };
+
+  // Simulate other player collecting coin (for demo purposes)
+  useEffect(() => {
+    if (coinCollectedThisRound && !showSlotAnimation) {
+      // Someone else collected the coin - show notification
+      setShowOtherPlayerBonusMessage(true);
+      setTimeout(() => setShowOtherPlayerBonusMessage(false), 3000);
+    }
+  }, [coinCollectedThisRound, showSlotAnimation]);
 
   // Handle slot animation completion
   const handleSlotComplete = () => {
@@ -335,6 +349,17 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
               <span className="emoji-consistent mr-1">💥</span>
               YOU BLEW UP JET
               <span className="emoji-consistent ml-1">🚀💨</span>
+            </div>
+          </div>
+        )}
+
+        {/* OTHER PLAYER BONUS MESSAGE */}
+        {showOtherPlayerBonusMessage && (
+          <div className="absolute top-8 inset-x-0 z-40 animate-bounce">
+            <div className="mx-auto w-fit bg-yellow-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-yellow-400">
+              <span className="emoji-consistent mr-1">💰</span>
+              SOMEONE GOT BONUS BID
+              <span className="emoji-consistent ml-1">🎰✨</span>
             </div>
           </div>
         )}

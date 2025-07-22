@@ -495,8 +495,10 @@ const Auction = () => {
               userJustBid={userJustBid}
               bidProgress={bidProgress}
               isAuctionEnded={isAuctionEnded}
-              onBonusBidCollected={() => {
-                setUserBidCredits(prev => prev + 1);
+              onBonusBidCollected={(isCurrentUser: boolean) => {
+                if (isCurrentUser) {
+                  setUserBidCredits(prev => prev + 1);
+                }
               }}
             />
 
