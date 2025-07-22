@@ -202,13 +202,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
 
-  // LUCKY COIN SPAWNING - Always appear on the jet's path
+  // LUCKY COIN SPAWNING - Only appear in last 4-5 seconds
   useEffect(() => {
-    if (isAuctionEnded || isCoinVisible) return;
+    if (isAuctionEnded || isCoinVisible || timeLeft > 5 || timeLeft <= 0) return;
     
     const spawnCoin = () => {
-      // 80% chance to spawn a coin every 1 second (for testing)
-      if (Math.random() < 0.8) {
+      // Only spawn during last 4-5 seconds (timeLeft 1-5)
+      if (timeLeft >= 1 && timeLeft <= 5) {
         // Spawn coin ahead of the jet on its path
         const currentJetX = jetPosition.x;
         const currentJetY = jetPosition.y;
@@ -223,15 +223,16 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         setCoinPosition({ x: coinX, y: coinY });
         setIsCoinVisible(true);
         
-        // Auto-hide coin after 5 seconds if not collected (shorter for testing)
+        // Auto-hide coin after timeLeft seconds (so it disappears when timer resets)
         setTimeout(() => {
           setIsCoinVisible(false);
-        }, 5000);
+        }, timeLeft * 1000);
       }
     };
     
-    const interval = setInterval(spawnCoin, 1000); // Check every 1 second
-    return () => clearInterval(interval);
+    // Spawn coin immediately when entering the 1-5 second window
+    spawnCoin();
+    
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft]);
 
   // COLLISION DETECTION - Check if jet hits the coin
