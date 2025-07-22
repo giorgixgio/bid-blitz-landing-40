@@ -160,7 +160,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   }, [isAuctionEnded]);
 
   return (
-    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10">
+    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
       {/* GAME AREA */}
       <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-10">
         
