@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,16 +12,24 @@ import {
   Heart,
   Share2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Coins,
+  Zap
 } from 'lucide-react';
 
 const Auction = () => {
-  const [currentBid, setCurrentBid] = useState(3599);
-  const [bidAmount, setBidAmount] = useState('');
-  const [timeLeft, setTimeLeft] = useState({ hours: 2, minutes: 34, seconds: 15 });
+  const [currentPrice, setCurrentPrice] = useState(0.01); // Penny auction starts at 1 cent
+  const [userBidCredits, setUserBidCredits] = useState(45); // User's remaining bids
+  const [timeLeft, setTimeLeft] = useState(15); // Seconds left
+  const [totalBidsPlaced, setTotalBidsPlaced] = useState(847);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [lastBidder, setLastBidder] = useState('vako12');
   const { toast } = useToast();
+
+  const BID_COST = 0.60; // Cost per bid in ₾
+  const PRICE_INCREMENT = 0.01; // Each bid increases price by 1 cent
+  const TIME_EXTENSION = 15; // Seconds added per bid
 
   // Mock product images
   const productImages = [
@@ -32,48 +39,54 @@ const Auction = () => {
     '/placeholder.svg'
   ];
 
-  // Mock recent bidders
+  // Mock recent bidders for penny auction
   const recentBidders = [
-    { id: 1, name: 'vako12', amount: 3499, time: '2 წუთის წინ', avatar: '/placeholder.svg' },
-    { id: 2, name: 'zukito24', amount: 3450, time: '5 წუთის წინ', avatar: '/placeholder.svg' },
-    { id: 3, name: 'rezman777', amount: 3400, time: '8 წუთის წინ', avatar: '/placeholder.svg' },
-    { id: 4, name: 'Roma17', amount: 3350, time: '12 წუთის წინ', avatar: '/placeholder.svg' },
+    { id: 1, name: 'vako12', bidNumber: totalBidsPlaced, time: '2 წამის წინ', avatar: '/placeholder.svg' },
+    { id: 2, name: 'zukito24', bidNumber: totalBidsPlaced - 1, time: '18 წამის წინ', avatar: '/placeholder.svg' },
+    { id: 3, name: 'rezman777', bidNumber: totalBidsPlaced - 2, time: '35 წამის წინ', avatar: '/placeholder.svg' },
+    { id: 4, name: 'Roma17', bidNumber: totalBidsPlaced - 3, time: '52 წამის წინ', avatar: '/placeholder.svg' },
+    { id: 5, name: 'jemiko10', bidNumber: totalBidsPlaced - 4, time: '1 წუთის წინ', avatar: '/placeholder.svg' },
   ];
 
-  // Timer countdown effect
+  // Timer countdown effect - resets to TIME_EXTENSION when bid is placed
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        }
-        return prev;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft]);
 
   const handleBid = () => {
-    const bid = parseFloat(bidAmount);
-    if (!bid || bid <= currentBid) {
+    if (userBidCredits <= 0) {
       toast({
-        title: "არასწორი ბიდი",
-        description: `ბიდი უნდა იყოს ${currentBid + 1} ₾-ზე მეტი`,
+        title: "არ გაქვს საკმარისი ბიდები",
+        description: "შეიძინე დამატებითი ბიდები გასაგრძელებლად",
         variant: "destructive"
       });
       return;
     }
 
-    setCurrentBid(bid);
-    setBidAmount('');
+    if (timeLeft <= 0) {
+      toast({
+        title: "აუქციონი დასრულებულია",
+        description: "ვეღარ შეძლებ ბიდის განთავსებას",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Place bid
+    setCurrentPrice(prev => prev + PRICE_INCREMENT);
+    setUserBidCredits(prev => prev - 1);
+    setTotalBidsPlaced(prev => prev + 1);
+    setTimeLeft(TIME_EXTENSION); // Reset timer
+    setLastBidder('შენ'); // You are now the highest bidder
+
     toast({
       title: "ბიდი წარმატებით განთავსდა!",
-      description: `თქვენი ბიდი ${bid} ₾ განთავსდა`,
+      description: `ახალი ფასი: ${(currentPrice + PRICE_INCREMENT).toFixed(2)} ₾`,
     });
   };
 
@@ -196,29 +209,45 @@ const Auction = () => {
 
           {/* Right Column - Bidding Section */}
           <div className="space-y-6">
-            {/* Timer and Current Bid */}
+            {/* Timer and Current Price */}
             <Card className="p-6 text-center bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
               <div className="space-y-4">
-                <div className="flex justify-center items-center gap-4">
-                  <div className="text-left">
-                    <p className="text-sm text-muted-foreground">მიმდინარე ფასი</p>
-                    <p className="text-3xl font-bold text-primary">{currentBid} ₾</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">დარჩენილი დრო</p>
-                    <div className="flex gap-1 text-2xl font-bold text-destructive">
-                      <span>{String(timeLeft.hours).padStart(2, '0')}</span>
-                      <span>:</span>
-                      <span>{String(timeLeft.minutes).padStart(2, '0')}</span>
-                      <span>:</span>
-                      <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-                    </div>
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground">მიმდინარე ფასი</p>
+                  <p className="text-4xl font-bold text-primary">{currentPrice.toFixed(2)} ₾</p>
+                  <p className="text-xs text-muted-foreground">საცალო ფასი: 3599 ₾</p>
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground">დარჩენილი დრო</p>
+                  <div className={`text-3xl font-bold ${timeLeft <= 5 ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
+                    {String(timeLeft).padStart(2, '0')} წამი
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>აუქციონი ძალაშია</span>
+                <div className="flex items-center justify-center gap-4 text-sm">
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Gavel className="w-4 h-4" />
+                    <span>{totalBidsPlaced} ბიდი განთავსდა</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Users className="w-4 h-4" />
+                    <span>წამყვანი: {lastBidder}</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* User Bid Credits */}
+            <Card className="p-4 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Coins className="w-5 h-5 text-primary" />
+                  <span className="font-medium">შენი ბიდები</span>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-primary">{userBidCredits}</p>
+                  <p className="text-xs text-muted-foreground">დარჩენილი</p>
                 </div>
               </div>
             </Card>
@@ -226,52 +255,46 @@ const Auction = () => {
             {/* Bid Placement */}
             <Card className="p-6">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Gavel className="w-5 h-5" />
-                  ბიდის განთავსება
-                </h3>
-                
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      თქვენი ბიდი (მინ: {currentBid + 1} ₾)
-                    </label>
-                    <Input
-                      type="number"
-                      value={bidAmount}
-                      onChange={(e) => setBidAmount(e.target.value)}
-                      placeholder={`${currentBid + 50}`}
-                      className="text-lg h-12"
-                      min={currentBid + 1}
-                    />
-                  </div>
-                  
-                  <div className="flex gap-2 flex-wrap">
-                    {[50, 100, 200, 500].map((increment) => (
-                      <Button
-                        key={increment}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setBidAmount(String(currentBid + increment))}
-                        className="flex-1 min-w-[80px]"
-                      >
-                        +{increment} ₾
-                      </Button>
-                    ))}
-                  </div>
-                  
-                  <Button 
-                    onClick={handleBid}
-                    className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                    disabled={!bidAmount || parseFloat(bidAmount) <= currentBid}
-                  >
-                    <Gavel className="w-5 h-5 mr-2" />
-                    ბიდის განთავსება
-                  </Button>
+                <div className="text-center space-y-2">
+                  <h3 className="text-lg font-semibold">ბიდის განთავსება</h3>
+                  <p className="text-sm text-muted-foreground">
+                    ყოველი ბიდი: <span className="font-bold text-primary">{BID_COST} ₾</span> | 
+                    ფასი იზრდება: <span className="font-bold text-primary">+{PRICE_INCREMENT.toFixed(2)} ₾</span>
+                  </p>
                 </div>
+                
+                <Button 
+                  onClick={handleBid}
+                  className="w-full h-16 text-xl font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 disabled:from-muted disabled:to-muted"
+                  disabled={userBidCredits <= 0 || timeLeft <= 0}
+                >
+                  {timeLeft <= 0 ? (
+                    "აუქციონი დასრულდა"
+                  ) : userBidCredits <= 0 ? (
+                    "არ გაქვს ბიდები"
+                  ) : (
+                    <>
+                      <Zap className="w-6 h-6 mr-2" />
+                      ბიდი ({BID_COST} ₾)
+                    </>
+                  )}
+                </Button>
+
+                {userBidCredits <= 5 && userBidCredits > 0 && (
+                  <div className="text-center p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+                    <p className="text-sm text-destructive font-medium">
+                      ⚠️ მალე ბიდები დამთავრდება! შეიძინე ახალი ბიდები
+                    </p>
+                  </div>
+                )}
+
+                <Button variant="outline" className="w-full">
+                  <Coins className="w-4 h-4 mr-2" />
+                  ბიდების შეძენა
+                </Button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  ბიდის განთავსებით თქვენ ეთანხმებით ჩვენს წესებსა და პირობებს
+                  ტაიმერი განახლდება ყოველი ბიდის შემდეგ {TIME_EXTENSION} წამით
                 </p>
               </div>
             </Card>
@@ -283,7 +306,7 @@ const Auction = () => {
                 ბოლო ბიდერები
               </h3>
               
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-80 overflow-y-auto">
                 {recentBidders.map((bidder, index) => (
                   <div key={bidder.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
@@ -302,7 +325,7 @@ const Auction = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-sm">{bidder.amount} ₾</p>
+                      <p className="font-semibold text-sm">ბიდი #{bidder.bidNumber}</p>
                       {index === 0 && (
                         <Badge variant="secondary" className="text-xs px-1 py-0">
                           წამყვანი
