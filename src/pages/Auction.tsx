@@ -4,6 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Clock, 
@@ -36,6 +39,7 @@ const Auction = () => {
   const [showStickyBar, setShowStickyBar] = useState(true);
   const [bidProgress, setBidProgress] = useState(0); // Progress bar for user bid
   const [userJustBid, setUserJustBid] = useState(false); // Track if user just placed a bid
+  const [showBuyBidsSheet, setShowBuyBidsSheet] = useState(false); // Control buy bids sheet
   const { toast } = useToast();
 
   const BID_COST = 0.60; // Cost per bid in ₾
@@ -460,10 +464,124 @@ const Auction = () => {
                   </div>
                 )}
 
-                <Button variant="outline" className="w-full h-12 text-sm sm:text-base border-orange-400/30 hover:bg-orange-500/10">
-                  <Coins className="w-4 h-4 mr-2" />
-                  ბიდების შეძენა
-                </Button>
+                <Sheet open={showBuyBidsSheet} onOpenChange={setShowBuyBidsSheet}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="w-full h-12 text-sm sm:text-base border-orange-400/30 hover:bg-orange-500/10">
+                      <Coins className="w-4 h-4 mr-2" />
+                      ბიდების შეძენა
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl">
+                    <SheetHeader className="text-center pb-6">
+                      <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle>
+                      <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p>
+                    </SheetHeader>
+
+                    <div className="space-y-6 max-w-md mx-auto">
+                      {/* Bid Packages */}
+                      <div className="grid gap-3">
+                        <div className="p-4 border-2 border-orange-400 bg-orange-50 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-bold text-lg">50 ბიდი</h3>
+                              <p className="text-sm text-muted-foreground">ყველაზე პოპულარული</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-2xl font-bold text-orange-600">30₾</p>
+                              <p className="text-xs text-muted-foreground">0.60₾ თითო ბიდი</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-bold">25 ბიდი</h3>
+                              <p className="text-sm text-muted-foreground">დამწყებთათვის</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xl font-bold">16₾</p>
+                              <p className="text-xs text-muted-foreground">0.64₾ თითო ბიდი</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-bold">100 ბიდი</h3>
+                              <p className="text-sm text-muted-foreground">ყველაზე ოპტიმალური</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xl font-bold">55₾</p>
+                              <p className="text-xs text-muted-foreground">0.55₾ თითო ბიდი</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Payment Form */}
+                      <div className="pt-4 border-t">
+                        <h3 className="font-semibold mb-4">გადახდის დეტალები</h3>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="cardNumber">ბარათის ნომერი</Label>
+                            <Input 
+                              id="cardNumber" 
+                              placeholder="1234 5678 9012 3456" 
+                              defaultValue="4111 1111 1111 1111"
+                              className="font-mono"
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="expiry">ვადა</Label>
+                              <Input 
+                                id="expiry" 
+                                placeholder="MM/YY" 
+                                defaultValue="12/25"
+                                className="font-mono"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="cvv">CVV</Label>
+                              <Input 
+                                id="cvv" 
+                                placeholder="123" 
+                                defaultValue="123"
+                                className="font-mono"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label htmlFor="cardName">ბარათზე მითითებული სახელი</Label>
+                            <Input 
+                              id="cardName" 
+                              placeholder="John Doe" 
+                              defaultValue="John Doe"
+                            />
+                          </div>
+
+                          <Button 
+                            className="w-full h-12 text-lg font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white"
+                            onClick={() => {
+                              setUserBidCredits(prev => prev + 50);
+                              setShowBuyBidsSheet(false);
+                              toast({
+                                title: "ბიდები წარმატებით შეძენილია!",
+                                description: "50 ბიდი დაემატა თქვენს ანგარიშს",
+                              });
+                            }}
+                          >
+                            გადახდა - 30₾
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
 
                 <p className="text-xs text-muted-foreground text-center">
                   ტაიმერი განახლდება ყოველი ბიდის შემდეგ {TIME_EXTENSION} წამით
