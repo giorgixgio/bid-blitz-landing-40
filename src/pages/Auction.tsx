@@ -65,6 +65,7 @@ const Auction = () => {
   const generateBidHistory = (totalBids) => {
     const history = [];
     const usedNames = new Set();
+    const now = new Date();
     
     for (let i = 0; i < Math.min(10, totalBids); i++) {
       let bidderName;
@@ -74,17 +75,26 @@ const Auction = () => {
       
       usedNames.add(bidderName);
       
-      const timeAgo = i === 0 ? '2 წამის წინ' : 
-                     i === 1 ? '18 წამის წინ' :
-                     i === 2 ? '35 წამის წინ' :
-                     i === 3 ? '52 წამის წინ' :
-                     `${Math.floor(Math.random() * 5) + 1} წუთის წინ`;
+      // Generate timestamps going backwards
+      const secondsAgo = i === 0 ? 2 : 
+                        i === 1 ? 18 :
+                        i === 2 ? 35 :
+                        i === 3 ? 52 :
+                        Math.floor(Math.random() * 300) + 60; // 1-5 minutes ago
+      
+      const bidTime = new Date(now.getTime() - (secondsAgo * 1000));
+      const timeString = bidTime.toLocaleTimeString('en-GB', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+      });
       
       history.push({
         id: totalBids - i,
         name: bidderName,
         bidNumber: totalBids - i,
-        time: timeAgo,
+        time: timeString,
         avatar: '/placeholder.svg'
       });
     }
@@ -115,23 +125,23 @@ const Auction = () => {
           
           // Update bid history
           setRecentBidders(prevBidders => {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-GB', { 
+              hour12: false, 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              second: '2-digit' 
+            });
+            
             const newBidder = {
               id: newTotal,
               name: randomBidder,
               bidNumber: newTotal,
-              time: 'ახლა',
+              time: timeString,
               avatar: '/placeholder.svg'
             };
             
-            const updated = [newBidder, ...prevBidders.slice(0, 9)];
-            // Update timestamps
-            return updated.map((bidder, index) => ({
-              ...bidder,
-              time: index === 0 ? 'ახლა' :
-                    index === 1 ? '15 წამის წინ' :
-                    index === 2 ? '30 წამის წინ' :
-                    `${index * 15} წამის წინ`
-            }));
+            return [newBidder, ...prevBidders.slice(0, 9)];
           });
           
           return newTotal;
@@ -209,22 +219,23 @@ const Auction = () => {
 
     // Update bid history with user bid
     setRecentBidders(prev => {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('en-GB', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+      });
+      
       const newBidder = {
         id: totalBidsPlaced + 1,
         name: 'შენ',
         bidNumber: totalBidsPlaced + 1,
-        time: 'ახლა',
+        time: timeString,
         avatar: '/placeholder.svg'
       };
       
-      const updated = [newBidder, ...prev.slice(0, 9)];
-      return updated.map((bidder, index) => ({
-        ...bidder,
-        time: index === 0 ? 'ახლა' :
-              index === 1 ? '15 წამის წინ' :
-              index === 2 ? '30 წამის წინ' :
-              `${index * 15} წამის წინ`
-      }));
+      return [newBidder, ...prev.slice(0, 9)];
     });
 
     // Removed toast notification for smoother UX
