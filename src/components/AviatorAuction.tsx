@@ -121,13 +121,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // CONTINUOUS FLIGHT ANIMATION - Update jet position
   useEffect(() => {
-    if (battlePhase === 'idle') {
+    if (battlePhase === 'idle' || battlePhase === 'victory') {
       if (userJustBid && lastBidder === 'შენ') {
         const progress = bidProgress;
         const targetX = 20 + (60 * progress / 100);
         const targetY = 75 - (50 * progress / 100);
         setJetPosition({ x: targetX, y: targetY });
-      } else if (lastBidder !== 'შენ' && timeLeft > 0) {
+      } else if (timeLeft > 0) {
         const timeProgress = (10 - timeLeft) / 10 * 100;
         const targetX = 20 + (60 * timeProgress / 100);
         const targetY = 75 - (50 * timeProgress / 100);
