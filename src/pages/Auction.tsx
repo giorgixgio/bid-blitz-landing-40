@@ -165,7 +165,7 @@ const Auction = () => {
    * Automatically places bids when enabled and conditions are met
    */
   useEffect(() => {
-    if (!autoBidderEnabled) return;
+    if (!autoBidderEnabled || isAuctionEnded) return;
     
     const autoBidInterval = setInterval(() => {
       // Only bid if time is low (last 3 seconds) and user has credits
@@ -182,7 +182,7 @@ const Auction = () => {
    * Creates AI competitors that bid in the final seconds
    */
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (timeLeft <= 0 || isAuctionEnded) return;
 
     const shouldBid = Math.random() < 0.7; // 70% chance to bid each second
     const minTimeForBid = 1; // Don't bid if less than 1 second left
@@ -244,7 +244,7 @@ const Auction = () => {
    * Modified for testing - automatically extends when reaching 1 second
    */
   useEffect(() => {
-    if (timeLeft > 0) {
+    if (timeLeft > 0 && !isAuctionEnded) {
       const timer = setTimeout(() => {
         setTimeLeft(prev => {
           const newTime = prev - 1;
@@ -284,6 +284,16 @@ const Auction = () => {
    * Processes user bid placement with validation and state updates
    */
   const handleBid = () => {
+    // Validation: Check if auction has ended
+    if (isAuctionEnded) {
+      toast({
+        title: "აუქციონი დასრულებულია",
+        description: "ვეღარ შეძლებ ბიდის განთავსებას",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Validation: Check if user has enough credits
     if (userBidCredits <= 0) {
       toast({
