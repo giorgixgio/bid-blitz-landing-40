@@ -148,14 +148,16 @@ const Auction = () => {
     }
   }, [timeLeft]); // Only depend on timeLeft
 
-  // Scroll detection for sticky bar
+  // Scroll detection for sticky bar - show it earlier and keep it longer
   useEffect(() => {
     const handleScroll = () => {
       const productSection = document.getElementById('product-images');
       if (productSection) {
         const rect = productSection.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-        setShowStickyBar(!isVisible);
+        // Show sticky bar when top 60% of product section is scrolled past
+        const threshold = window.innerHeight * 0.4; // Show when 60% scrolled past
+        const shouldShow = rect.top < threshold;
+        setShowStickyBar(shouldShow);
       }
     };
 
