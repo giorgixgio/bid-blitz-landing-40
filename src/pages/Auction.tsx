@@ -503,76 +503,21 @@ const Auction = () => {
                         </div>
                       </div>
 
-                      {/* Payment Form */}
+                      {/* Payment Button */}
                       <div className="pt-4 border-t">
-                        <h3 className="font-semibold mb-4">გადახდის დეტალები</h3>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="cardNumber">ბარათის ნომერი</Label>
-                            <Input 
-                              id="cardNumber" 
-                              placeholder="1234 5678 9012 3456" 
-                              defaultValue="4111 1111 1111 1111"
-                              className="font-mono"
-                              autoFocus={false}
-                              readOnly
-                              onFocus={(e) => e.target.removeAttribute('readonly')}
-                            />
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="expiry">ვადა</Label>
-                              <Input 
-                                id="expiry" 
-                                placeholder="MM/YY" 
-                                defaultValue="12/25"
-                                className="font-mono"
-                                autoFocus={false}
-                                readOnly
-                                onFocus={(e) => e.target.removeAttribute('readonly')}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="cvv">CVV</Label>
-                              <Input 
-                                id="cvv" 
-                                placeholder="123" 
-                                defaultValue="123"
-                                className="font-mono"
-                                autoFocus={false}
-                                readOnly
-                                onFocus={(e) => e.target.removeAttribute('readonly')}
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <Label htmlFor="cardName">ბარათზე მითითებული სახელი</Label>
-                            <Input 
-                              id="cardName" 
-                              placeholder="John Doe" 
-                              defaultValue="John Doe"
-                              autoFocus={false}
-                              readOnly
-                              onFocus={(e) => e.target.removeAttribute('readonly')}
-                            />
-                          </div>
-
-                          <Button 
-                            className="w-full h-12 text-lg font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white"
-                            onClick={() => {
-                              setUserBidCredits(prev => prev + 50);
-                              setShowBuyBidsSheet(false);
-                              toast({
-                                title: "ბიდები წარმატებით შეძენილია!",
-                                description: "50 ბიდი დაემატა თქვენს ანგარიშს",
-                              });
-                            }}
-                          >
-                            გადახდა - 30₾
-                          </Button>
-                        </div>
+                        <Button 
+                          className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white shadow-lg"
+                          onClick={() => {
+                            setUserBidCredits(prev => prev + 50);
+                            setShowBuyBidsSheet(false);
+                            toast({
+                              title: "ბიდები წარმატებით შეძენილია!",
+                              description: "50 ბიდი დაემატა თქვენს ანგარიშს",
+                            });
+                          }}
+                        >
+                          PAY NOW - 30₾
+                        </Button>
                       </div>
                     </div>
                   </SheetContent>
