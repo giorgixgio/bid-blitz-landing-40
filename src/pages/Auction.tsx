@@ -359,7 +359,7 @@ const Auction = () => {
           {/* Mobile-first: Bidding section (appears first on mobile) */}
           <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
             {/* Mobile-optimized Timer and Current Price */}
-            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-primary to-destructive border-primary/20 shadow-lg">
+            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-slate-700 to-slate-800 border-slate-600/20 shadow-lg">
               <div className="space-y-3 sm:space-y-4">
                 <div className="text-center">
                   <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
@@ -388,7 +388,7 @@ const Auction = () => {
             </Card>
 
             {/* Mobile-optimized User Bid Credits */}
-            <Card className="p-3 sm:p-4 bg-gradient-to-r from-accent to-auction-premium border-accent/20 shadow-lg">
+            <Card className="p-3 sm:p-4 bg-gradient-to-r from-slate-600 to-slate-700 border-slate-500/20 shadow-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -418,12 +418,12 @@ const Auction = () => {
                     onClick={handleBid}
                     className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden ${
                       userJustBid 
-                        ? 'bg-gradient-to-r from-red-300/60 to-red-400/60' // Lighter red background when filling
-                        : 'bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90'
+                        ? 'bg-gradient-to-r from-red-200/40 to-red-300/40' // Much lighter red background when filling
+                        : 'bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600'
                     } disabled:from-muted disabled:to-muted`}
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
-                    <span className="relative z-10">
+                    <span className="relative z-10 flex items-center justify-center gap-2">
                       {timeLeft <= 0 ? (
                         "აუქციონი დასრულდა"
                       ) : userBidCredits <= 0 ? (
@@ -432,8 +432,8 @@ const Auction = () => {
                         "YOU ARE WINNING!"
                       ) : (
                         <>
-                          <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                          ბიდი ({BID_COST} ₾)
+                          <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+                          <span>ბიდი ({BID_COST} ₾)</span>
                         </>
                       )}
                     </span>
@@ -443,7 +443,7 @@ const Auction = () => {
                   {userJustBid && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md z-0">
                       <div 
-                        className="h-full bg-gradient-to-r from-primary to-destructive transition-all duration-1000 ease-linear"
+                        className="h-full bg-gradient-to-r from-slate-600 to-slate-700 transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
                       />
                     </div>
@@ -509,8 +509,8 @@ const Auction = () => {
           </div>
         </div>
 
-        {/* Sticky Top Bar - below header */}
-        <div className={`fixed top-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-3 shadow-lg transition-transform duration-300 z-40 ${
+        {/* Sticky Top Bar - below header with margin to avoid timer overlap */}
+        <div className={`fixed top-20 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-3 shadow-lg transition-transform duration-300 z-40 ${
           showStickyBar ? 'translate-y-0' : '-translate-y-full'
         }`}>
           <div className="container mx-auto flex items-center gap-3">
@@ -524,7 +524,7 @@ const Auction = () => {
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate">Samsung S938B Galaxy S25 Ultra</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-bold text-primary">{currentPrice.toFixed(2)} ₾</span>
+                <span className="font-bold text-foreground">{currentPrice.toFixed(2)} ₾</span>
                 <span>•</span>
                 <span>{String(timeLeft).padStart(2, '0')} წამი</span>
               </div>
@@ -533,7 +533,7 @@ const Auction = () => {
               onClick={handleBid}
               disabled={userBidCredits <= 0 || timeLeft <= 0}
               size="sm"
-              className="bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90 text-white font-bold px-4"
+              className="bg-slate-600 hover:bg-slate-500 text-white font-bold px-4"
             >
               ბიდი
             </Button>
