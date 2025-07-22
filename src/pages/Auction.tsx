@@ -22,6 +22,7 @@ import galaxyMainImage from '@/assets/samsung-galaxy-s25-ultra.jpg';
 import galaxyBackImage from '@/assets/samsung-galaxy-s25-ultra-back.jpg';
 import galaxySideImage from '@/assets/samsung-galaxy-s25-ultra-side.jpg';
 import galaxySPenImage from '@/assets/samsung-galaxy-s25-ultra-spen.jpg';
+import Header from '@/components/Header';
 
 const Auction = () => {
   const [currentPrice, setCurrentPrice] = useState(0.01); // Penny auction starts at 1 cent
@@ -219,6 +220,7 @@ const Auction = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+      <Header />
       <div className="container mx-auto p-3 sm:p-4 lg:p-8">
         <div className="grid gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto lg:grid-cols-2">
           
