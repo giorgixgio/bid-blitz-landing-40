@@ -372,7 +372,7 @@ const Auction = () => {
         <div className="grid gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto lg:grid-cols-2">
           
           {/* LEFT COLUMN - Product Details (Order 2 on mobile, 1 on desktop) */}
-          <div className="order-2 lg:order-1 space-y-4 sm:space-y-6">
+          <div className="order-2 lg:order-1 space-y-4 sm:space-y-6 mt-16">
             
             {/* Product Image Carousel */}
             <Card className="overflow-hidden">
