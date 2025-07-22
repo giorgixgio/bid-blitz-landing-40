@@ -9,7 +9,6 @@ import {
   Heart,
   ShoppingCart
 } from 'lucide-react';
-import auctionLogo from '@/assets/auction-logo.png';
 
 const Header = () => {
   return (
@@ -19,12 +18,11 @@ const Header = () => {
           {/* Logo and Brand */}
           <div className="flex items-center gap-3">
             <img 
-              src={auctionLogo} 
-              alt="Auction Logo" 
+              src="/lovable-uploads/68ec0e8e-2e73-40a5-ae5c-1033c2f1169a.png" 
+              alt="MANEKI Logo" 
               className="h-8 w-auto"
             />
             <div className="hidden sm:block">
-              <h1 className="text-xl font-bold text-primary">PennyAuction</h1>
               <p className="text-xs text-muted-foreground">ღირებული ნივთები, უზიარო ფასები</p>
             </div>
           </div>
