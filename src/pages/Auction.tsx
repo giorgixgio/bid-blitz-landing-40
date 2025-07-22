@@ -420,7 +420,7 @@ const Auction = () => {
                     onClick={handleBid}
                     className={`w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative overflow-hidden ${
                       userJustBid 
-                        ? 'bg-gradient-to-r from-green-300/50 to-green-400/50' // Light green background when filling
+                        ? 'bg-gradient-to-r from-green-200/30 to-green-300/30' // Very light green background when filling
                         : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500'
                     } disabled:from-muted disabled:to-muted`}
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
