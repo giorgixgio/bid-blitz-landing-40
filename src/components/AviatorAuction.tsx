@@ -357,8 +357,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         )}
 
-        {/* OTHER PLAYER BONUS MESSAGE */}
-        {showOtherPlayerBonusMessage && (
+        {/* OTHER PLAYER BONUS MESSAGE - Only show if current user did NOT collect */}
+        {showOtherPlayerBonusMessage && !currentUserCollectedCoin && (
           <div className="absolute top-8 inset-x-0 z-40 animate-bounce">
             <div className="mx-auto w-fit bg-yellow-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-yellow-400">
               <span className="emoji-consistent mr-1">💰</span>
@@ -527,9 +527,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </div>
       )}
 
-      {/* SLOT ANIMATION OVERLAY */}
+      {/* SLOT ANIMATION OVERLAY - Only show if current user collected */}
       <SlotAnimation 
-        isVisible={showSlotAnimation}
+        isVisible={showSlotAnimation && currentUserCollectedCoin}
         onComplete={handleSlotComplete}
       />
     </Card>
