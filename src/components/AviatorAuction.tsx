@@ -257,7 +257,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       setCurrentUserCollectedCoin(true); // Mark that current user collected it
-      setShowSlotAnimation(true);
+      setShowSlotAnimation(true); // Only current user gets slot animation
       
       // Play winning sound for bonus collection
       playWinningSound();
@@ -269,12 +269,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected, coinCollectedThisRound]);
 
-  // Handle coin collection
+  // Handle coin collection (manual click)
   const handleCoinCollect = () => {
     setIsCoinVisible(false);
     setCoinCollectedThisRound(true);
     setCurrentUserCollectedCoin(true); // Mark that current user collected it
-    setShowSlotAnimation(true);
+    setShowSlotAnimation(true); // Only current user gets slot animation
     playWinningSound();
     
     if (onBonusBidCollected) {
@@ -282,14 +282,23 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   };
 
-  // Simulate other player collecting coin (for demo purposes)
+  // Simulate other player collecting coin - for testing
   useEffect(() => {
-    if (coinCollectedThisRound && !currentUserCollectedCoin) {
-      // Someone else collected the coin - show notification
+    if (isCoinVisible && timeLeft <= 2 && Math.random() < 0.3) {
+      // 30% chance someone else grabs the coin when 2 seconds left
+      setIsCoinVisible(false);
+      setCoinCollectedThisRound(true);
+      // Don't set currentUserCollectedCoin to true, so this simulates "other player"
+      
+      // Show notification for other player collection
       setShowOtherPlayerBonusMessage(true);
       setTimeout(() => setShowOtherPlayerBonusMessage(false), 3000);
+      
+      if (onBonusBidCollected) {
+        onBonusBidCollected(false); // false = other player collected
+      }
     }
-  }, [coinCollectedThisRound, currentUserCollectedCoin]);
+  }, [timeLeft, isCoinVisible, onBonusBidCollected]);
 
   // Handle slot animation completion
   const handleSlotComplete = () => {
@@ -527,9 +536,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </div>
       )}
 
-      {/* SLOT ANIMATION OVERLAY - Only show if current user collected */}
+      {/* SLOT ANIMATION OVERLAY - Only for current user */}
       <SlotAnimation 
-        isVisible={showSlotAnimation && currentUserCollectedCoin}
+        isVisible={showSlotAnimation}
         onComplete={handleSlotComplete}
       />
     </Card>
