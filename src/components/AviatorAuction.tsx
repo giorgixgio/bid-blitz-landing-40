@@ -275,55 +275,59 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </div>
       </div>
 
-      {/* CONFETTI ANIMATION FOR AUCTION ENDED - VERY SLOW LIKE FIREWORKS */}
+      {/* CONFETTI ANIMATION FOR AUCTION ENDED - EXTREMELY SLOW */}
       {isAuctionEnded && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-          {/* Super slow confetti - like real fireworks */}
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute opacity-70"
-              style={{
-                left: `${20 + Math.random() * 60}%`,
-                top: `${20 + Math.random() * 60}%`,
-                animation: `fadeInOut ${15 + Math.random() * 10}s infinite`,
-                animationDelay: `${Math.random() * 20}s`,
-                fontSize: `${16 + Math.random() * 4}px`
-              }}
-            >
-              {['🎉', '🎊', '✨', '🌟', '💫'][Math.floor(Math.random() * 5)]}
-            </div>
-          ))}
-          
-          {/* Ultra slow floating elements */}
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={`ultra-slow-${i}`}
-              className="absolute opacity-50"
-              style={{
-                left: `${30 + Math.random() * 40}%`,
-                top: `${30 + Math.random() * 40}%`,
-                animation: `gentleFloat ${20 + Math.random() * 15}s infinite`,
-                animationDelay: `${Math.random() * 25}s`,
-                fontSize: `${14 + Math.random() * 3}px`
-              }}
-            >
-              {['⭐', '💰', '🥇'][Math.floor(Math.random() * 3)]}
-            </div>
-          ))}
-          
-          {/* Add custom CSS animations for very slow movement */}
+        <>
           <style>{`
-            @keyframes fadeInOut {
-              0%, 100% { opacity: 0; transform: translateY(0px); }
-              50% { opacity: 0.7; transform: translateY(-10px); }
+            @keyframes slowFadeIn {
+              0% { opacity: 0; transform: scale(0.5); }
+              20% { opacity: 1; transform: scale(1); }
+              80% { opacity: 1; transform: scale(1); }
+              100% { opacity: 0; transform: scale(0.5); }
             }
-            @keyframes gentleFloat {
-              0%, 100% { opacity: 0; transform: translateY(0px) rotate(0deg); }
-              50% { opacity: 0.5; transform: translateY(-5px) rotate(5deg); }
+            @keyframes verySlowFloat {
+              0% { transform: translateY(0px) rotate(0deg); }
+              25% { transform: translateY(-3px) rotate(2deg); }
+              50% { transform: translateY(-5px) rotate(0deg); }
+              75% { transform: translateY(-3px) rotate(-2deg); }
+              100% { transform: translateY(0px) rotate(0deg); }
             }
           `}</style>
-        </div>
+          
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
+            {/* Only 4 confetti pieces with VERY slow animation */}
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute text-xl"
+                style={{
+                  left: `${25 + (i * 15)}%`,
+                  top: `${30 + (i * 10)}%`,
+                  animation: `slowFadeIn 8s infinite`,
+                  animationDelay: `${i * 3}s`,
+                }}
+              >
+                {['🎉', '✨', '🌟', '💫'][i]}
+              </div>
+            ))}
+            
+            {/* 2 very slow floating stars */}
+            {[...Array(2)].map((_, i) => (
+              <div
+                key={`float-${i}`}
+                className="absolute text-lg"
+                style={{
+                  left: `${40 + (i * 20)}%`,
+                  top: `${45 + (i * 5)}%`,
+                  animation: `verySlowFloat 12s infinite`,
+                  animationDelay: `${i * 6}s`,
+                }}
+              >
+                ⭐
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* CRASH WARNING */}
