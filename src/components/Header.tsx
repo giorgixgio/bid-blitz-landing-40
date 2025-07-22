@@ -1,3 +1,15 @@
+/**
+ * HEADER COMPONENT
+ * ================
+ * 
+ * Site-wide navigation header with:
+ * - Brand logo and tagline
+ * - Search functionality
+ * - User notifications
+ * - Bid credits display
+ * - Mobile-responsive design
+ */
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,19 +27,21 @@ const Header = () => {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
+          
+          {/* Logo and Brand Section */}
           <div className="flex items-center gap-3">
             <img 
               src="/lovable-uploads/68ec0e8e-2e73-40a5-ae5c-1033c2f1169a.png" 
               alt="MANEKI Logo" 
               className="h-8 w-auto"
             />
+            {/* Brand tagline - hidden on mobile */}
             <div className="hidden sm:block">
               <p className="text-xs text-muted-foreground">ღირებული ნივთები, უზიარო ფასები</p>
             </div>
           </div>
 
-          {/* Search Bar - Hidden on mobile */}
+          {/* Search Bar - Desktop only */}
           <div className="hidden md:flex flex-1 max-w-md mx-6">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -41,12 +55,13 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-            {/* Mobile Search */}
+            
+            {/* Mobile Search Button */}
             <Button variant="ghost" size="icon" className="md:hidden">
               <Search className="w-5 h-5" />
             </Button>
 
-            {/* Notifications */}
+            {/* Notifications with Badge */}
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5" />
               <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-destructive text-destructive-foreground">
@@ -54,12 +69,12 @@ const Header = () => {
               </Badge>
             </Button>
 
-            {/* Favorites */}
+            {/* Favorites - Hidden on mobile */}
             <Button variant="ghost" size="icon" className="hidden sm:flex">
               <Heart className="w-5 h-5" />
             </Button>
 
-            {/* Bid Credits */}
+            {/* Bid Credits Display - Hidden on mobile */}
             <div className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-accent to-auction-premium px-3 py-1.5 rounded-full">
               <ShoppingCart className="w-4 h-4 text-white" />
               <span className="text-sm font-bold text-white">45</span>

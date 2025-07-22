@@ -236,33 +236,32 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </div>
       </div>
 
-      {/* GAME STATS */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p> {/* Current Price */}
+          <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
           <p className="text-xl sm:text-2xl font-bold text-white">{currentPrice.toFixed(2)} ₾</p>
         </div>
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-white/80">მულტიპლაიერი</p> {/* Multiplier */}
+          <p className="text-xs sm:text-sm text-white/80">მულტიპლაიერი</p>
           <div className="text-xl sm:text-2xl font-bold text-yellow-400">
             {(currentPrice * 100).toFixed(0)}x
           </div>
         </div>
       </div>
 
-      {/* BOTTOM STATS */}
+      {/* Bottom Stats */}
       <div className="flex items-center justify-between text-xs sm:text-sm text-white/80">
         <div className="flex items-center gap-1">
           <Gavel className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>{totalBidsPlaced} ბიდი</span> {/* Bids */}
+          <span>{totalBidsPlaced} ბიდი</span>
         </div>
         <div className="flex items-center gap-1">
           <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>ლიდერი: {lastBidder}</span> {/* Leader */}
+          <span>ლიდერი: {lastBidder}</span>
         </div>
         <div className="flex items-center gap-1">
           <Coins className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>{userBidCredits} ბიდი</span> {/* User Bids */}
+          <span>{userBidCredits} ბიდი</span>
         </div>
       </div>
 

@@ -306,7 +306,7 @@ const Auction = () => {
     setUserBidCredits(prev => prev - 1); // Deduct bid credit
     setTotalBidsPlaced(prev => prev + 1); // Increment total bids
     setTimeLeft(TIME_EXTENSION); // Reset countdown timer
-    setLastBidder('შენ'); // Set user as highest bidder (Georgian: "You")
+    setLastBidder('შენ'); // Set user as highest bidder (Russian: "Ты")
     
     // Start progress animation
     setBidProgress(0);
@@ -324,7 +324,7 @@ const Auction = () => {
       
       const newBidder = {
         id: totalBidsPlaced + 1,
-        name: 'შენ', // Georgian: "You"
+        name: 'შენ', // Russian: "Ты"
         bidNumber: totalBidsPlaced + 1,
         time: timeString,
         avatar: '/placeholder.svg'
@@ -435,34 +435,34 @@ const Auction = () => {
                   <h1 className="text-lg sm:text-2xl font-bold leading-tight">Samsung S938B Galaxy S25 Ultra</h1>
                   <Badge variant="secondary" className="ml-2 text-xs">
                     <TrendingUp className="w-3 h-3 mr-1" />
-                    ტოპ {/* Georgian: "Top" */}
+                    ტოპ
                   </Badge>
                 </div>
                 
                 {/* Product Specifications Grid */}
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                   <div>
-                    <span className="font-medium">საცალო ფასი:</span> 3599 ₾ {/* Retail Price */}
+                    <span className="font-medium">საცალო ფასი:</span> 3599 ₾
                   </div>
                   <div>
-                    <span className="font-medium">მდგომარეობა:</span> ახალი {/* Condition: New */}
+                    <span className="font-medium">მდგომარეობა:</span> ახალი
                   </div>
                   <div>
-                    <span className="font-medium">კატეგორია:</span> სმარტფონები {/* Category: Smartphones */}
+                    <span className="font-medium">კატეგორია:</span> სმარტფონები
                   </div>
                   <div>
-                    <span className="font-medium">ბრენდი:</span> Samsung {/* Brand */}
+                    <span className="font-medium">ბრენდი:</span> Samsung
                   </div>
                 </div>
 
                 {/* Features List */}
                 <div className="pt-3 sm:pt-4 border-t">
-                  <h3 className="font-semibold mb-2 text-sm sm:text-base">მახასიათებლები</h3> {/* Features */}
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">მახასიათებლები</h3>
                   <ul className="text-xs sm:text-sm text-muted-foreground space-y-1">
-                    <li>• 256GB მეხსიერება</li> {/* Storage */}
+                    <li>• 256GB მეხსიერება</li>
                     <li>• 12GB RAM</li>
-                    <li>• 200MP კამერა</li> {/* Camera */}
-                    <li>• S Pen-ით</li> {/* With S Pen */}
+                    <li>• 200MP კამერა</li>
+                    <li>• S Pen-ით</li>
                   </ul>
                 </div>
               </div>
@@ -536,12 +536,12 @@ const Auction = () => {
                         "აუქციონი დასრულდა" /* Auction Ended */
                       ) : userBidCredits <= 0 ? (
                         "არ გაქვს ბიდები" /* No Bids */
-                      ) : userJustBid ? (
+                        ) : userJustBid ? (
                         "YOU ARE WINNING!"
                        ) : (
                          <>
                            <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
-                           <span>ბიდი ({BID_COST} ₾)</span> {/* Bid */}
+                           <span>ბიდი ({BID_COST} ₾)</span>
                          </>
                        )}
                      </span>
@@ -552,7 +552,7 @@ const Auction = () => {
                 {userBidCredits <= 5 && userBidCredits > 0 && (
                   <div className="text-center p-3 bg-destructive/10 rounded-lg border border-destructive/20">
                     <p className="text-xs sm:text-sm text-destructive font-medium">
-                      ⚠️ მალე ბიდები დამთავრდება! შეიძინე ახალი ბიდები {/* Bids running low! Buy new bids */}
+                      ⚠️ მალე ბიდები დამთავრდება! შეიძინე ახალი ბიდები
                     </p>
                   </div>
                 )}
@@ -562,13 +562,13 @@ const Auction = () => {
                   <SheetTrigger asChild>
                     <Button variant="outline" className="w-full h-12 text-sm sm:text-base border-orange-400/30 hover:bg-orange-500/10">
                       <Coins className="w-4 h-4 mr-2" />
-                      ბიდების შეძენა {/* Buy Bids */}
+                      ბიდების შეძენა
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl overflow-y-auto">
                     <SheetHeader className="text-center pb-6">
-                      <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle> {/* Buy Bids */}
-                      <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p> {/* Choose bid package */}
+                      <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle>
+                      <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p>
                     </SheetHeader>
 
                     <div className="space-y-6 max-w-md mx-auto pb-8">
@@ -579,11 +579,11 @@ const Auction = () => {
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-bold text-lg">50 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">ყველაზე პოპულარული</p> {/* Most Popular */}
+                              <p className="text-sm text-muted-foreground">ყველაზე პოპულარული</p>
                             </div>
                             <div className="text-right">
                               <p className="text-2xl font-bold text-orange-600">30₾</p>
-                              <p className="text-xs text-muted-foreground">0.60₾ თითო ბიდი</p> {/* Per bid */}
+                              <p className="text-xs text-muted-foreground">0.60₾ თითო ბიდი</p>
                             </div>
                           </div>
                         </div>
@@ -593,7 +593,7 @@ const Auction = () => {
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-bold">25 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">დამწყებთათვის</p> {/* For Beginners */}
+                              <p className="text-sm text-muted-foreground">დამწყებთათვის</p>
                             </div>
                             <div className="text-right">
                               <p className="text-xl font-bold">16₾</p>
@@ -607,7 +607,7 @@ const Auction = () => {
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-bold">100 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">ყველაზე ოპტიმალური</p> {/* Most Optimal */}
+                              <p className="text-sm text-muted-foreground">ყველაზე ოპტიმალური</p>
                             </div>
                             <div className="text-right">
                               <p className="text-xl font-bold">55₾</p>
@@ -626,8 +626,8 @@ const Auction = () => {
                             setUserBidCredits(prev => prev + 50);
                             setShowBuyBidsSheet(false);
                             toast({
-                              title: "ბიდები წარმატებით შეძენილია!", // Bids purchased successfully!
-                              description: "50 ბიდი დაემატა თქვენს ანგარიშს", // 50 bids added to your account
+                              title: "ბიდები წარმატებით შეძენილია!",
+                              description: "50 ბიდი დაემატა თქვენს ანგარიშს",
                             });
                           }}
                         >
