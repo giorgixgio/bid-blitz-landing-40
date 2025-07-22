@@ -45,6 +45,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [trailPoints, setTrailPoints] = useState<Array<{x: number, y: number, id: number}>>([]);
   const [milliseconds, setMilliseconds] = useState(0); // Millisecond counter
   const [isExploding, setIsExploding] = useState(false); // Explosion state
+  const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -71,6 +72,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   useEffect(() => {
     if (lastBidder !== currentLeader) {
       // Trigger explosion for previous jet
+      if (currentLeader && lastBidder === 'შენ') {
+        // Show "YOU BLEW UP JET" message when user bids
+        setShowBlowUpMessage(true);
+        setTimeout(() => setShowBlowUpMessage(false), 3000); // Hide after 3 seconds
+      }
+      
       if (currentLeader) {
         setIsExploding(true);
         
@@ -164,6 +171,17 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       {/* GAME AREA */}
       <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-10">
         
+        {/* "YOU BLEW UP JET" MESSAGE */}
+        {showBlowUpMessage && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40 animate-bounce">
+            <div className="bg-red-500/90 text-white px-4 py-2 rounded-lg font-bold text-sm sm:text-base shadow-lg border-2 border-red-400">
+              <span className="emoji-consistent mr-2">💥</span>
+              YOU BLEW UP JET
+              <span className="emoji-consistent ml-2">🚀💨</span>
+            </div>
+          </div>
+        )}
+
         {/* Background with zoom effect */}
         <div 
           className="absolute inset-0 transition-transform duration-1000 ease-out origin-bottom-left"
