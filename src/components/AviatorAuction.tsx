@@ -48,6 +48,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
   const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
   const [musicEnabled, setMusicEnabled] = useState(false); // Background music toggle
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const musicContextRef = useRef<AudioContext | null>(null);
   const musicSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
@@ -128,19 +129,58 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   };
 
   // BACKGROUND MUSIC FUNCTIONS
-  const startBackgroundMusic = async () => {
+  const startBackgroundMusic = () => {
+    try {
+      // Create audio element if it doesn't exist
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        // You can replace this with your own audio file
+        // For now, using a placeholder - you'll need to add your audio file to the public folder
+        audioRef.current.src = '/background-music.mp3'; // Add your downloaded audio file here
+        audioRef.current.loop = true;
+        audioRef.current.volume = 0.3; // Adjust volume as needed
+        
+        // Handle audio loading errors
+        audioRef.current.onerror = () => {
+          console.log('Audio file not found. Please add background-music.mp3 to the public folder.');
+          // Fallback to generated music
+          startGeneratedMusic();
+        };
+      }
+      
+      if (audioRef.current && audioRef.current.paused) {
+        audioRef.current.play().catch(() => {
+          console.log('Audio autoplay blocked by browser');
+          // Fallback to generated music
+          startGeneratedMusic();
+        });
+      }
+    } catch (error) {
+      console.log('Audio not supported, using generated music');
+      startGeneratedMusic();
+    }
+  };
+
+  const stopBackgroundMusic = () => {
+    if (audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    stopGeneratedMusic();
+  };
+
+  // Fallback generated music (your previous instrumental)
+  const startGeneratedMusic = async () => {
     try {
       const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
       const audioContext = new AudioContext();
       musicContextRef.current = audioContext;
 
-      // Musical notes frequencies (in Hz)
       const notes = {
         C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
         C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99
       };
 
-      // Create a musical note
       const playNote = (frequency: number, startTime: number, duration: number, volume: number = 0.1) => {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
@@ -151,13 +191,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         gainNode.connect(audioContext.destination);
         
         oscillator.frequency.setValueAtTime(frequency, startTime);
-        oscillator.type = 'triangle'; // Warmer sound than sine
+        oscillator.type = 'triangle';
         
-        // Add some warmth with low-pass filter
         filterNode.type = 'lowpass';
         filterNode.frequency.setValueAtTime(2000, startTime);
         
-        // Smooth envelope
         gainNode.gain.setValueAtTime(0, startTime);
         gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.1);
         gainNode.gain.linearRampToValueAtTime(volume * 0.7, startTime + duration - 0.2);
@@ -169,34 +207,29 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         return oscillator;
       };
 
-      // Positive uplifting melody pattern
       const playMelodyLoop = () => {
         if (!musicEnabled) return;
         
         const currentTime = audioContext.currentTime;
         const noteDuration = 0.6;
         
-        // Main melody - uplifting progression
         const melody = [
-          notes.C4, notes.E4, notes.G4, notes.C5,  // C major chord arpeggio
-          notes.A4, notes.C5, notes.E5, notes.A4,  // A minor chord arpeggio  
-          notes.F4, notes.A4, notes.C5, notes.F5,  // F major chord arpeggio
-          notes.G4, notes.B4, notes.D5, notes.G4   // G major chord arpeggio
+          notes.C4, notes.E4, notes.G4, notes.C5,
+          notes.A4, notes.C5, notes.E5, notes.A4,
+          notes.F4, notes.A4, notes.C5, notes.F5,
+          notes.G4, notes.B4, notes.D5, notes.G4
         ];
         
-        // Play melody
         melody.forEach((note, index) => {
           playNote(note, currentTime + (index * noteDuration), noteDuration, 0.08);
         });
         
-        // Add harmonic bass notes (played softer and longer)
         const bassNotes = [notes.C4, notes.A4, notes.F4, notes.G4];
         bassNotes.forEach((note, index) => {
-          playNote(note * 0.5, currentTime + (index * noteDuration * 4), noteDuration * 4, 0.04); // Octave lower
+          playNote(note * 0.5, currentTime + (index * noteDuration * 4), noteDuration * 4, 0.04);
         });
         
-        // Schedule next loop
-        const loopDuration = melody.length * noteDuration * 1000; // Convert to milliseconds
+        const loopDuration = melody.length * noteDuration * 1000;
         setTimeout(() => {
           if (musicEnabled && musicContextRef.current) {
             playMelodyLoop();
@@ -206,11 +239,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
       playMelodyLoop();
     } catch (error) {
-      console.log('Background music not supported');
+      console.log('Generated music not supported');
     }
   };
 
-  const stopBackgroundMusic = () => {
+  const stopGeneratedMusic = () => {
     if (musicContextRef.current) {
       musicContextRef.current.close();
       musicContextRef.current = null;
