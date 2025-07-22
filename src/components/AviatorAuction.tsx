@@ -23,6 +23,7 @@ interface AviatorAuctionProps {
   userBidCredits: number;        // User's remaining bid credits
   userJustBid: boolean;          // Whether user just placed a bid
   bidProgress: number;           // Progress percentage (0-100)
+  isAuctionEnded?: boolean;      // Whether auction has ended
 }
 
 export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
@@ -32,7 +33,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   lastBidder,
   userBidCredits,
   userJustBid,
-  bidProgress
+  bidProgress,
+  isAuctionEnded = false
 }) => {
   // ANIMATION STATE
   const [jetPosition, setJetPosition] = useState({ x: 10, y: 85 }); // Jet position (x: left-right, y: top-bottom)
@@ -206,13 +208,26 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         </div>
 
-        {/* CENTER TIMER */}
+        {/* CENTER TIMER OR AUCTION ENDED */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-30">
-          <div className={`text-4xl sm:text-6xl font-bold ${timeLeft <= 3 ? 'text-red-400 animate-pulse' : 'text-white'} drop-shadow-lg flex items-center justify-center gap-1`}>
-            <span>{String(timeLeft).padStart(2, '0')}</span>
-            <span className="text-2xl sm:text-3xl text-white/70">.{String(milliseconds).padStart(2, '0')}</span>
-          </div>
-          <div className="text-xs sm:text-sm text-white/80 mt-1">SECONDS</div>
+          {isAuctionEnded ? (
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl font-bold text-yellow-400 drop-shadow-lg mb-2">
+                SOLD FOR
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
+                {currentPrice.toFixed(2)} ₾
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className={`text-4xl sm:text-6xl font-bold ${timeLeft <= 3 ? 'text-red-400 animate-pulse' : 'text-white'} drop-shadow-lg flex items-center justify-center gap-1`}>
+                <span>{String(timeLeft).padStart(2, '0')}</span>
+                <span className="text-2xl sm:text-3xl text-white/70">.{String(milliseconds).padStart(2, '0')}</span>
+              </div>
+              <div className="text-xs sm:text-sm text-white/80 mt-1">SECONDS</div>
+            </>
+          )}
         </div>
 
         {/* PROGRESS LINE */}
@@ -259,8 +274,28 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </div>
       </div>
 
+      {/* CONFETTI ANIMATION FOR AUCTION ENDED */}
+      {isAuctionEnded && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-bounce text-2xl"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            >
+              {['🎉', '🎊', '✨', '🌟', '💫'][Math.floor(Math.random() * 5)]}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* CRASH WARNING */}
-      {timeLeft <= 3 && (
+      {timeLeft <= 3 && !isAuctionEnded && (
         <div className="absolute inset-0 bg-red-500/20 animate-pulse pointer-events-none rounded-lg">
           <div className="flex items-center justify-center h-full">
             <span className="text-red-400 font-bold text-lg animate-bounce">⚠️ CRASH INCOMING!</span>

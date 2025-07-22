@@ -31,8 +31,8 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding }) =
 
   return (
     <div className="relative">
-      {/* Jet body */}
-      <div className="text-3xl sm:text-4xl relative">
+      {/* Jet body - 25% bigger */}
+      <div className="text-4xl sm:text-5xl relative">
         🚀
         {/* Cat inside jet - more visible with background */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg bg-white/20 rounded-full px-1 backdrop-blur-sm border border-white/30">
