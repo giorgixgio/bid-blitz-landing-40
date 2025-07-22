@@ -473,13 +473,13 @@ const Auction = () => {
                       ბიდების შეძენა
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl">
+                  <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl overflow-y-auto">
                     <SheetHeader className="text-center pb-6">
                       <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle>
                       <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p>
                     </SheetHeader>
 
-                    <div className="space-y-6 max-w-md mx-auto">
+                    <div className="space-y-6 max-w-md mx-auto pb-8">
                       {/* Bid Packages */}
                       <div className="grid gap-3">
                         <div className="p-4 border-2 border-orange-400 bg-orange-50 rounded-lg">
@@ -533,6 +533,9 @@ const Auction = () => {
                               placeholder="1234 5678 9012 3456" 
                               defaultValue="4111 1111 1111 1111"
                               className="font-mono"
+                              autoFocus={false}
+                              readOnly
+                              onFocus={(e) => e.target.removeAttribute('readonly')}
                             />
                           </div>
                           
@@ -544,6 +547,9 @@ const Auction = () => {
                                 placeholder="MM/YY" 
                                 defaultValue="12/25"
                                 className="font-mono"
+                                autoFocus={false}
+                                readOnly
+                                onFocus={(e) => e.target.removeAttribute('readonly')}
                               />
                             </div>
                             <div>
@@ -553,6 +559,9 @@ const Auction = () => {
                                 placeholder="123" 
                                 defaultValue="123"
                                 className="font-mono"
+                                autoFocus={false}
+                                readOnly
+                                onFocus={(e) => e.target.removeAttribute('readonly')}
                               />
                             </div>
                           </div>
@@ -563,6 +572,9 @@ const Auction = () => {
                               id="cardName" 
                               placeholder="John Doe" 
                               defaultValue="John Doe"
+                              autoFocus={false}
+                              readOnly
+                              onFocus={(e) => e.target.removeAttribute('readonly')}
                             />
                           </div>
 
