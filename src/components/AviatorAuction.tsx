@@ -171,7 +171,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       {/* GAME AREA */}
       <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-10">
         
-        {/* "YOU BLEW UP JET" MESSAGE */}
+        {/* "YOU BLEW UP JET" MESSAGE - At the very top center of animation */}
         {showBlowUpMessage && (
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 animate-bounce">
             <div className="bg-red-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-red-400">
