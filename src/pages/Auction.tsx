@@ -27,6 +27,7 @@ import galaxyBackImage from '@/assets/samsung-galaxy-s25-ultra-back.jpg';
 import galaxySideImage from '@/assets/samsung-galaxy-s25-ultra-side.jpg';
 import galaxySPenImage from '@/assets/samsung-galaxy-s25-ultra-spen.jpg';
 import Header from '@/components/Header';
+import { AviatorAuction } from '@/components/AviatorAuction';
 
 const Auction = () => {
   const [currentPrice, setCurrentPrice] = useState(0.01); // Penny auction starts at 1 cent
@@ -352,34 +353,16 @@ const Auction = () => {
 
           {/* Mobile-first: Bidding section (appears first on mobile) */}
           <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
-            {/* Mobile-optimized Timer and Current Price */}
-            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-blue-600/80 to-blue-700/80 border-blue-500/20 shadow-lg">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="text-center">
-                  <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
-                  <p className="text-3xl sm:text-4xl font-bold text-white">{currentPrice.toFixed(2)} ₾</p>
-                  <p className="text-xs text-white/80">საცალო ფასი: 3599 ₾</p>
-                </div>
-                
-                <div className="text-center">
-                  <p className="text-xs sm:text-sm text-white/80">დარჩენილი დრო</p>
-                  <div className={`text-2xl sm:text-3xl font-bold ${timeLeft <= 5 ? 'text-warning animate-pulse' : 'text-white'}`}>
-                    {String(timeLeft).padStart(2, '0')} წამი
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm">
-                  <div className="flex items-center gap-1 text-white/80">
-                    <Gavel className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>{totalBidsPlaced} ბიდი</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-white/80">
-                    <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>წამყვანი: {lastBidder}</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
+            {/* Aviator Style Game */}
+            <AviatorAuction
+              currentPrice={currentPrice}
+              timeLeft={timeLeft}
+              totalBidsPlaced={totalBidsPlaced}
+              lastBidder={lastBidder}
+              userBidCredits={userBidCredits}
+              userJustBid={userJustBid}
+              bidProgress={bidProgress}
+            />
 
             {/* Mobile-optimized User Bid Credits */}
             <Card className="p-3 sm:p-4 bg-gradient-to-r from-orange-500/70 to-orange-600/70 border-orange-400/20 shadow-lg">
