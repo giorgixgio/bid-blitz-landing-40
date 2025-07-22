@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
-import { Gavel, Users, Coins, Smartphone, Volume2, VolumeX, Music, Music2 } from 'lucide-react';
+import { Gavel, Users, Coins, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { JetCat } from './JetCat';
 import confetti from 'canvas-confetti';
 
@@ -47,10 +47,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [isExploding, setIsExploding] = useState(false); // Explosion state
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
   const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
-  const [musicEnabled, setMusicEnabled] = useState(false); // Background music toggle
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const musicContextRef = useRef<AudioContext | null>(null);
-  const musicSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -127,145 +123,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       console.log('Audio not supported');
     }
   };
-
-  // BACKGROUND MUSIC FUNCTIONS
-  const startBackgroundMusic = () => {
-    try {
-      // Create audio element if it doesn't exist
-      if (!audioRef.current) {
-        audioRef.current = new Audio();
-        // You can replace this with your own audio file
-        // For now, using a placeholder - you'll need to add your audio file to the public folder
-        audioRef.current.src = '/background-music.mp3'; // Add your downloaded audio file here
-        audioRef.current.loop = true;
-        audioRef.current.volume = 0.3; // Adjust volume as needed
-        
-        // Handle audio loading errors
-        audioRef.current.onerror = () => {
-          console.log('Audio file not found. Please add background-music.mp3 to the public folder.');
-          // Fallback to generated music
-          startGeneratedMusic();
-        };
-      }
-      
-      if (audioRef.current && audioRef.current.paused) {
-        audioRef.current.play().catch(() => {
-          console.log('Audio autoplay blocked by browser');
-          // Fallback to generated music
-          startGeneratedMusic();
-        });
-      }
-    } catch (error) {
-      console.log('Audio not supported, using generated music');
-      startGeneratedMusic();
-    }
-  };
-
-  const stopBackgroundMusic = () => {
-    if (audioRef.current && !audioRef.current.paused) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    stopGeneratedMusic();
-  };
-
-  // Fallback generated music (your previous instrumental)
-  const startGeneratedMusic = async () => {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      const audioContext = new AudioContext();
-      musicContextRef.current = audioContext;
-
-      const notes = {
-        C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
-        C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99
-      };
-
-      const playNote = (frequency: number, startTime: number, duration: number, volume: number = 0.1) => {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        const filterNode = audioContext.createBiquadFilter();
-        
-        oscillator.connect(filterNode);
-        filterNode.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(frequency, startTime);
-        oscillator.type = 'triangle';
-        
-        filterNode.type = 'lowpass';
-        filterNode.frequency.setValueAtTime(2000, startTime);
-        
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.1);
-        gainNode.gain.linearRampToValueAtTime(volume * 0.7, startTime + duration - 0.2);
-        gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
-        
-        oscillator.start(startTime);
-        oscillator.stop(startTime + duration);
-        
-        return oscillator;
-      };
-
-      const playMelodyLoop = () => {
-        if (!musicEnabled) return;
-        
-        const currentTime = audioContext.currentTime;
-        const noteDuration = 0.6;
-        
-        const melody = [
-          notes.C4, notes.E4, notes.G4, notes.C5,
-          notes.A4, notes.C5, notes.E5, notes.A4,
-          notes.F4, notes.A4, notes.C5, notes.F5,
-          notes.G4, notes.B4, notes.D5, notes.G4
-        ];
-        
-        melody.forEach((note, index) => {
-          playNote(note, currentTime + (index * noteDuration), noteDuration, 0.08);
-        });
-        
-        const bassNotes = [notes.C4, notes.A4, notes.F4, notes.G4];
-        bassNotes.forEach((note, index) => {
-          playNote(note * 0.5, currentTime + (index * noteDuration * 4), noteDuration * 4, 0.04);
-        });
-        
-        const loopDuration = melody.length * noteDuration * 1000;
-        setTimeout(() => {
-          if (musicEnabled && musicContextRef.current) {
-            playMelodyLoop();
-          }
-        }, loopDuration);
-      };
-
-      playMelodyLoop();
-    } catch (error) {
-      console.log('Generated music not supported');
-    }
-  };
-
-  const stopGeneratedMusic = () => {
-    if (musicContextRef.current) {
-      musicContextRef.current.close();
-      musicContextRef.current = null;
-    }
-    if (musicSourceRef.current) {
-      musicSourceRef.current.stop();
-      musicSourceRef.current = null;
-    }
-  };
-
-  // Handle music toggle
-  useEffect(() => {
-    if (musicEnabled) {
-      startBackgroundMusic();
-    } else {
-      stopBackgroundMusic();
-    }
-    
-    return () => {
-      stopBackgroundMusic();
-    };
-  }, [musicEnabled]);
 
   // JET ANIMATION - Update position when bidder changes
   useEffect(() => {
@@ -369,9 +226,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   return (
     <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
-      {/* AUDIO CONTROLS - Top left corner */}
-      <div className="absolute top-2 left-2 z-50 flex gap-2">
-        {/* Sound Effects Toggle */}
+      {/* SOUND TOGGLE - Top left corner */}
+      <div className="absolute top-2 left-2 z-50">
         <button
           onClick={() => setSoundEnabled(!soundEnabled)}
           className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-2 transition-colors"
@@ -381,19 +237,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
             <Volume2 className="w-4 h-4 text-white" />
           ) : (
             <VolumeX className="w-4 h-4 text-white/60" />
-          )}
-        </button>
-        
-        {/* Background Music Toggle */}
-        <button
-          onClick={() => setMusicEnabled(!musicEnabled)}
-          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full p-2 transition-colors"
-          title={musicEnabled ? "Disable background music" : "Enable background music"}
-        >
-          {musicEnabled ? (
-            <Music className="w-4 h-4 text-white" />
-          ) : (
-            <Music className="w-4 h-4 text-white/60" />
           )}
         </button>
       </div>
