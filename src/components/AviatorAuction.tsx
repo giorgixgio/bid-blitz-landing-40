@@ -173,11 +173,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         
         {/* "YOU BLEW UP JET" MESSAGE */}
         {showBlowUpMessage && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40 animate-bounce">
-            <div className="bg-red-500/90 text-white px-4 py-2 rounded-lg font-bold text-sm sm:text-base shadow-lg border-2 border-red-400">
-              <span className="emoji-consistent mr-2">💥</span>
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-40 animate-bounce">
+            <div className="bg-red-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-red-400">
+              <span className="emoji-consistent mr-1">💥</span>
               YOU BLEW UP JET
-              <span className="emoji-consistent ml-2">🚀💨</span>
+              <span className="emoji-consistent ml-1">🚀💨</span>
             </div>
           </div>
         )}
