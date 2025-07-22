@@ -249,6 +249,8 @@ const Auction = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       <Header />
       <div className="container mx-auto p-3 sm:p-4 lg:p-8">
+        {/* Add top padding when sticky bar is visible */}
+        <div className={`transition-all duration-300 ${showStickyBar ? 'pt-16' : 'pt-0'}`}>
         <div className="grid gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto lg:grid-cols-2">
           
           {/* Mobile-first: Bidding section comes first on mobile */}
@@ -509,8 +511,8 @@ const Auction = () => {
           </div>
         </div>
 
-        {/* Sticky Top Bar - below header with margin to avoid timer overlap */}
-        <div className={`fixed top-20 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-3 shadow-lg transition-transform duration-300 z-40 ${
+        {/* Sticky Top Bar - closer to header */}
+        <div className={`fixed top-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-2 shadow-lg transition-transform duration-300 z-40 ${
           showStickyBar ? 'translate-y-0' : '-translate-y-full'
         }`}>
           <div className="container mx-auto flex items-center gap-3">
@@ -538,6 +540,7 @@ const Auction = () => {
               ბიდი
             </Button>
           </div>
+        </div>
         </div>
       </div>
     </div>
