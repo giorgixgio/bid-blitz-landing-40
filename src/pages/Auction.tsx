@@ -424,20 +424,20 @@ const Auction = () => {
                 </div>
                 
                 {/* Extra large mobile-friendly BID button with progress */}
-                <div className="relative">
+                <div className="relative overflow-hidden rounded-md">
                   <Button 
                     onClick={handleBid}
-                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative bg-gradient-to-r from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted"
+                    className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 relative bg-gradient-to-r from-green-300 to-green-400 hover:from-green-200 hover:to-green-300 disabled:from-muted disabled:to-muted rounded-md"
                     disabled={userBidCredits <= 0 || timeLeft <= 0}
                   >
                     {/* Empty button - text is positioned absolutely outside */}
                   </Button>
                   
-                  {/* Progress overlay */}
+                  {/* Progress overlay - contained within parent container */}
                   {userJustBid && (
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
+                    <div className="absolute inset-0 pointer-events-none">
                       <div 
-                        className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-linear rounded-md"
+                        className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-1000 ease-linear"
                         style={{ width: `${bidProgress}%` }}
                       />
                     </div>
