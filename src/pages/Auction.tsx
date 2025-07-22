@@ -32,7 +32,7 @@ import { AviatorAuction } from '@/components/AviatorAuction';
 const Auction = () => {
   const [currentPrice, setCurrentPrice] = useState(0.01); // Penny auction starts at 1 cent
   const [userBidCredits, setUserBidCredits] = useState(45); // User's remaining bids
-  const [timeLeft, setTimeLeft] = useState(15); // Seconds left
+  const [timeLeft, setTimeLeft] = useState(10); // Seconds left
   const [totalBidsPlaced, setTotalBidsPlaced] = useState(847);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -45,7 +45,7 @@ const Auction = () => {
 
   const BID_COST = 0.60; // Cost per bid in ₾
   const PRICE_INCREMENT = 0.01; // Each bid increases price by 1 cent
-  const TIME_EXTENSION = 15; // Seconds added per bid
+  const TIME_EXTENSION = 10; // Seconds added per bid
 
   // Dummy bidders pool
   const dummyBidders = [

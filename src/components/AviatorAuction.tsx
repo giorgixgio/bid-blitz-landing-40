@@ -66,7 +66,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
     } else if (lastBidder !== 'შენ' && timeLeft > 0) {
       // For other bidders, animate based on remaining time
-      const timeProgress = (15 - timeLeft) / 15 * 100;
+      const timeProgress = (10 - timeLeft) / 10 * 100; // Changed to 10 seconds
       const targetX = 10 + (80 * timeProgress / 100);
       const targetY = 85 - (70 * timeProgress / 100);
       setCatPosition({ x: targetX, y: targetY });
@@ -139,6 +139,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
             {/* Flying Cat with Flapping Ears */}
             <div className="text-2xl sm:text-3xl relative">
               🐱
+              {/* Crown for winner */}
+              {lastBidder === 'შენ' && (
+                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 text-xl animate-bounce">
+                  👑
+                </div>
+              )}
               {/* Flapping ear effects */}
               <div className="absolute -top-1 -left-1 text-lg animate-pulse">👂</div>
               <div className="absolute -top-1 -right-1 text-lg animate-pulse" style={{ animationDelay: '0.1s' }}>👂</div>
@@ -148,27 +154,35 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
                 <div className="absolute -right-2 top-1 text-sm opacity-70 animate-ping" style={{ animationDelay: '0.2s' }}>✨</div>
               </div>
             </div>
-            {/* Player name bubble */}
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white/90 text-black px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
+            {/* Player name bubble - yellow styling when user is winning */}
+            <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded text-xs font-bold whitespace-nowrap ${
+              lastBidder === 'შენ' 
+                ? 'bg-yellow-400/90 text-black border-2 border-yellow-300 shadow-lg' 
+                : 'bg-white/90 text-black'
+            }`}>
               {lastBidder}
             </div>
-            {/* Enhanced trail effect when moving */}
+            {/* Enhanced trail effect when moving - yellow for user */}
             {isAnimating && (
               <>
-                <div className="absolute inset-0 bg-yellow-300/30 rounded-full animate-ping"></div>
-                <div className="absolute inset-0 bg-blue-300/20 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
+                <div className={`absolute inset-0 rounded-full animate-ping ${
+                  lastBidder === 'შენ' ? 'bg-yellow-300/50' : 'bg-yellow-300/30'
+                }`}></div>
+                <div className={`absolute inset-0 rounded-full animate-ping ${
+                  lastBidder === 'შენ' ? 'bg-yellow-400/30' : 'bg-blue-300/20'
+                }`} style={{ animationDelay: '0.3s' }}></div>
               </>
             )}
           </div>
           </div>
         </div>
 
-        {/* Multiplier Display - Fixed position, unaffected by zoom */}
-        <div className="absolute top-4 left-4 text-white z-20">
-          <div className="text-lg sm:text-xl font-bold">
-            {(currentPrice * 100).toFixed(0)}x
+        {/* Center Timer Display - Aviator style */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-30">
+          <div className={`text-4xl sm:text-6xl font-bold ${timeLeft <= 3 ? 'text-red-400 animate-pulse' : 'text-white'} drop-shadow-lg`}>
+            {String(timeLeft).padStart(2, '0')}
           </div>
-          <div className="text-xs opacity-80">მრავლისაძღვნა</div>
+          <div className="text-xs sm:text-sm text-white/80 mt-1">SECONDS</div>
         </div>
 
         {/* Progress Line - In game space */}
@@ -190,12 +204,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="text-center">
           <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
-          <p className="text-2xl sm:text-3xl font-bold text-white">{currentPrice.toFixed(2)} ₾</p>
+          <p className="text-xl sm:text-2xl font-bold text-white">{currentPrice.toFixed(2)} ₾</p>
         </div>
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-white/80">დარჩენილი დრო</p>
-          <div className={`text-2xl sm:text-3xl font-bold ${timeLeft <= 5 ? 'text-yellow-400 animate-pulse' : 'text-white'}`}>
-            {String(timeLeft).padStart(2, '0')}
+          <p className="text-xs sm:text-sm text-white/80">მულტიპლაიერი</p>
+          <div className="text-xl sm:text-2xl font-bold text-yellow-400">
+            {(currentPrice * 100).toFixed(0)}x
           </div>
         </div>
       </div>
@@ -217,7 +231,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       </div>
 
       {/* Crash warning when time is low */}
-      {timeLeft <= 5 && (
+      {timeLeft <= 3 && (
         <div className="absolute inset-0 bg-red-500/20 animate-pulse pointer-events-none rounded-lg">
           <div className="flex items-center justify-center h-full">
             <span className="text-red-400 font-bold text-lg animate-bounce">⚠️ CRASH INCOMING!</span>
