@@ -211,27 +211,27 @@ const Auction = () => {
           {/* Mobile-first: Bidding section (appears first on mobile) */}
           <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
             {/* Mobile-optimized Timer and Current Price */}
-            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+            <Card className="p-4 sm:p-6 text-center bg-gradient-to-r from-primary to-destructive border-primary/20 shadow-lg">
               <div className="space-y-3 sm:space-y-4">
                 <div className="text-center">
-                  <p className="text-xs sm:text-sm text-muted-foreground">მიმდინარე ფასი</p>
-                  <p className="text-3xl sm:text-4xl font-bold text-primary">{currentPrice.toFixed(2)} ₾</p>
-                  <p className="text-xs text-muted-foreground">საცალო ფასი: 3599 ₾</p>
+                  <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
+                  <p className="text-3xl sm:text-4xl font-bold text-white">{currentPrice.toFixed(2)} ₾</p>
+                  <p className="text-xs text-white/80">საცალო ფასი: 3599 ₾</p>
                 </div>
                 
                 <div className="text-center">
-                  <p className="text-xs sm:text-sm text-muted-foreground">დარჩენილი დრო</p>
-                  <div className={`text-2xl sm:text-3xl font-bold ${timeLeft <= 5 ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
+                  <p className="text-xs sm:text-sm text-white/80">დარჩენილი დრო</p>
+                  <div className={`text-2xl sm:text-3xl font-bold ${timeLeft <= 5 ? 'text-warning animate-pulse' : 'text-white'}`}>
                     {String(timeLeft).padStart(2, '0')} წამი
                   </div>
                 </div>
                 
                 <div className="flex items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm">
-                  <div className="flex items-center gap-1 text-muted-foreground">
+                  <div className="flex items-center gap-1 text-white/80">
                     <Gavel className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>{totalBidsPlaced} ბიდი</span>
                   </div>
-                  <div className="flex items-center gap-1 text-muted-foreground">
+                  <div className="flex items-center gap-1 text-white/80">
                     <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>წამყვანი: {lastBidder}</span>
                   </div>
@@ -240,15 +240,15 @@ const Auction = () => {
             </Card>
 
             {/* Mobile-optimized User Bid Credits */}
-            <Card className="p-3 sm:p-4 bg-gradient-to-r from-accent/10 to-primary/10 border-accent/20">
+            <Card className="p-3 sm:p-4 bg-gradient-to-r from-accent to-auction-premium border-accent/20 shadow-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                  <span className="font-medium text-sm sm:text-base">შენი ბიდები</span>
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  <span className="font-medium text-sm sm:text-base text-white">შენი ბიდები</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-xl sm:text-2xl font-bold text-primary">{userBidCredits}</p>
-                  <p className="text-xs text-muted-foreground">დარჩენილი</p>
+                  <p className="text-xl sm:text-2xl font-bold text-white">{userBidCredits}</p>
+                  <p className="text-xs text-white/80">დარჩენილი</p>
                 </div>
               </div>
             </Card>
@@ -267,7 +267,7 @@ const Auction = () => {
                 {/* Extra large mobile-friendly BID button */}
                 <Button 
                   onClick={handleBid}
-                  className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 disabled:from-muted disabled:to-muted shadow-lg"
+                  className="w-full h-14 sm:h-16 text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-destructive hover:from-primary/90 hover:to-destructive/90 disabled:from-muted disabled:to-muted shadow-lg text-white transform transition-transform active:scale-95"
                   disabled={userBidCredits <= 0 || timeLeft <= 0}
                 >
                   {timeLeft <= 0 ? (
