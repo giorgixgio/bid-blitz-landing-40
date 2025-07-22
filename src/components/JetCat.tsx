@@ -32,28 +32,38 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
 
   return (
     <div className="relative">
-      {/* Jet body - Custom styled jet instead of emoji */}
-      <div className="text-3xl sm:text-4xl relative flex items-center justify-center">
-        {/* Custom jet shape */}
-        <div className="relative w-12 h-8 sm:w-16 sm:h-10">
-          {/* Jet body */}
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-500 rounded-full transform rotate-45"></div>
-          {/* Jet nose */}
-          <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full"></div>
-          {/* Jet wings */}
-          <div className="absolute left-1 top-0 w-2 h-2 sm:w-3 sm:h-3 bg-gray-400 rounded transform -rotate-45"></div>
-          <div className="absolute left-1 bottom-0 w-2 h-2 sm:w-3 sm:h-3 bg-gray-400 rounded transform rotate-45"></div>
-          
-          {/* Cat inside jet - more visible with background */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg bg-white/20 rounded-full px-1 backdrop-blur-sm border border-white/30">
+      {/* Jet body - 25% bigger with emoji fallback system */}
+      <div className="text-4xl sm:text-5xl relative">
+        {/* Force consistent emoji rendering across devices */}
+        <span 
+          style={{ 
+            fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif',
+            fontSize: 'inherit',
+            lineHeight: 1
+          }}
+        >
+          🚀
+        </span>
+        {/* Cat inside jet - more visible with background */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg bg-white/20 rounded-full px-1 backdrop-blur-sm border border-white/30">
+          <span 
+            style={{ 
+              fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif'
+            }}
+          >
             🐱
-          </div>
+          </span>
         </div>
-        
         {/* Crown for user or winner */}
         {(isUser || isAuctionEnded) && (
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xl animate-bounce">
-            👑
+            <span 
+              style={{ 
+                fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", sans-serif'
+              }}
+            >
+              👑
+            </span>
           </div>
         )}
         {/* Jet trail */}
