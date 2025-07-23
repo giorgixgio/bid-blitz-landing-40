@@ -281,13 +281,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       return;
     }
     
-    // More predictable timing - only at exact timeLeft = 5
-    if (timeLeft === 5) {
+    // Changed timing to timeLeft = 3 to avoid conflict with coin spawning at timeLeft = 5
+    if (timeLeft === 3) {
       const chance = Math.random();
-      console.log('Other player collection chance:', chance, 'threshold: 0.75');
+      console.log('Other player collection chance:', chance, 'threshold: 0.6');
       
-      // Higher chance (75%) for other players to collect
-      if (chance < 0.75) {
+      // Reduced chance (60%) to give users more opportunities
+      if (chance < 0.6) {
         const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
         console.log('🤖 OTHER PLAYER COLLECTED COIN:', randomPlayer);
         

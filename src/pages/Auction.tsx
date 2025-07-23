@@ -210,12 +210,12 @@ const Auction = () => {
   useEffect(() => {
     if (timeLeft <= 0 || isAuctionEnded) return;
 
-    // More reliable bot bidding - 90% chance to ensure consistent activity
-    const shouldBid = Math.random() < 0.9; // Increased from 70% to 90%
+    // Balanced bot bidding - 75% chance for good activity without being too aggressive
+    const shouldBid = Math.random() < 0.75;
     const minTimeForBid = 1; // Don't bid if less than 1 second left
     
-    // Only bid in the final 2-6 seconds to create tension (expanded range)
-    if (shouldBid && timeLeft > minTimeForBid && timeLeft <= 6) {
+    // Only bid in the final 2-4 seconds to create tension (back to original range)
+    if (shouldBid && timeLeft > minTimeForBid && timeLeft <= 4) {
       const timer = setTimeout(() => {
         // Double-check timer is still valid before bidding
         if (timeLeft > minTimeForBid) {
@@ -262,7 +262,7 @@ const Auction = () => {
           setBidProgress(0);
           setUserJustBid(false);
         }
-      }, Math.random() * 800 + 300); // Reduced delay: 0.3-1.1 seconds
+      }, Math.random() * 1200 + 400); // Slightly longer delay: 0.4-1.6 seconds
       
       return () => clearTimeout(timer);
     }
