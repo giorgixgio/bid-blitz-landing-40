@@ -48,14 +48,14 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
 
   return (
     <div className="relative">
-      {/* Jet body - 25% bigger with consistent emoji font */}
-      <div className="text-4xl sm:text-5xl relative">
+      {/* Jet body - bigger with consistent emoji font */}
+      <div className="text-5xl sm:text-6xl relative">
         {/* Force consistent emoji rendering with Noto Color Emoji */}
         <span className="emoji-consistent inline-block">
           🚀
         </span>
-        {/* Cat inside jet - more visible with background */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg bg-white/20 rounded-full px-1 backdrop-blur-sm border border-white/30">
+        {/* Cat head sticking out of jet window - bigger and more prominent */}
+        <div className="absolute top-1/4 left-1/3 transform -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-3xl bg-white/30 rounded-full px-1 backdrop-blur-sm border border-white/40 shadow-lg">
           <span className="emoji-consistent">
             🐱
           </span>
