@@ -235,52 +235,43 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // COLLISION DETECTION - Check who actually touches the coin first
+  // SIMPLE COLLISION SYSTEM - bots collect first at specific time
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound) return;
     
-    // 1. Check USER collision first
-    const userJetX = isAuctionEnded ? 90 : jetPosition.x;
-    const userJetY = isAuctionEnded ? 15 : jetPosition.y;
-    const userDistance = Math.sqrt(
-      Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
-    );
-    
-    if (userDistance < 8) {
-      console.log('✅ USER TOUCHED COIN FIRST');
+    // BOT COLLECTION happens at timeLeft = 2 (before user gets chance)
+    if (timeLeft === 2 && lastBidder !== 'შენ') {
+      console.log('❌ BOT COLLECTED:', lastBidder);
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
-      setUserCollectedThisRound(true);
       setShowBonusMessage(true);
       setTimeout(() => setShowBonusMessage(false), 3000);
-      playWinningSound();
       
       if (onBonusBidCollected) {
-        onBonusBidCollected('შენ');
+        onBonusBidCollected(lastBidder);
       }
-      return; // USER COLLECTED - STOP HERE
+      return; // BOT COLLECTED - STOP
     }
     
-    // 2. Check BOT collision (simulate bot jet positions)
-    if (lastBidder !== 'შენ' && timeLeft <= 3) {
-      // Simulate bot jet position (similar to user but slightly different path)
-      const botProgress = ((10 - timeLeft) / 10 * 100);
-      const botJetX = 10 + (80 * botProgress / 100) + (Math.random() * 10 - 5); // Add some randomness
-      const botJetY = 85 - (70 * botProgress / 100) + (Math.random() * 5 - 2.5); // Add some randomness
-      
-      const botDistance = Math.sqrt(
-        Math.pow(botJetX - coinPosition.x, 2) + Math.pow(botJetY - coinPosition.y, 2)
+    // USER COLLISION only runs if timeLeft != 2 (so bot collection doesn't interfere)
+    if (timeLeft !== 2) {
+      const userJetX = isAuctionEnded ? 90 : jetPosition.x;
+      const userJetY = isAuctionEnded ? 15 : jetPosition.y;
+      const userDistance = Math.sqrt(
+        Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
       );
       
-      if (botDistance < 12 && Math.random() < 0.3) { // 30% chance bot hits when close
-        console.log('❌ BOT TOUCHED COIN FIRST:', lastBidder);
+      if (userDistance < 8) {
+        console.log('✅ USER COLLECTED');
         setIsCoinVisible(false);
         setCoinCollectedThisRound(true);
+        setUserCollectedThisRound(true);
         setShowBonusMessage(true);
         setTimeout(() => setShowBonusMessage(false), 3000);
+        playWinningSound();
         
         if (onBonusBidCollected) {
-          onBonusBidCollected(lastBidder); // Credit the actual bot bidder
+          onBonusBidCollected('შენ');
         }
       }
     }
