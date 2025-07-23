@@ -240,11 +240,28 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // SINGLE COIN COLLECTION HANDLER - handles all scenarios in one place
+  // SINGLE COIN COLLECTION HANDLER - ONLY ONE WAY TO COLLECT COINS
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound) return;
     
-    // STEP 1: Check if user collected by collision first (highest priority)
+    // First check: Did bot collect at timeLeft = 3?
+    if (timeLeft === 3 && Math.random() < 0.6) {
+      // BOT COLLECTED
+      const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+      console.log('❌ BOT COLLECTED:', randomPlayer);
+      
+      setIsCoinVisible(false);
+      setCoinCollectedThisRound(true);
+      setShowBonusMessage(true);
+      setTimeout(() => setShowBonusMessage(false), 3000);
+      
+      if (onBonusBidCollected) {
+        onBonusBidCollected(randomPlayer);
+      }
+      return; // STOP - bot collected
+    }
+    
+    // Second check: User collision detection (only if bot didn't collect)
     const jetX = isAuctionEnded ? 90 : jetPosition.x;
     const jetY = isAuctionEnded ? 15 : jetPosition.y;
     const distance = Math.sqrt(
@@ -252,8 +269,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     );
     
     if (distance < 8) {
-      // USER COLLECTED - highest priority
-      console.log('✅ USER COLLECTED COIN - CREDITING USER');
+      // USER COLLECTED
+      console.log('✅ USER COLLECTED');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       setUserCollectedThisRound(true);
@@ -264,43 +281,10 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       if (onBonusBidCollected) {
         onBonusBidCollected('შენ');
       }
-      return; // STOP HERE - user collected
-    }
-    
-    // STEP 2: Only if user didn't collect, check if other players should collect
-    if (timeLeft === 3 && Math.random() < 0.6) {
-      // OTHER PLAYER COLLECTED - only if user didn't collect first
-      const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-      console.log('❌ OTHER PLAYER COLLECTED COIN:', randomPlayer);
-      
-      setIsCoinVisible(false);
-      setCoinCollectedThisRound(true);
-      setShowBonusMessage(true);
-      setTimeout(() => setShowBonusMessage(false), 3000);
-      
-      if (onBonusBidCollected) {
-        onBonusBidCollected(randomPlayer);
-      }
     }
   }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, timeLeft, coinCollectedThisRound, onBonusBidCollected]);
 
-  // Handle coin collection (manual click) - separate from automatic logic
-  const handleCoinCollect = () => {
-    if (!isCoinVisible || coinCollectedThisRound) return;
-    
-    console.log('User collected coin by manual click');
-    setIsCoinVisible(false);
-    setCoinCollectedThisRound(true);
-    setUserCollectedThisRound(true);
-    setShowBonusMessage(true);
-    setTimeout(() => setShowBonusMessage(false), 3000);
-    playWinningSound();
-    
-    if (onBonusBidCollected) {
-      console.log('Calling onBonusBidCollected with: შენ (manual)');
-      onBonusBidCollected('შენ');
-    }
-  };
+  // REMOVED MANUAL CLICK - NO MORE MULTIPLE PATHS
 
 
   // CONFETTI EFFECT FOR AUCTION ENDED
@@ -424,7 +408,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           x={coinPosition.x}
           y={coinPosition.y}
           isVisible={isCoinVisible && !isAuctionEnded}
-          onCollect={handleCoinCollect}
         />
 
         {/* FLYING JET CAT */}

@@ -4,10 +4,9 @@ interface LuckyCoinProps {
   x: number;
   y: number;
   isVisible: boolean;
-  onCollect: () => void;
 }
 
-export const LuckyCoin: React.FC<LuckyCoinProps> = ({ x, y, isVisible, onCollect }) => {
+export const LuckyCoin: React.FC<LuckyCoinProps> = ({ x, y, isVisible }) => {
   if (!isVisible) return null;
 
   return (
