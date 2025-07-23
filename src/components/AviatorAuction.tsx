@@ -82,6 +82,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       setUserCollectedThisRound(false); // Reset user collection flag
       setShowBonusMessage(false);
       setBonusCollectorId(null); // Reset collector ID
+      
+      // Reset jet position to start when timer resets
+      setJetPosition({ x: 10, y: 85 });
+      setZoomLevel(1); // Reset zoom level
+      setTrailPoints([]); // Clear trail points
     }
   }, [timeLeft]);
 
