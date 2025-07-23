@@ -286,26 +286,29 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   };
 
-  // Simulate other player collecting coin - only if user hasn't collected it
+  // Determine who collects the coin - happens once when coin appears
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) return;
     
-    // More aggressive other player collection - 70% chance when timeLeft hits 3 seconds
-    if (timeLeft === 3 && Math.random() < 0.7) {
-      // Someone else collected the coin
-      console.log('Other player collected coin');
-      setIsCoinVisible(false);
-      setCoinCollectedThisRound(true);
-      
-      // Show ONLY the small notification
-      setShowBonusMessage(true);
-      setTimeout(() => setShowBonusMessage(false), 3000);
-      
-      if (onBonusBidCollected) {
-        const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-        console.log('Calling onBonusBidCollected with:', randomPlayer);
-        onBonusBidCollected(randomPlayer); // other player collected
+    // Immediately decide who will collect this coin when timeLeft hits 4 seconds
+    if (timeLeft === 4) {
+      // 70% chance other player collects it immediately
+      if (Math.random() < 0.7) {
+        console.log('Other player collected coin');
+        setIsCoinVisible(false);
+        setCoinCollectedThisRound(true);
+        
+        // Show ONLY the small notification
+        setShowBonusMessage(true);
+        setTimeout(() => setShowBonusMessage(false), 3000);
+        
+        if (onBonusBidCollected) {
+          const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+          console.log('Calling onBonusBidCollected with:', randomPlayer);
+          onBonusBidCollected(randomPlayer); // other player collected
+        }
       }
+      // Otherwise, let the user have a chance to collect it through collision detection
     }
   }, [timeLeft, isCoinVisible, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
 
