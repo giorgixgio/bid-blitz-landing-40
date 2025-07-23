@@ -235,44 +235,44 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // SIMPLE COLLISION SYSTEM - bots collect first at specific time
+  // COLLISION DETECTION - Check which specific user hits the coin
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound) return;
     
-    // BOT COLLECTION happens at timeLeft = 2 (before user gets chance)
-    if (timeLeft === 2 && lastBidder !== 'შენ') {
-      console.log('❌ BOT COLLECTED:', lastBidder);
+    // Check if CURRENT USER hits the coin
+    const userJetX = isAuctionEnded ? 90 : jetPosition.x;
+    const userJetY = isAuctionEnded ? 15 : jetPosition.y;
+    const userDistance = Math.sqrt(
+      Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
+    );
+    
+    if (userDistance < 8) {
+      // CURRENT USER collected the coin
+      console.log('✅ CURRENT USER (შენ) COLLECTED COIN');
+      setIsCoinVisible(false);
+      setCoinCollectedThisRound(true);
+      setUserCollectedThisRound(true);
+      setShowBonusMessage(true);
+      setTimeout(() => setShowBonusMessage(false), 3000);
+      playWinningSound();
+      
+      if (onBonusBidCollected) {
+        onBonusBidCollected('შენ'); // Only current user gets credit
+      }
+      return;
+    }
+    
+    // Simulate OTHER USERS hitting the coin
+    if (lastBidder !== 'შენ' && timeLeft <= 3 && Math.random() < 0.4) {
+      // Another user (not current user) collected the coin
+      console.log('❌ OTHER USER COLLECTED COIN:', lastBidder);
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       setShowBonusMessage(true);
       setTimeout(() => setShowBonusMessage(false), 3000);
       
       if (onBonusBidCollected) {
-        onBonusBidCollected(lastBidder);
-      }
-      return; // BOT COLLECTED - STOP
-    }
-    
-    // USER COLLISION only runs if timeLeft != 2 (so bot collection doesn't interfere)
-    if (timeLeft !== 2) {
-      const userJetX = isAuctionEnded ? 90 : jetPosition.x;
-      const userJetY = isAuctionEnded ? 15 : jetPosition.y;
-      const userDistance = Math.sqrt(
-        Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
-      );
-      
-      if (userDistance < 8) {
-        console.log('✅ USER COLLECTED');
-        setIsCoinVisible(false);
-        setCoinCollectedThisRound(true);
-        setUserCollectedThisRound(true);
-        setShowBonusMessage(true);
-        setTimeout(() => setShowBonusMessage(false), 3000);
-        playWinningSound();
-        
-        if (onBonusBidCollected) {
-          onBonusBidCollected('შენ');
-        }
+        onBonusBidCollected(lastBidder); // THAT user gets credit, NOT current user
       }
     }
   }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, lastBidder, timeLeft, onBonusBidCollected]);
