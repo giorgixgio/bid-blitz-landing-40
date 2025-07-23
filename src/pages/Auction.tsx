@@ -210,60 +210,63 @@ const Auction = () => {
   useEffect(() => {
     if (timeLeft <= 0 || isAuctionEnded) return;
 
-    const shouldBid = Math.random() < 0.7; // 70% chance to bid each second
+    // More reliable bot bidding - 90% chance to ensure consistent activity
+    const shouldBid = Math.random() < 0.9; // Increased from 70% to 90%
     const minTimeForBid = 1; // Don't bid if less than 1 second left
     
-    // Only bid in the final 2-4 seconds to create tension
-    if (shouldBid && timeLeft > minTimeForBid && timeLeft <= 4) {
+    // Only bid in the final 2-6 seconds to create tension (expanded range)
+    if (shouldBid && timeLeft > minTimeForBid && timeLeft <= 6) {
       const timer = setTimeout(() => {
-        // Select random bidder from pool
-        const randomBidder = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
-        
-        console.log(`Dummy bidder ${randomBidder} placing bid at ${timeLeft} seconds left`);
-        
-        // Execute the automated bid
-        setCurrentPrice(prev => prev + PRICE_INCREMENT);
-        setTotalBidsPlaced(prev => {
-          const newTotal = prev + 1;
+        // Double-check timer is still valid before bidding
+        if (timeLeft > minTimeForBid) {
+          // Select random bidder from pool
+          const randomBidder = dummyBidders[Math.floor(Math.random() * dummyBidders.length)];
           
-          // Add to bid history with current timestamp
-          setRecentBidders(prevBidders => {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-GB', { 
-              hour12: false, 
-              hour: '2-digit', 
-              minute: '2-digit', 
-              second: '2-digit' 
+          console.log(`Dummy bidder ${randomBidder} placing bid at ${timeLeft} seconds left`);
+          
+          // Execute the automated bid
+          setCurrentPrice(prev => prev + PRICE_INCREMENT);
+          setTotalBidsPlaced(prev => {
+            const newTotal = prev + 1;
+            
+            // Add to bid history with current timestamp
+            setRecentBidders(prevBidders => {
+              const now = new Date();
+              const timeString = now.toLocaleTimeString('en-GB', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+              });
+              
+              const newBidder = {
+                id: newTotal,
+                name: randomBidder,
+                bidNumber: newTotal,
+                time: timeString,
+                avatar: '/placeholder.svg'
+              };
+              
+              // Keep only latest 10 bidders
+              return [newBidder, ...prevBidders.slice(0, 9)];
             });
             
-            const newBidder = {
-              id: newTotal,
-              name: randomBidder,
-              bidNumber: newTotal,
-              time: timeString,
-              avatar: '/placeholder.svg'
-            };
-            
-            // Keep only latest 10 bidders
-            return [newBidder, ...prevBidders.slice(0, 9)];
+            return newTotal;
           });
           
-          return newTotal;
-        });
-        
-        // Reset timer and update game state
-        setTimeLeft(TIME_EXTENSION);
-        setLastBidder(randomBidder);
-        
-        // Reset user bid progress when someone else bids
-        setBidProgress(0);
-        setUserJustBid(false);
-        
-      }, Math.random() * 1000 + 500); // Random delay between 0.5-1.5 seconds
+          // Reset timer and update game state
+          setTimeLeft(TIME_EXTENSION);
+          setLastBidder(randomBidder);
+          
+          // Reset user bid progress when someone else bids
+          setBidProgress(0);
+          setUserJustBid(false);
+        }
+      }, Math.random() * 800 + 300); // Reduced delay: 0.3-1.1 seconds
       
       return () => clearTimeout(timer);
     }
-  }, [timeLeft]);
+  }, [timeLeft, isAuctionEnded]);
 
   /**
    * COUNTDOWN TIMER

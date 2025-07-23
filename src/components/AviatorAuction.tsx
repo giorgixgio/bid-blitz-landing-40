@@ -180,24 +180,24 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // CONTINUOUS ANIMATION - Update jet position based on progress
+  // CONTINUOUS ANIMATION - Update jet position based on progress with bounds checking
   useEffect(() => {
     if (!isExploding) {
       if (userJustBid && lastBidder === 'შენ') {
         // User bid - animate based on bid progress
-        const progress = bidProgress;
-        const targetX = 10 + (80 * progress / 100);
-        const targetY = 85 - (70 * progress / 100);
+        const progress = Math.min(bidProgress, 100); // Ensure max 100%
+        const targetX = Math.min(10 + (80 * progress / 100), 90); // Cap at 90%
+        const targetY = Math.max(85 - (70 * progress / 100), 15); // Cap at 15%
         setJetPosition({ x: targetX, y: targetY });
         setZoomLevel(1 + (progress / 100) * 0.3);
         
         // Add trail point
         setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
       } else if (lastBidder !== 'შენ' && timeLeft > 0) {
-        // Other bidders - animate based on time remaining
-        const timeProgress = (10 - timeLeft) / 10 * 100;
-        const targetX = 10 + (80 * timeProgress / 100);
-        const targetY = 85 - (70 * timeProgress / 100);
+        // Other bidders - animate based on time remaining with bounds checking
+        const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100); // Ensure max 100%
+        const targetX = Math.min(10 + (80 * timeProgress / 100), 90); // Cap at 90%
+        const targetY = Math.max(85 - (70 * timeProgress / 100), 15); // Cap at 15%
         setJetPosition({ x: targetX, y: targetY });
         setZoomLevel(1 + (timeProgress / 100) * 0.2);
         
@@ -281,11 +281,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       return;
     }
     
-    if (timeLeft === 4) {
+    // More predictable timing - only at exact timeLeft = 5
+    if (timeLeft === 5) {
       const chance = Math.random();
-      console.log('Other player collection chance:', chance, 'threshold: 0.7');
+      console.log('Other player collection chance:', chance, 'threshold: 0.75');
       
-      if (chance < 0.7) {
+      // Higher chance (75%) for other players to collect
+      if (chance < 0.75) {
         const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
         console.log('🤖 OTHER PLAYER COLLECTED COIN:', randomPlayer);
         
@@ -298,6 +300,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           console.log('❌ Calling onBonusBidCollected with:', randomPlayer);
           onBonusBidCollected(randomPlayer);
         }
+      } else {
+        console.log('🎯 User gets a chance to collect this coin');
       }
     }
   }, [timeLeft, isCoinVisible, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
