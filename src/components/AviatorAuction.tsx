@@ -254,6 +254,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
     if (distance < 8) {
       // Collision detected by current user!
+      console.log('User collected coin by collision detection');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       setUserCollectedThisRound(true); // Mark that user collected it
@@ -272,6 +273,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // Handle coin collection (manual click)
   const handleCoinCollect = () => {
+    console.log('User collected coin by manual click');
     setIsCoinVisible(false);
     setCoinCollectedThisRound(true);
     setUserCollectedThisRound(true); // Mark that user collected it
@@ -290,6 +292,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
     if (timeLeft <= 2 && Math.random() < 0.3) {
       // Someone else collected the coin
+      console.log('Other player collected coin');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       
@@ -299,6 +302,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       
       if (onBonusBidCollected) {
         const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+        console.log('Calling onBonusBidCollected with:', randomPlayer);
         onBonusBidCollected(randomPlayer); // other player collected
       }
     }
