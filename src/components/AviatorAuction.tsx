@@ -15,7 +15,7 @@ import { Card } from '@/components/ui/card';
 import { Gavel, Users, Coins, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { JetCat } from './JetCat';
 import { LuckyCoin } from './LuckyCoin';
-import { SlotAnimation } from './SlotAnimation';
+
 import confetti from 'canvas-confetti';
 
 interface AviatorAuctionProps {
@@ -55,10 +55,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   // LUCKY COIN STATE
   const [coinPosition, setCoinPosition] = useState({ x: 50, y: 50 });
   const [isCoinVisible, setIsCoinVisible] = useState(false);
-  const [showSlotAnimation, setShowSlotAnimation] = useState(false);
   const [coinCollectedThisRound, setCoinCollectedThisRound] = useState(false);
-  const [showOtherPlayerBonusMessage, setShowOtherPlayerBonusMessage] = useState(false);
-  const [currentUserCollectedCoin, setCurrentUserCollectedCoin] = useState(false);
+  const [showBonusMessage, setShowBonusMessage] = useState(false);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -79,9 +77,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     if (timeLeft === 10) { // When timer resets to full
       setMilliseconds(99);
       setCoinCollectedThisRound(false);
-      setCurrentUserCollectedCoin(false);
-      setShowSlotAnimation(false);
-      setShowOtherPlayerBonusMessage(false);
+      setShowBonusMessage(false);
     }
   }, [timeLeft]);
 
@@ -258,8 +254,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       // Collision detected by current user!
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
-      setCurrentUserCollectedCoin(true); // Mark that current user collected it
-      setShowSlotAnimation(true); // Only current user gets slot animation
+      setShowBonusMessage(true);
+      setTimeout(() => setShowBonusMessage(false), 3000);
       
       // Play winning sound for bonus collection
       playWinningSound();
@@ -275,8 +271,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const handleCoinCollect = () => {
     setIsCoinVisible(false);
     setCoinCollectedThisRound(true);
-    setCurrentUserCollectedCoin(true); // Mark that current user collected it
-    setShowSlotAnimation(true); // Only current user gets slot animation
+    setShowBonusMessage(true);
+    setTimeout(() => setShowBonusMessage(false), 3000);
     playWinningSound();
     
     if (onBonusBidCollected) {
@@ -286,28 +282,23 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // Simulate other player collecting coin - for testing
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound || currentUserCollectedCoin) return;
+    if (!isCoinVisible || coinCollectedThisRound) return;
     
     if (timeLeft <= 2 && Math.random() < 0.3) {
       // Someone else collected the coin
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
-      // currentUserCollectedCoin stays FALSE
       
       // Show ONLY the small notification
-      setShowOtherPlayerBonusMessage(true);
-      setTimeout(() => setShowOtherPlayerBonusMessage(false), 3000);
+      setShowBonusMessage(true);
+      setTimeout(() => setShowBonusMessage(false), 3000);
       
       if (onBonusBidCollected) {
         onBonusBidCollected(false); // false = other player collected
       }
     }
-  }, [timeLeft, isCoinVisible, coinCollectedThisRound, currentUserCollectedCoin, onBonusBidCollected]);
+  }, [timeLeft, isCoinVisible, coinCollectedThisRound, onBonusBidCollected]);
 
-  // Handle slot animation completion
-  const handleSlotComplete = () => {
-    setShowSlotAnimation(false);
-  };
 
   // CONFETTI EFFECT FOR AUCTION ENDED
   useEffect(() => {
@@ -370,12 +361,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         )}
 
-        {/* OTHER PLAYER BONUS MESSAGE - Only show if current user did NOT collect */}
-        {showOtherPlayerBonusMessage && !currentUserCollectedCoin && (
+        {/* BONUS MESSAGE - Small notification for all bonus collections */}
+        {showBonusMessage && (
           <div className="absolute top-8 inset-x-0 z-40 animate-bounce">
             <div className="mx-auto w-fit bg-yellow-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-yellow-400">
               <span className="emoji-consistent mr-1">💰</span>
-              SOMEONE GOT BONUS BID
+              GOT BONUS BID
               <span className="emoji-consistent ml-1">🎰✨</span>
             </div>
           </div>
@@ -540,11 +531,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </div>
       )}
 
-      {/* SLOT ANIMATION OVERLAY - Only for current user */}
-      <SlotAnimation 
-        isVisible={showSlotAnimation}
-        onComplete={handleSlotComplete}
-      />
     </Card>
   );
 };
