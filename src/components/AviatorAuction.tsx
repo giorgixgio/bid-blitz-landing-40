@@ -214,21 +214,34 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     const spawnCoin = () => {
       // Only spawn during last 4-5 seconds (timeLeft 1-5) and if no coin collected this round
       if (timeLeft >= 1 && timeLeft <= 5 && !coinCollectedThisRound) {
-        // Spawn coin ahead of the jet on its path
-        const currentJetX = jetPosition.x;
-        const currentJetY = jetPosition.y;
         
-        // Calculate the jet's direction and place coin ahead on the path
+        // IMMEDIATELY decide who gets the coin (80% bots, 20% user)
+        if (Math.random() < 0.8) {
+          // BOT GETS IT - no user opportunity
+          const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+          console.log('❌ BOT WINS COIN IMMEDIATELY:', randomPlayer);
+          
+          setCoinCollectedThisRound(true);
+          setShowBonusMessage(true);
+          setTimeout(() => setShowBonusMessage(false), 3000);
+          
+          if (onBonusBidCollected) {
+            onBonusBidCollected(randomPlayer);
+          }
+          return; // BOT COLLECTED - NO COIN FOR USER
+        }
+        
+        // USER GETS CHANCE - spawn coin normally
+        console.log('🎯 USER GETS COIN OPPORTUNITY');
         const progressPercent = bidProgress || ((10 - timeLeft) / 10 * 100);
-        const futureProgress = Math.min(progressPercent + 15, 100); // 15% ahead of current position
+        const futureProgress = Math.min(progressPercent + 15, 100);
         
-        const coinX = 10 + (80 * futureProgress / 100); // Follow the same path formula
-        const coinY = 85 - (70 * futureProgress / 100); // Follow the same path formula
+        const coinX = 10 + (80 * futureProgress / 100);
+        const coinY = 85 - (70 * futureProgress / 100);
         
         setCoinPosition({ x: coinX, y: coinY });
         setIsCoinVisible(true);
         
-        // Auto-hide coin after timeLeft seconds (so it disappears when timer resets)
         setTimeout(() => {
           setIsCoinVisible(false);
         }, timeLeft * 1000);
@@ -240,37 +253,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // BOT COLLECTION - happens first, blocks user collection
-  useEffect(() => {
-    console.log('BOT CHECK - timeLeft:', timeLeft, 'isCoinVisible:', isCoinVisible, 'coinCollectedThisRound:', coinCollectedThisRound);
-    
-    if (!isCoinVisible || coinCollectedThisRound) {
-      console.log('BOT CHECK FAILED - coin not visible or already collected');
-      return;
-    }
-    
-    if (timeLeft === 3) {
-      const chance = Math.random();
-      console.log('BOT COLLECTION CHANCE:', chance, 'threshold: 0.8');
-      
-      if (chance < 0.8) {
-        // BOT COLLECTED - happens immediately, blocks user
-        const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-        console.log('❌ BOT COLLECTED FIRST:', randomPlayer);
-        
-        setIsCoinVisible(false);
-        setCoinCollectedThisRound(true);
-        setShowBonusMessage(true);
-        setTimeout(() => setShowBonusMessage(false), 3000);
-        
-        if (onBonusBidCollected) {
-          onBonusBidCollected(randomPlayer);
-        }
-      } else {
-        console.log('BOT MISSED - user gets chance');
-      }
-    }
-  }, [timeLeft, isCoinVisible, coinCollectedThisRound, onBonusBidCollected]);
+  // USER COLLISION - only runs if coin is visible for user
 
   // USER COLLISION - only runs if bot didn't collect
   useEffect(() => {
