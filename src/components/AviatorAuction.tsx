@@ -290,7 +290,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) return;
     
-    if (timeLeft <= 2 && Math.random() < 0.3) {
+    // More aggressive other player collection - 70% chance when timeLeft hits 3 seconds
+    if (timeLeft === 3 && Math.random() < 0.7) {
       // Someone else collected the coin
       console.log('Other player collected coin');
       setIsCoinVisible(false);
