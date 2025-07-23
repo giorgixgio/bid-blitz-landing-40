@@ -240,15 +240,14 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // SINGLE COIN COLLECTION HANDLER - ONLY ONE WAY TO COLLECT COINS
+  // BOT COLLECTION - happens first, blocks user collection
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound) return;
     
-    // First check: Did bot collect at timeLeft = 3?
-    if (timeLeft === 3 && Math.random() < 0.6) {
-      // BOT COLLECTED
+    if (timeLeft === 3 && Math.random() < 0.8) {
+      // BOT COLLECTED - happens immediately, blocks user
       const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-      console.log('❌ BOT COLLECTED:', randomPlayer);
+      console.log('❌ BOT COLLECTED FIRST:', randomPlayer);
       
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
@@ -258,10 +257,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       if (onBonusBidCollected) {
         onBonusBidCollected(randomPlayer);
       }
-      return; // STOP - bot collected
     }
+  }, [timeLeft, isCoinVisible, coinCollectedThisRound, onBonusBidCollected]);
+
+  // USER COLLISION - only runs if bot didn't collect
+  useEffect(() => {
+    if (!isCoinVisible || coinCollectedThisRound) return;
     
-    // Second check: User collision detection (only if bot didn't collect)
     const jetX = isAuctionEnded ? 90 : jetPosition.x;
     const jetY = isAuctionEnded ? 15 : jetPosition.y;
     const distance = Math.sqrt(
@@ -269,7 +271,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     );
     
     if (distance < 8) {
-      // USER COLLECTED
       console.log('✅ USER COLLECTED');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
@@ -282,9 +283,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         onBonusBidCollected('შენ');
       }
     }
-  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, timeLeft, coinCollectedThisRound, onBonusBidCollected]);
-
-  // REMOVED MANUAL CLICK - NO MORE MULTIPLE PATHS
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, onBonusBidCollected]);
 
 
   // CONFETTI EFFECT FOR AUCTION ENDED
