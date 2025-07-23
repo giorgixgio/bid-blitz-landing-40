@@ -27,7 +27,7 @@ interface AviatorAuctionProps {
   userJustBid: boolean;          // Whether user just placed a bid
   bidProgress: number;           // Progress percentage (0-100)
   isAuctionEnded?: boolean;      // Whether auction has ended
-  onBonusBidCollected?: (isCurrentUser: boolean) => void; // Callback when bonus bid is collected
+  onBonusBidCollected?: (collectorId: string) => void; // Callback when bonus bid is collected - collectorId indicates who collected it
 }
 
 export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
@@ -262,7 +262,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       
       // Notify parent component about bonus collection (current user)
       if (onBonusBidCollected) {
-        onBonusBidCollected(true); // true = current user collected
+        onBonusBidCollected('შენ'); // current user collected
       }
     }
   }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected, coinCollectedThisRound]);
@@ -276,7 +276,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     playWinningSound();
     
     if (onBonusBidCollected) {
-      onBonusBidCollected(true); // true = current user collected
+      onBonusBidCollected('შენ'); // current user collected
     }
   };
 
@@ -294,7 +294,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       setTimeout(() => setShowBonusMessage(false), 3000);
       
       if (onBonusBidCollected) {
-        onBonusBidCollected(false); // false = other player collected
+        const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+        onBonusBidCollected(randomPlayer); // other player collected
       }
     }
   }, [timeLeft, isCoinVisible, coinCollectedThisRound, onBonusBidCollected]);

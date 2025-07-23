@@ -521,10 +521,12 @@ const Auction = () => {
               userJustBid={userJustBid}
               bidProgress={bidProgress}
               isAuctionEnded={isAuctionEnded}
-              onBonusBidCollected={(isCurrentUser: boolean) => {
-                if (isCurrentUser) {
+              onBonusBidCollected={(collectorId: string) => {
+                // Only give bonus bid to the specific collector
+                if (collectorId === 'შენ') {
                   setUserBidCredits(prev => prev + 1);
                 }
+                // Note: Other players' bonus bids would be handled server-side in a real app
               }}
             />
 
