@@ -240,77 +240,65 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // COLLISION DETECTION - Check if jet hits the coin
+  // SINGLE coin collection logic - prevents multiple calls
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) return;
+    if (!isCoinVisible || coinCollectedThisRound) return;
     
+    // Check if current user collected by collision detection
     const jetX = isAuctionEnded ? 90 : jetPosition.x;
     const jetY = isAuctionEnded ? 15 : jetPosition.y;
-    
-    // Simple collision detection (within 8% distance)
     const distance = Math.sqrt(
       Math.pow(jetX - coinPosition.x, 2) + Math.pow(jetY - coinPosition.y, 2)
     );
     
+    let collector = null;
+    
+    // Priority 1: User collision detection
     if (distance < 8) {
-      // Collision detected by current user!
+      collector = 'შენ';
       console.log('User collected coin by collision detection');
+      setUserCollectedThisRound(true);
+      playWinningSound();
+    }
+    // Priority 2: Other players collect at timeLeft = 4 with 70% chance
+    else if (timeLeft === 4 && Math.random() < 0.7) {
+      const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+      collector = randomPlayer;
+      console.log('Other player collected coin:', randomPlayer);
+    }
+    
+    // Execute collection if someone collected it
+    if (collector) {
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
-      setUserCollectedThisRound(true); // Mark that user collected it
       setShowBonusMessage(true);
       setTimeout(() => setShowBonusMessage(false), 3000);
       
-      // Play winning sound for bonus collection
-      playWinningSound();
-      
-      // Notify parent component about bonus collection (current user)
+      // Call parent callback ONLY ONCE
       if (onBonusBidCollected) {
-        onBonusBidCollected('შენ'); // current user collected
+        console.log('Calling onBonusBidCollected with:', collector);
+        onBonusBidCollected(collector);
       }
     }
-  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected, coinCollectedThisRound, userCollectedThisRound]);
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, timeLeft, coinCollectedThisRound, onBonusBidCollected]);
 
-  // Handle coin collection (manual click)
+  // Handle coin collection (manual click) - separate from automatic logic
   const handleCoinCollect = () => {
+    if (!isCoinVisible || coinCollectedThisRound) return;
+    
     console.log('User collected coin by manual click');
     setIsCoinVisible(false);
     setCoinCollectedThisRound(true);
-    setUserCollectedThisRound(true); // Mark that user collected it
+    setUserCollectedThisRound(true);
     setShowBonusMessage(true);
     setTimeout(() => setShowBonusMessage(false), 3000);
     playWinningSound();
     
     if (onBonusBidCollected) {
-      onBonusBidCollected('შენ'); // current user collected
+      console.log('Calling onBonusBidCollected with: შენ (manual)');
+      onBonusBidCollected('შენ');
     }
   };
-
-  // Determine who collects the coin - happens once when coin appears
-  useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) return;
-    
-    // Immediately decide who will collect this coin when timeLeft hits 4 seconds
-    if (timeLeft === 4) {
-      // 70% chance other player collects it immediately
-      if (Math.random() < 0.7) {
-        console.log('Other player collected coin');
-        setIsCoinVisible(false);
-        setCoinCollectedThisRound(true);
-        
-        // Show ONLY the small notification
-        setShowBonusMessage(true);
-        setTimeout(() => setShowBonusMessage(false), 3000);
-        
-        if (onBonusBidCollected) {
-          const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-          console.log('Calling onBonusBidCollected with:', randomPlayer);
-          onBonusBidCollected(randomPlayer); // other player collected
-        }
-      }
-      // Otherwise, let the user have a chance to collect it through collision detection
-    }
-  }, [timeLeft, isCoinVisible, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
 
 
   // CONFETTI EFFECT FOR AUCTION ENDED

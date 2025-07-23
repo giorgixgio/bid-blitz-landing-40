@@ -530,7 +530,6 @@ const Auction = () => {
                 } else {
                   console.log('Other player collected, not giving bonus to current user');
                 }
-                // Note: Other players' bonus bids would be handled server-side in a real app
               }}
             />
 
