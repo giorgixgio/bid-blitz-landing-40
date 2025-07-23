@@ -242,7 +242,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // COLLISION DETECTION - Check if jet hits the coin
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound) return;
+    if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) return;
     
     const jetX = isAuctionEnded ? 90 : jetPosition.x;
     const jetY = isAuctionEnded ? 15 : jetPosition.y;
@@ -269,7 +269,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         onBonusBidCollected('შენ'); // current user collected
       }
     }
-  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected, coinCollectedThisRound]);
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, onBonusBidCollected, coinCollectedThisRound, userCollectedThisRound]);
 
   // Handle coin collection (manual click)
   const handleCoinCollect = () => {
