@@ -240,24 +240,20 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // User collision detection - highest priority
+  // SINGLE COIN COLLECTION HANDLER - handles all scenarios in one place
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound) {
-      return;
-    }
+    if (!isCoinVisible || coinCollectedThisRound) return;
     
-    console.log('Collision check - timeLeft:', timeLeft, 'userCollectedThisRound:', userCollectedThisRound);
-    
+    // STEP 1: Check if user collected by collision first (highest priority)
     const jetX = isAuctionEnded ? 90 : jetPosition.x;
     const jetY = isAuctionEnded ? 15 : jetPosition.y;
     const distance = Math.sqrt(
       Math.pow(jetX - coinPosition.x, 2) + Math.pow(jetY - coinPosition.y, 2)
     );
     
-    console.log('Distance check:', distance, 'jetPos:', {x: jetX, y: jetY}, 'coinPos:', coinPosition);
-    
     if (distance < 8) {
-      console.log('🎯 USER COLLISION DETECTED - COLLECTING COIN');
+      // USER COLLECTED - highest priority
+      console.log('✅ USER COLLECTED COIN - CREDITING USER');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       setUserCollectedThisRound(true);
@@ -266,45 +262,27 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       playWinningSound();
       
       if (onBonusBidCollected) {
-        console.log('✅ Calling onBonusBidCollected with: შენ (collision)');
         onBonusBidCollected('შენ');
       }
-    }
-  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
-
-  // Other players collect coin - only if user hasn't collected it yet
-  useEffect(() => {
-    console.log('Other player check - timeLeft:', timeLeft, 'isCoinVisible:', isCoinVisible, 'coinCollectedThisRound:', coinCollectedThisRound, 'userCollectedThisRound:', userCollectedThisRound);
-    
-    if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) {
-      console.log('Other player collection blocked - coin already handled');
-      return;
+      return; // STOP HERE - user collected
     }
     
-    // Changed timing to timeLeft = 3 to avoid conflict with coin spawning at timeLeft = 5
-    if (timeLeft === 3) {
-      const chance = Math.random();
-      console.log('Other player collection chance:', chance, 'threshold: 0.6');
+    // STEP 2: Only if user didn't collect, check if other players should collect
+    if (timeLeft === 3 && Math.random() < 0.6) {
+      // OTHER PLAYER COLLECTED - only if user didn't collect first
+      const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+      console.log('❌ OTHER PLAYER COLLECTED COIN:', randomPlayer);
       
-      // Reduced chance (60%) to give users more opportunities
-      if (chance < 0.6) {
-        const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-        console.log('🤖 OTHER PLAYER COLLECTED COIN:', randomPlayer);
-        
-        setIsCoinVisible(false);
-        setCoinCollectedThisRound(true);
-        setShowBonusMessage(true);
-        setTimeout(() => setShowBonusMessage(false), 3000);
-        
-        if (onBonusBidCollected) {
-          console.log('❌ Calling onBonusBidCollected with:', randomPlayer);
-          onBonusBidCollected(randomPlayer);
-        }
-      } else {
-        console.log('🎯 User gets a chance to collect this coin');
+      setIsCoinVisible(false);
+      setCoinCollectedThisRound(true);
+      setShowBonusMessage(true);
+      setTimeout(() => setShowBonusMessage(false), 3000);
+      
+      if (onBonusBidCollected) {
+        onBonusBidCollected(randomPlayer);
       }
     }
-  }, [timeLeft, isCoinVisible, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, timeLeft, coinCollectedThisRound, onBonusBidCollected]);
 
   // Handle coin collection (manual click) - separate from automatic logic
   const handleCoinCollect = () => {
