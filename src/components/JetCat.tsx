@@ -55,7 +55,7 @@ export const JetCat: React.FC<JetCatProps> = ({ bidder, isUser, isExploding, isA
           🚀
         </span>
         {/* Cat head sticking out of jet window - bigger and more prominent */}
-        <div className="absolute top-1/4 left-1/3 transform -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-3xl bg-white/30 rounded-full px-1 backdrop-blur-sm border border-white/40 shadow-lg">
+        <div className="absolute top-1/4 left-1/5 transform -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-3xl bg-white/30 rounded-full px-1 backdrop-blur-sm border border-white/40 shadow-lg">
           <span className="emoji-consistent">
             🐱
           </span>
