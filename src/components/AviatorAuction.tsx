@@ -56,6 +56,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [coinPosition, setCoinPosition] = useState({ x: 50, y: 50 });
   const [isCoinVisible, setIsCoinVisible] = useState(false);
   const [coinCollectedThisRound, setCoinCollectedThisRound] = useState(false);
+  const [userCollectedThisRound, setUserCollectedThisRound] = useState(false);
   const [showBonusMessage, setShowBonusMessage] = useState(false);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
@@ -77,6 +78,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     if (timeLeft === 10) { // When timer resets to full
       setMilliseconds(99);
       setCoinCollectedThisRound(false);
+      setUserCollectedThisRound(false); // Reset user collection flag
       setShowBonusMessage(false);
     }
   }, [timeLeft]);
@@ -254,6 +256,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       // Collision detected by current user!
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
+      setUserCollectedThisRound(true); // Mark that user collected it
       setShowBonusMessage(true);
       setTimeout(() => setShowBonusMessage(false), 3000);
       
@@ -271,6 +274,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const handleCoinCollect = () => {
     setIsCoinVisible(false);
     setCoinCollectedThisRound(true);
+    setUserCollectedThisRound(true); // Mark that user collected it
     setShowBonusMessage(true);
     setTimeout(() => setShowBonusMessage(false), 3000);
     playWinningSound();
@@ -280,9 +284,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   };
 
-  // Simulate other player collecting coin - for testing
+  // Simulate other player collecting coin - only if user hasn't collected it
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound) return;
+    if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) return;
     
     if (timeLeft <= 2 && Math.random() < 0.3) {
       // Someone else collected the coin
@@ -298,7 +302,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         onBonusBidCollected(randomPlayer); // other player collected
       }
     }
-  }, [timeLeft, isCoinVisible, coinCollectedThisRound, onBonusBidCollected]);
+  }, [timeLeft, isCoinVisible, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
 
 
   // CONFETTI EFFECT FOR AUCTION ENDED
