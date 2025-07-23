@@ -58,6 +58,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [coinCollectedThisRound, setCoinCollectedThisRound] = useState(false);
   const [userCollectedThisRound, setUserCollectedThisRound] = useState(false);
   const [showBonusMessage, setShowBonusMessage] = useState(false);
+  const [bonusCollectorId, setBonusCollectorId] = useState<string | null>(null);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -80,6 +81,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       setCoinCollectedThisRound(false);
       setUserCollectedThisRound(false); // Reset user collection flag
       setShowBonusMessage(false);
+      setBonusCollectorId(null); // Reset collector ID
     }
   }, [timeLeft]);
 
@@ -245,6 +247,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       console.log('❌ OTHER USER GETS COIN:', lastBidder);
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
+      setBonusCollectorId(lastBidder); // Track who collected it
       setShowBonusMessage(true);
       setTimeout(() => setShowBonusMessage(false), 3000);
       
@@ -267,6 +270,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         setIsCoinVisible(false);
         setCoinCollectedThisRound(true);
         setUserCollectedThisRound(true);
+        setBonusCollectorId('შენ'); // Track that current user collected it
         setShowBonusMessage(true);
         setTimeout(() => setShowBonusMessage(false), 3000);
         playWinningSound();
@@ -340,10 +344,14 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         )}
 
-        {/* BONUS MESSAGE - Small notification for all bonus collections */}
+        {/* BONUS MESSAGE - Green for highest bidder, yellow for others */}
         {showBonusMessage && (
           <div className="absolute top-8 inset-x-0 z-40 animate-bounce">
-            <div className="mx-auto w-fit bg-yellow-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-yellow-400">
+            <div className={`mx-auto w-fit text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg ${
+              bonusCollectorId === 'შენ' && lastBidder === 'შენ' 
+                ? 'bg-green-500/90 border border-green-400' 
+                : 'bg-yellow-500/90 border border-yellow-400'
+            }`}>
               <span className="emoji-consistent mr-1">💰</span>
               GOT BONUS BID
               <span className="emoji-consistent ml-1">🎰✨</span>
