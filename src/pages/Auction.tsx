@@ -552,20 +552,6 @@ const Auction = () => {
               }}
             />
 
-            {/* User's Bid Credits Display */}
-            <Card className="p-3 sm:p-4 bg-gradient-to-r from-orange-500/70 to-orange-600/70 border-orange-400/20 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  <span className="font-medium text-sm sm:text-base text-white">შენი ბიდები</span> {/* Your Bids */}
-                </div>
-                <div className="text-right">
-                  <p className="text-xl sm:text-2xl font-bold text-white">{userBidCredits}</p>
-                  <p className="text-xs text-white/80">დარჩენილი</p> {/* Remaining */}
-                </div>
-              </div>
-            </Card>
-
             {/* Bid Placement Interface */}
             <Card className="p-4 sm:p-6">
               <div className="space-y-3 sm:space-y-4">
@@ -631,110 +617,124 @@ const Auction = () => {
                     </p>
                   </div>
                 )}
-
-                {/* Buy Bids Sheet Modal */}
-                <Sheet open={showBuyBidsSheet} onOpenChange={setShowBuyBidsSheet}>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" className="w-full h-12 text-sm sm:text-base border-orange-400/30 hover:bg-orange-500/10">
-                      <Coins className="w-4 h-4 mr-2" />
-                      ბიდების შეძენა
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl overflow-y-auto">
-                    <SheetHeader className="text-center pb-6">
-                      <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle>
-                      <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p>
-                    </SheetHeader>
-
-                    <div className="space-y-6 max-w-md mx-auto pb-8">
-                      {/* Bid Package Options */}
-                      <div className="grid gap-3">
-                        {/* Popular Package - Highlighted */}
-                        <div className="p-4 border-2 border-orange-400 bg-orange-50 rounded-lg">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h3 className="font-bold text-lg">50 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">ყველაზე პოპულარული</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-2xl font-bold text-orange-600">30₾</p>
-                              <p className="text-xs text-muted-foreground">0.60₾ თითო ბიდი</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Starter Package */}
-                        <div className="p-4 border border-gray-200 rounded-lg">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h3 className="font-bold">25 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">დამწყებთათვის</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xl font-bold">16₾</p>
-                              <p className="text-xs text-muted-foreground">0.64₾ თითო ბიდი</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Value Package */}
-                        <div className="p-4 border border-gray-200 rounded-lg">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h3 className="font-bold">100 ბიდი</h3>
-                              <p className="text-sm text-muted-foreground">ყველაზე ოპტიმალური</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xl font-bold">55₾</p>
-                              <p className="text-xs text-muted-foreground">0.55₾ თითო ბიდი</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Payment Button */}
-                      <div className="pt-4 border-t">
-                        <Button 
-                          className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white shadow-lg"
-                          onClick={() => {
-                            // Mock payment - adds 50 bids to user account
-                            setUserBidCredits(prev => prev + 50);
-                            setShowBuyBidsSheet(false);
-                            toast({
-                              title: "ბიდები წარმატებით შეძენილია!",
-                              description: "50 ბიდი დაემატა თქვენს ანგარიშს",
-                            });
-                          }}
-                        >
-                          PAY NOW - 30₾
-                        </Button>
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-
-                {/* Autobidder Toggle */}
-                <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border">
-                  <div className="flex items-center gap-2">
-                    <Bot className="w-4 h-4 text-primary" />
-                    <div>
-                      <p className="font-medium text-sm">ავტო-ბიდერი</p> {/* Auto-bidder */}
-                      <p className="text-xs text-muted-foreground">ავტომატურად განათავსებს ბიდებს</p> {/* Automatically places bids */}
-                    </div>
-                  </div>
-                  <Switch 
-                    checked={autoBidderEnabled}
-                    onCheckedChange={setAutoBidderEnabled}
-                    className="data-[state=checked]:bg-primary"
-                  />
-                </div>
-
-                {/* Timer Extension Info */}
-                <p className="text-xs text-muted-foreground text-center">
-                  ტაიმერი განახლდება ყოველი ბიდის შემდეგ {TIME_EXTENSION} წამით {/* Timer extends by X seconds after each bid */}
-                </p>
               </div>
             </Card>
+
+            {/* User's Bid Credits Display */}
+            <Card className="p-3 sm:p-4 bg-gradient-to-r from-orange-500/70 to-orange-600/70 border-orange-400/20 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  <span className="font-medium text-sm sm:text-base text-white">შენი ბიდები</span> {/* Your Bids */}
+                </div>
+                <div className="text-right">
+                  <p className="text-xl sm:text-2xl font-bold text-white">{userBidCredits}</p>
+                  <p className="text-xs text-white/80">დარჩენილი</p> {/* Remaining */}
+                </div>
+              </div>
+            </Card>
+
+            {/* Buy Bids Sheet Modal */}
+            <Sheet open={showBuyBidsSheet} onOpenChange={setShowBuyBidsSheet}>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="w-full h-12 text-sm sm:text-base border-orange-400/30 hover:bg-orange-500/10">
+                  <Coins className="w-4 h-4 mr-2" />
+                  ბიდების შეძენა
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl overflow-y-auto">
+                <SheetHeader className="text-center pb-6">
+                  <SheetTitle className="text-xl font-bold">ბიდების შეძენა</SheetTitle>
+                  <p className="text-muted-foreground">აირჩიე ბიდების პაკეტი და განაგრძე აუქციონი</p>
+                </SheetHeader>
+
+                <div className="space-y-6 max-w-md mx-auto pb-8">
+                  {/* Bid Package Options */}
+                  <div className="grid gap-3">
+                    {/* Popular Package - Highlighted */}
+                    <div className="p-4 border-2 border-orange-400 bg-orange-50 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-bold text-lg">50 ბიდი</h3>
+                          <p className="text-sm text-muted-foreground">ყველაზე პოპულარული</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-orange-600">30₾</p>
+                          <p className="text-xs text-muted-foreground">0.60₾ თითო ბიდი</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Starter Package */}
+                    <div className="p-4 border border-gray-200 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-bold">25 ბიდი</h3>
+                          <p className="text-sm text-muted-foreground">დამწყებთათვის</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold">16₾</p>
+                          <p className="text-xs text-muted-foreground">0.64₾ თითო ბიდი</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Value Package */}
+                    <div className="p-4 border border-gray-200 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-bold">100 ბიდი</h3>
+                          <p className="text-sm text-muted-foreground">ყველაზე ოპტიმალური</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold">55₾</p>
+                          <p className="text-xs text-muted-foreground">0.55₾ თითო ბიდი</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment Button */}
+                  <div className="pt-4 border-t">
+                    <Button 
+                      className="w-full h-14 text-xl font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white shadow-lg"
+                      onClick={() => {
+                        // Mock payment - adds 50 bids to user account
+                        setUserBidCredits(prev => prev + 50);
+                        setShowBuyBidsSheet(false);
+                        toast({
+                          title: "ბიდები წარმატებით შეძენილია!",
+                          description: "50 ბიდი დაემატა თქვენს ანგარიშს",
+                        });
+                      }}
+                    >
+                      PAY NOW - 30₾
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            {/* Autobidder Toggle */}
+            <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border">
+              <div className="flex items-center gap-2">
+                <Bot className="w-4 h-4 text-primary" />
+                <div>
+                  <p className="font-medium text-sm">ავტო-ბიდერი</p> {/* Auto-bidder */}
+                  <p className="text-xs text-muted-foreground">ავტომატურად განათავსებს ბიდებს</p> {/* Automatically places bids */}
+                </div>
+              </div>
+              <Switch 
+                checked={autoBidderEnabled}
+                onCheckedChange={setAutoBidderEnabled}
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
+
+            {/* Timer Extension Info */}
+            <p className="text-xs text-muted-foreground text-center">
+              ტაიმერი განახლდება ყოველი ბიდის შემდეგ {TIME_EXTENSION} წამით {/* Timer extends by X seconds after each bid */}
+            </p>
 
             {/* Recent Bidders List */}
             <Card className="p-4 sm:p-6">
