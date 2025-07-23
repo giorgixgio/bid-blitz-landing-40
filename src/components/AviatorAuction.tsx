@@ -214,25 +214,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     const spawnCoin = () => {
       // Only spawn during last 4-5 seconds (timeLeft 1-5) and if no coin collected this round
       if (timeLeft >= 1 && timeLeft <= 5 && !coinCollectedThisRound) {
-        
-        // IMMEDIATELY decide who gets the coin (80% bots, 20% user)
-        if (Math.random() < 0.8) {
-          // BOT GETS IT - no user opportunity
-          const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-          console.log('❌ BOT WINS COIN IMMEDIATELY:', randomPlayer);
-          
-          setCoinCollectedThisRound(true);
-          setShowBonusMessage(true);
-          setTimeout(() => setShowBonusMessage(false), 3000);
-          
-          if (onBonusBidCollected) {
-            onBonusBidCollected(randomPlayer);
-          }
-          return; // BOT COLLECTED - NO COIN FOR USER
-        }
-        
-        // USER GETS CHANCE - spawn coin normally
-        console.log('🎯 USER GETS COIN OPPORTUNITY');
+        // Spawn coin ahead of the jet on its path
         const progressPercent = bidProgress || ((10 - timeLeft) / 10 * 100);
         const futureProgress = Math.min(progressPercent + 15, 100);
         
@@ -253,20 +235,19 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // USER COLLISION - only runs if coin is visible for user
-
-  // USER COLLISION - only runs if bot didn't collect
+  // COLLISION DETECTION - Check who actually touches the coin first
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound) return;
     
-    const jetX = isAuctionEnded ? 90 : jetPosition.x;
-    const jetY = isAuctionEnded ? 15 : jetPosition.y;
-    const distance = Math.sqrt(
-      Math.pow(jetX - coinPosition.x, 2) + Math.pow(jetY - coinPosition.y, 2)
+    // 1. Check USER collision first
+    const userJetX = isAuctionEnded ? 90 : jetPosition.x;
+    const userJetY = isAuctionEnded ? 15 : jetPosition.y;
+    const userDistance = Math.sqrt(
+      Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
     );
     
-    if (distance < 8) {
-      console.log('✅ USER COLLECTED');
+    if (userDistance < 8) {
+      console.log('✅ USER TOUCHED COIN FIRST');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       setUserCollectedThisRound(true);
@@ -277,8 +258,33 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       if (onBonusBidCollected) {
         onBonusBidCollected('შენ');
       }
+      return; // USER COLLECTED - STOP HERE
     }
-  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, onBonusBidCollected]);
+    
+    // 2. Check BOT collision (simulate bot jet positions)
+    if (lastBidder !== 'შენ' && timeLeft <= 3) {
+      // Simulate bot jet position (similar to user but slightly different path)
+      const botProgress = ((10 - timeLeft) / 10 * 100);
+      const botJetX = 10 + (80 * botProgress / 100) + (Math.random() * 10 - 5); // Add some randomness
+      const botJetY = 85 - (70 * botProgress / 100) + (Math.random() * 5 - 2.5); // Add some randomness
+      
+      const botDistance = Math.sqrt(
+        Math.pow(botJetX - coinPosition.x, 2) + Math.pow(botJetY - coinPosition.y, 2)
+      );
+      
+      if (botDistance < 12 && Math.random() < 0.3) { // 30% chance bot hits when close
+        console.log('❌ BOT TOUCHED COIN FIRST:', lastBidder);
+        setIsCoinVisible(false);
+        setCoinCollectedThisRound(true);
+        setShowBonusMessage(true);
+        setTimeout(() => setShowBonusMessage(false), 3000);
+        
+        if (onBonusBidCollected) {
+          onBonusBidCollected(lastBidder); // Credit the actual bot bidder
+        }
+      }
+    }
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, lastBidder, timeLeft, onBonusBidCollected]);
 
 
   // CONFETTI EFFECT FOR AUCTION ENDED
