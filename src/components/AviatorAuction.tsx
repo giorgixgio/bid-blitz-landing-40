@@ -74,7 +74,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Reset states when main timer resets
+  // Reset states when main timer resets (force rebuild)
   useEffect(() => {
     if (timeLeft === 10) { // When timer resets to full
       setMilliseconds(99);
