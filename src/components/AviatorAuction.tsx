@@ -235,44 +235,45 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     
   }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // COLLISION DETECTION - Check which specific user hits the coin
+  // COLLISION DETECTION - First determine WHO will collect
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound) return;
     
-    // Check if CURRENT USER hits the coin
-    const userJetX = isAuctionEnded ? 90 : jetPosition.x;
-    const userJetY = isAuctionEnded ? 15 : jetPosition.y;
-    const userDistance = Math.sqrt(
-      Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
-    );
-    
-    if (userDistance < 8) {
-      // CURRENT USER collected the coin
-      console.log('✅ CURRENT USER (შენ) COLLECTED COIN');
+    // STEP 1: At timeLeft = 3, decide if other user gets it (60% chance)
+    if (timeLeft === 3 && lastBidder !== 'შენ' && Math.random() < 0.6) {
+      // OTHER USER gets the coin - NO collision detection for current user
+      console.log('❌ OTHER USER GETS COIN:', lastBidder);
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
-      setUserCollectedThisRound(true);
       setShowBonusMessage(true);
       setTimeout(() => setShowBonusMessage(false), 3000);
-      playWinningSound();
       
       if (onBonusBidCollected) {
-        onBonusBidCollected('შენ'); // Only current user gets credit
+        onBonusBidCollected(lastBidder); // OTHER user gets credit
       }
-      return;
+      return; // STOP HERE - other user collected
     }
     
-    // Simulate OTHER USERS hitting the coin
-    if (lastBidder !== 'შენ' && timeLeft <= 3 && Math.random() < 0.4) {
-      // Another user (not current user) collected the coin
-      console.log('❌ OTHER USER COLLECTED COIN:', lastBidder);
-      setIsCoinVisible(false);
-      setCoinCollectedThisRound(true);
-      setShowBonusMessage(true);
-      setTimeout(() => setShowBonusMessage(false), 3000);
+    // STEP 2: ONLY if other user didn't collect, check current user collision
+    if (timeLeft !== 3) { // Don't check collision at timeLeft=3 to avoid conflicts
+      const userJetX = isAuctionEnded ? 90 : jetPosition.x;
+      const userJetY = isAuctionEnded ? 15 : jetPosition.y;
+      const userDistance = Math.sqrt(
+        Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
+      );
       
-      if (onBonusBidCollected) {
-        onBonusBidCollected(lastBidder); // THAT user gets credit, NOT current user
+      if (userDistance < 8) {
+        console.log('✅ CURRENT USER GETS COIN');
+        setIsCoinVisible(false);
+        setCoinCollectedThisRound(true);
+        setUserCollectedThisRound(true);
+        setShowBonusMessage(true);
+        setTimeout(() => setShowBonusMessage(false), 3000);
+        playWinningSound();
+        
+        if (onBonusBidCollected) {
+          onBonusBidCollected('შენ'); // Current user gets credit
+        }
       }
     }
   }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, lastBidder, timeLeft, onBonusBidCollected]);
