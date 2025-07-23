@@ -535,13 +535,19 @@ const Auction = () => {
               bidProgress={bidProgress}
               isAuctionEnded={isAuctionEnded}
               onBonusBidCollected={(collectorId: string) => {
-                console.log('Bonus bid collected by:', collectorId);
+                console.log('🔥 BONUS BID CALLBACK CALLED with collectorId:', collectorId);
+                console.log('🔥 Current user bid credits before:', userBidCredits);
+                
                 // Only give bonus bid to the specific collector
                 if (collectorId === 'შენ') {
-                  console.log('Giving bonus bid to current user');
-                  setUserBidCredits(prev => prev + 1);
+                  console.log('✅ GIVING BONUS BID TO USER (შენ)');
+                  setUserBidCredits(prev => {
+                    console.log('🔥 User credits changing from', prev, 'to', prev + 1);
+                    return prev + 1;
+                  });
                 } else {
-                  console.log('Other player collected, not giving bonus to current user');
+                  console.log('❌ NOT GIVING BONUS TO USER - bot collected:', collectorId);
+                  console.log('🔥 User credits should stay the same:', userBidCredits);
                 }
               }}
             />
