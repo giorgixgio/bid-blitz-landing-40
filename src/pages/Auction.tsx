@@ -52,6 +52,9 @@ import Header from '@/components/Header';
 import { AviatorAuction } from '@/components/AviatorAuction';
 
 const Auction = () => {
+  // HEADER VISIBILITY STATE
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   /* ================================
    * STATE MANAGEMENT
    * ================================ */
@@ -155,6 +158,29 @@ const Auction = () => {
 
   // Initialize recent bidders with generated history
   const [recentBidders, setRecentBidders] = useState(() => generateBidHistory(totalBidsPlaced));
+
+  /* ================================
+   * SCROLL HANDLER FOR HEADER VISIBILITY
+   * ================================ */
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down and past threshold
+        setIsHeaderVisible(false);
+      } else {
+        // Scrolling up or at top
+        setIsHeaderVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   /* ================================
    * EFFECT HOOKS
@@ -363,7 +389,7 @@ const Auction = () => {
    * ================================ */
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 pt-16">
       {/* Site Header */}
       <Header />
       
@@ -729,7 +755,7 @@ const Auction = () => {
         </div>
 
         {/* Sticky Top Bar - Quick Bidding Interface */}
-        <div className="fixed top-16 left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-2 shadow-lg transition-transform duration-300 z-40">
+        <div className={`fixed left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-2 shadow-lg transition-all duration-300 z-40 ${isHeaderVisible ? 'top-16' : 'top-0'}`}>
           <div className="container mx-auto flex items-center gap-3">
             {/* Product Thumbnail */}
             <div className="flex-shrink-0">
