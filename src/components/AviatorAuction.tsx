@@ -242,7 +242,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // User collision detection - highest priority
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound) return;
+    if (!isCoinVisible || coinCollectedThisRound) {
+      return;
+    }
+    
+    console.log('Collision check - timeLeft:', timeLeft, 'userCollectedThisRound:', userCollectedThisRound);
     
     const jetX = isAuctionEnded ? 90 : jetPosition.x;
     const jetY = isAuctionEnded ? 15 : jetPosition.y;
@@ -250,8 +254,10 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       Math.pow(jetX - coinPosition.x, 2) + Math.pow(jetY - coinPosition.y, 2)
     );
     
+    console.log('Distance check:', distance, 'jetPos:', {x: jetX, y: jetY}, 'coinPos:', coinPosition);
+    
     if (distance < 8) {
-      console.log('User collected coin by collision detection');
+      console.log('🎯 USER COLLISION DETECTED - COLLECTING COIN');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
       setUserCollectedThisRound(true);
@@ -260,28 +266,38 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       playWinningSound();
       
       if (onBonusBidCollected) {
-        console.log('Calling onBonusBidCollected with: შენ (collision)');
+        console.log('✅ Calling onBonusBidCollected with: შენ (collision)');
         onBonusBidCollected('შენ');
       }
     }
-  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, onBonusBidCollected]);
+  }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
 
   // Other players collect coin - only if user hasn't collected it yet
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) return;
+    console.log('Other player check - timeLeft:', timeLeft, 'isCoinVisible:', isCoinVisible, 'coinCollectedThisRound:', coinCollectedThisRound, 'userCollectedThisRound:', userCollectedThisRound);
     
-    if (timeLeft === 4 && Math.random() < 0.7) {
-      const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-      console.log('Other player collected coin:', randomPlayer);
+    if (!isCoinVisible || coinCollectedThisRound || userCollectedThisRound) {
+      console.log('Other player collection blocked - coin already handled');
+      return;
+    }
+    
+    if (timeLeft === 4) {
+      const chance = Math.random();
+      console.log('Other player collection chance:', chance, 'threshold: 0.7');
       
-      setIsCoinVisible(false);
-      setCoinCollectedThisRound(true);
-      setShowBonusMessage(true);
-      setTimeout(() => setShowBonusMessage(false), 3000);
-      
-      if (onBonusBidCollected) {
-        console.log('Calling onBonusBidCollected with:', randomPlayer);
-        onBonusBidCollected(randomPlayer);
+      if (chance < 0.7) {
+        const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+        console.log('🤖 OTHER PLAYER COLLECTED COIN:', randomPlayer);
+        
+        setIsCoinVisible(false);
+        setCoinCollectedThisRound(true);
+        setShowBonusMessage(true);
+        setTimeout(() => setShowBonusMessage(false), 3000);
+        
+        if (onBonusBidCollected) {
+          console.log('❌ Calling onBonusBidCollected with:', randomPlayer);
+          onBonusBidCollected(randomPlayer);
+        }
       }
     }
   }, [timeLeft, isCoinVisible, coinCollectedThisRound, userCollectedThisRound, onBonusBidCollected]);
