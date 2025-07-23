@@ -330,6 +330,16 @@ const Auction = () => {
       return;
     }
 
+    // Validation: Check if user is already the highest bidder
+    if (lastBidder === 'შენ') {
+      toast({
+        title: "შენ უკვე ხარ ყველაზე მაღალი ბიდერი",
+        description: "დაელოდე სხვების ბიდებს",
+        variant: "default"
+      });
+      return;
+    }
+
     // Validation: Check if auction is still active
     if (timeLeft <= 0) {
       toast({
