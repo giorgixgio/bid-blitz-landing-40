@@ -233,7 +233,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     // Spawn coin immediately when entering the 1-5 second window
     spawnCoin();
     
-  }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
+  }, [isAuctionEnded, isCoinVisible, bidProgress, timeLeft, coinCollectedThisRound, onBonusBidCollected]);
 
   // COLLISION DETECTION - First determine WHO will collect
   useEffect(() => {
