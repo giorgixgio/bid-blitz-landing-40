@@ -538,16 +538,16 @@ const Auction = () => {
                 console.log('🔥 BONUS BID CALLBACK CALLED with collectorId:', collectorId);
                 console.log('🔥 Current user bid credits before:', userBidCredits);
                 
-                // Only give bonus bid to the specific collector
-                if (collectorId === 'შენ') {
-                  console.log('✅ GIVING BONUS BID TO USER (შენ)');
+                // SIMPLE RULE: Only credit if collectorId is 'შენ' AND user is current bidder
+                if (collectorId === 'შენ' && lastBidder === 'შენ') {
+                  console.log('✅ GIVING BONUS BID TO USER (both conditions met)');
                   setUserBidCredits(prev => {
                     console.log('🔥 User credits changing from', prev, 'to', prev + 1);
                     return prev + 1;
                   });
                 } else {
-                  console.log('❌ NOT GIVING BONUS TO USER - bot collected:', collectorId);
-                  console.log('🔥 User credits should stay the same:', userBidCredits);
+                  console.log('❌ NOT GIVING BONUS - collectorId:', collectorId, 'lastBidder:', lastBidder);
+                  console.log('🔥 User credits staying the same:', userBidCredits);
                 }
               }}
             />
