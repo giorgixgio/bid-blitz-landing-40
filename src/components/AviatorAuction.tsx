@@ -242,20 +242,32 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
   // BOT COLLECTION - happens first, blocks user collection
   useEffect(() => {
-    if (!isCoinVisible || coinCollectedThisRound) return;
+    console.log('BOT CHECK - timeLeft:', timeLeft, 'isCoinVisible:', isCoinVisible, 'coinCollectedThisRound:', coinCollectedThisRound);
     
-    if (timeLeft === 3 && Math.random() < 0.8) {
-      // BOT COLLECTED - happens immediately, blocks user
-      const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
-      console.log('❌ BOT COLLECTED FIRST:', randomPlayer);
+    if (!isCoinVisible || coinCollectedThisRound) {
+      console.log('BOT CHECK FAILED - coin not visible or already collected');
+      return;
+    }
+    
+    if (timeLeft === 3) {
+      const chance = Math.random();
+      console.log('BOT COLLECTION CHANCE:', chance, 'threshold: 0.8');
       
-      setIsCoinVisible(false);
-      setCoinCollectedThisRound(true);
-      setShowBonusMessage(true);
-      setTimeout(() => setShowBonusMessage(false), 3000);
-      
-      if (onBonusBidCollected) {
-        onBonusBidCollected(randomPlayer);
+      if (chance < 0.8) {
+        // BOT COLLECTED - happens immediately, blocks user
+        const randomPlayer = ['ლევანი', 'თამარი', 'გიორგი', 'მარიამი', 'დავითი'][Math.floor(Math.random() * 5)];
+        console.log('❌ BOT COLLECTED FIRST:', randomPlayer);
+        
+        setIsCoinVisible(false);
+        setCoinCollectedThisRound(true);
+        setShowBonusMessage(true);
+        setTimeout(() => setShowBonusMessage(false), 3000);
+        
+        if (onBonusBidCollected) {
+          onBonusBidCollected(randomPlayer);
+        }
+      } else {
+        console.log('BOT MISSED - user gets chance');
       }
     }
   }, [timeLeft, isCoinVisible, coinCollectedThisRound, onBonusBidCollected]);
