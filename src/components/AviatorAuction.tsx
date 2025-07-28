@@ -319,7 +319,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   }, [isAuctionEnded]);
 
   return (
-    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
+    <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-900 to-black border-green-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
       {/* SOUND TOGGLE - Top left corner */}
       <div className="absolute top-2 left-2 z-50">
         <button
@@ -335,8 +335,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </button>
       </div>
 
-      {/* GAME AREA */}
-      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-10">
+      {/* GAME AREA - Crypto/Forex Style */}
+      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-gray-900 to-gray-800 rounded-lg mb-4 overflow-hidden z-10 border border-green-500/30">
         
         {/* "YOU BLEW UP JET" MESSAGE - At the very top center of animation */}
         {showBlowUpMessage && (
@@ -364,33 +364,79 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         )}
 
-        {/* Background with zoom effect */}
+        {/* Parallax Background Effect */}
         <div 
-          className="absolute inset-0 transition-transform duration-1000 ease-out origin-bottom-left"
-          style={{ transform: `scale(${zoomLevel})` }}
+          className="absolute inset-0 transition-transform duration-1000 ease-out origin-bottom"
+          style={{ 
+            transform: `translateY(${(bidProgress || ((10 - timeLeft) / 10 * 100)) * -0.3}px) scale(${zoomLevel})` 
+          }}
         >
-          {/* Grid pattern background */}
-          <div className="absolute inset-0 opacity-20">
+          {/* Trading Grid Background */}
+          <div className="absolute inset-0 opacity-10">
             <svg width="100%" height="100%" className="w-full h-full">
               <defs>
-                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.5"/>
+                <pattern id="tradingGrid" width="40" height="30" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 30" fill="none" stroke="#10b981" strokeWidth="0.5"/>
                 </pattern>
               </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
+              <rect width="100%" height="100%" fill="url(#tradingGrid)" />
+            </svg>
+          </div>
+          
+          {/* Price Chart Lines */}
+          <div className="absolute inset-0">
+            <svg width="100%" height="100%" className="w-full h-full">
+              <path 
+                d={`M 0,${200 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 1.5} L 100,${150 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 1.2} L 200,${180 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 1.8} L 300,${120 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 2}`}
+                fill="none" 
+                stroke="url(#priceGradient)" 
+                strokeWidth="2" 
+                className="opacity-30"
+              />
+              <defs>
+                <linearGradient id="priceGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#34d399" />
+                </linearGradient>
+              </defs>
             </svg>
           </div>
         </div>
 
-        {/* FINISH LINE */}
-        <div className="absolute top-2 right-2 flex flex-col items-center text-white/80 z-20">
-          <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center mb-1">
-            🏁
+        {/* Green Price Bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-full">
+          <div 
+            className="absolute bottom-0 left-0 bg-gradient-to-t from-green-500/40 to-green-400/20 transition-all duration-1000 ease-out border-t-2 border-green-400/60"
+            style={{
+              height: `${Math.min((bidProgress || ((10 - timeLeft) / 10 * 100)), 100)}%`,
+              width: '100%'
+            }}
+          >
+            {/* Animated price movement effect */}
+            <div className="absolute inset-0 bg-gradient-to-t from-green-600/30 to-transparent animate-pulse"></div>
+            
+            {/* Price level indicators */}
+            <div className="absolute right-2 top-2 text-green-400 text-xs font-mono">
+              {currentPrice.toFixed(2)}
+            </div>
           </div>
-          <span className="text-xs font-bold">FINISH</span>
         </div>
 
-        {/* TRAIL EFFECTS */}
+        {/* TARGET PRICE LINE */}
+        <div 
+          className="absolute right-2 flex flex-col items-center text-green-400 z-20 transition-all duration-1000"
+          style={{
+            top: `${15 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 0.1}%`
+          }}
+        >
+          <div className="w-8 h-8 bg-green-500/80 rounded-full flex items-center justify-center mb-1 border-2 border-green-400">
+            <span className="text-white text-xs font-bold">$</span>
+          </div>
+          <span className="text-xs font-bold text-green-400">TARGET</span>
+          <div className="absolute -left-10 top-0 w-20 h-0.5 bg-green-400/60 animate-pulse"></div>
+        </div>
+
+        {/* GREEN TRADING TRAIL EFFECTS */}
         <div className="absolute inset-0">
           {trailPoints.map((point, index) => (
             <div
@@ -400,10 +446,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
                 left: `${point.x}%`,
                 top: `${point.y}%`,
                 transform: 'translate(-50%, -50%)',
-                opacity: (index + 1) / trailPoints.length * 0.6
+                opacity: (index + 1) / trailPoints.length * 0.8
               }}
             >
-              <div className="w-2 h-1 bg-orange-400 rounded opacity-80 animate-pulse"></div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-1 bg-green-400 rounded animate-pulse shadow-lg shadow-green-400/30"></div>
+                <div className="text-green-400 text-xs font-mono">+</div>
+              </div>
             </div>
           ))}
         </div>
