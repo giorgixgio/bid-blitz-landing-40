@@ -42,7 +42,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   onBonusBidCollected
 }) => {
   // ANIMATION STATE
-  const [jetPosition, setJetPosition] = useState({ x: 10, y: 85 }); // Jet position (x: left-right, y: top-bottom)
+  const [jetPosition, setJetPosition] = useState({ x: 10, y: 85 }); // For SVG polygon only
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentLeader, setCurrentLeader] = useState(lastBidder);
   const [zoomLevel, setZoomLevel] = useState(1); // Zoom effect for excitement
@@ -51,6 +51,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [isExploding, setIsExploding] = useState(false); // Explosion state
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
   const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
+  
+  // Direct DOM reference for smooth animation
+  const jetElementRef = useRef<HTMLDivElement>(null);
   
   // Refs for accessing current values in animation loop
   const timeLeftRef = useRef(timeLeft);
@@ -204,41 +207,45 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // CONTINUOUS ANIMATION LOOP - Never stops, uses refs for current values
+  // SUPER SMOOTH ANIMATION - Direct DOM manipulation
   useEffect(() => {
     let animationId: number;
     
     const animate = () => {
-      // Use ref values to get current state
       const currentTimeLeft = timeLeftRef.current;
       const currentBidProgress = bidProgressRef.current;
       const currentUserJustBid = userJustBidRef.current;
       const currentLastBidder = lastBidderRef.current;
       const currentIsExploding = isExplodingRef.current;
       
-      if (!currentIsExploding && currentTimeLeft > 0) {
+      if (!currentIsExploding && currentTimeLeft > 0 && jetElementRef.current) {
+        let targetX, targetY;
+        
         if (currentUserJustBid && currentLastBidder === 'შენ') {
-          // User bid - animate based on bid progress
           const progress = Math.min(currentBidProgress || 0, 100);
-          const targetX = Math.min(10 + (80 * progress / 100), 90);
-          const targetY = Math.max(85 - (70 * progress / 100), 15);
-          setJetPosition({ x: targetX, y: targetY });
-          setZoomLevel(1 + (progress / 100) * 0.3);
+          targetX = Math.min(10 + (80 * progress / 100), 90);
+          targetY = Math.max(85 - (70 * progress / 100), 15);
         } else if (currentLastBidder !== 'შენ') {
-          // Other bidders - continuous smooth movement based on time
           const timeProgress = Math.min((10 - currentTimeLeft) / 10 * 100, 100);
-          const targetX = Math.min(10 + (80 * timeProgress / 100), 90);
-          const targetY = Math.max(85 - (70 * timeProgress / 100), 15);
-          setJetPosition({ x: targetX, y: targetY });
-          setZoomLevel(1 + (timeProgress / 100) * 0.2);
+          targetX = Math.min(10 + (80 * timeProgress / 100), 90);
+          targetY = Math.max(85 - (70 * timeProgress / 100), 15);
+        }
+        
+        // Update DOM directly for smooth movement
+        if (targetX !== undefined && targetY !== undefined) {
+          jetElementRef.current.style.left = `${targetX}%`;
+          jetElementRef.current.style.top = `${targetY}%`;
+          
+          // Update state for SVG polygon (less frequently)
+          if (Math.random() < 0.1) {
+            setJetPosition({ x: targetX, y: targetY });
+          }
         }
       }
       
-      // Continue the animation loop
       animationId = requestAnimationFrame(animate);
     };
     
-    // Start the continuous animation
     animationId = requestAnimationFrame(animate);
     
     return () => {
@@ -246,7 +253,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         cancelAnimationFrame(animationId);
       }
     };
-  }, []); // Empty deps - runs once and continues forever
+  }, []);
 
   // Trail points update at lower frequency
   useEffect(() => {
@@ -544,7 +551,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         {/* FLYING JET CAT */}
         <div className="absolute inset-0">
           <div 
-            className="absolute transform z-20"
+            ref={jetElementRef}
+            className="absolute transform z-20 will-change-transform"
             style={{ 
               left: isAuctionEnded ? '90%' : `${jetPosition.x}%`, 
               top: isAuctionEnded ? '15%' : `${jetPosition.y}%`,
