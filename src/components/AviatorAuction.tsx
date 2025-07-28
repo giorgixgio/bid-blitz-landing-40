@@ -445,17 +445,6 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
               className="opacity-50 animate-pulse"
             />
           </svg>
-          
-          {/* Current multiplier display */}
-          <div 
-            className="absolute text-white text-lg sm:text-xl font-bold bg-black/70 px-3 py-1 rounded transform -translate-x-1/2 -translate-y-1/2 border-2 border-yellow-400"
-            style={{
-              left: `${jetPosition.x}%`,
-              top: `${jetPosition.y}%`
-            }}
-          >
-            {((bidProgress || ((10 - timeLeft) / 10 * 100)) / 100 * 2 + 1).toFixed(2)}x
-          </div>
         </div>
 
         {/* TARGET PRICE LINE */}
@@ -532,8 +521,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         </div>
 
-        {/* CENTER TIMER OR AUCTION ENDED */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-30">
+        {/* CENTER TIMER OR AUCTION ENDED - Moved lower to avoid jet path */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center z-30">
           {isAuctionEnded ? (
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-yellow-400 drop-shadow-lg mb-2">
