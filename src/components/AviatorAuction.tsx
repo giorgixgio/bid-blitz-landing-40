@@ -207,53 +207,26 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // SUPER SMOOTH ANIMATION - Direct DOM manipulation
+  // SIMPLE SMOOTH ANIMATION - Update every 16ms (60fps)
   useEffect(() => {
-    let animationId: number;
-    
-    const animate = () => {
-      const currentTimeLeft = timeLeftRef.current;
-      const currentBidProgress = bidProgressRef.current;
-      const currentUserJustBid = userJustBidRef.current;
-      const currentLastBidder = lastBidderRef.current;
-      const currentIsExploding = isExplodingRef.current;
-      
-      if (!currentIsExploding && currentTimeLeft > 0 && jetElementRef.current) {
-        let targetX, targetY;
-        
-        if (currentUserJustBid && currentLastBidder === 'შენ') {
-          const progress = Math.min(currentBidProgress || 0, 100);
-          targetX = Math.min(10 + (80 * progress / 100), 90);
-          targetY = Math.max(85 - (70 * progress / 100), 15);
-        } else if (currentLastBidder !== 'შენ') {
-          const timeProgress = Math.min((10 - currentTimeLeft) / 10 * 100, 100);
-          targetX = Math.min(10 + (80 * timeProgress / 100), 90);
-          targetY = Math.max(85 - (70 * timeProgress / 100), 15);
-        }
-        
-        // Update DOM directly for smooth movement
-        if (targetX !== undefined && targetY !== undefined) {
-          jetElementRef.current.style.left = `${targetX}%`;
-          jetElementRef.current.style.top = `${targetY}%`;
-          
-          // Update state for SVG polygon (less frequently)
-          if (Math.random() < 0.1) {
-            setJetPosition({ x: targetX, y: targetY });
-          }
+    const interval = setInterval(() => {
+      if (!isExploding && timeLeft > 0) {
+        if (userJustBid && lastBidder === 'შენ') {
+          const progress = Math.min(bidProgress || 0, 100);
+          const targetX = Math.min(10 + (80 * progress / 100), 90);
+          const targetY = Math.max(85 - (70 * progress / 100), 15);
+          setJetPosition({ x: targetX, y: targetY });
+        } else if (lastBidder !== 'შენ') {
+          const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100);
+          const targetX = Math.min(10 + (80 * timeProgress / 100), 90);
+          const targetY = Math.max(85 - (70 * timeProgress / 100), 15);
+          setJetPosition({ x: targetX, y: targetY });
         }
       }
-      
-      animationId = requestAnimationFrame(animate);
-    };
+    }, 16); // 60fps = 1000ms/60 ≈ 16ms
     
-    animationId = requestAnimationFrame(animate);
-    
-    return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
-    };
-  }, []);
+    return () => clearInterval(interval);
+  }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
 
   // Trail points update at lower frequency
   useEffect(() => {
@@ -551,12 +524,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         {/* FLYING JET CAT */}
         <div className="absolute inset-0">
           <div 
-            ref={jetElementRef}
-            className="absolute transform z-20 will-change-transform"
+            className="absolute transform z-20"
             style={{ 
               left: isAuctionEnded ? '90%' : `${jetPosition.x}%`, 
               top: isAuctionEnded ? '15%' : `${jetPosition.y}%`,
-              transform: 'translate(-50%, -50%)'
+              transform: 'translate(-50%, -50%)',
+              transition: 'none'
             }}
           >
             <div className="relative">
