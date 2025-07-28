@@ -403,34 +403,34 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         </div>
 
-        {/* Triangular Fill Area - Stake.com Style */}
+        {/* Triangular Mountain Fill - Crash Game Style */}
         <div className="absolute inset-0">
-          <svg width="100%" height="100%" className="w-full h-full">
+          <svg width="100%" height="100%" className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
-              <linearGradient id="triangleFillGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+              <linearGradient id="mountainFillGradient" x1="0%" y1="100%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
                 <stop offset="50%" stopColor="#fbbf24" stopOpacity="0.6" />
                 <stop offset="100%" stopColor="#fde047" stopOpacity="0.4" />
               </linearGradient>
-              <linearGradient id="triangleBorderGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+              <linearGradient id="mountainBorderGradient" x1="0%" y1="100%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#f59e0b" />
                 <stop offset="100%" stopColor="#fbbf24" />
               </linearGradient>
             </defs>
             
-            {/* Triangular fill area from bottom-left to jet position */}
+            {/* Mountain fill area - triangle from bottom-left, up to jet, back down */}
             <polygon
-              points={`0,100 0,100 ${jetPosition.x},${jetPosition.y} 0,100`}
-              fill="url(#triangleFillGradient)"
+              points={`0,100 ${jetPosition.x},${jetPosition.y} ${jetPosition.x},100 0,100`}
+              fill="url(#mountainFillGradient)"
               className="transition-all duration-500 ease-out"
             />
             
-            {/* Border line of the triangle */}
+            {/* Rising line border */}
             <path 
               d={`M 0,100 L ${jetPosition.x},${jetPosition.y}`}
               fill="none" 
-              stroke="url(#triangleBorderGradient)" 
-              strokeWidth="3" 
+              stroke="url(#mountainBorderGradient)" 
+              strokeWidth="0.8" 
               strokeLinecap="round"
               className="transition-all duration-500 ease-out"
             />
@@ -440,9 +440,9 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
               d={`M 0,100 L ${jetPosition.x},${jetPosition.y}`}
               fill="none" 
               stroke="#fbbf24" 
-              strokeWidth="6" 
+              strokeWidth="1.5" 
               strokeLinecap="round"
-              className="opacity-30 animate-pulse"
+              className="opacity-50 animate-pulse"
             />
           </svg>
           
