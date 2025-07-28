@@ -403,22 +403,48 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         </div>
 
-        {/* Green Price Bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-full">
+        {/* Jet Trail Path Animation */}
+        <div className="absolute inset-0">
+          {/* Trail that follows jet path */}
+          <svg width="100%" height="100%" className="w-full h-full">
+            <defs>
+              <linearGradient id="jetTrailGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#eab308" stopOpacity="0.6" />
+                <stop offset="50%" stopColor="#facc15" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#fde047" stopOpacity="0.2" />
+              </linearGradient>
+            </defs>
+            
+            {/* Create path from start to current jet position */}
+            <path 
+              d={`M 10,85 L ${jetPosition.x},${jetPosition.y}`}
+              fill="none" 
+              stroke="url(#jetTrailGradient)" 
+              strokeWidth="8" 
+              strokeLinecap="round"
+              className="transition-all duration-300 ease-out"
+            />
+            
+            {/* Glow effect along the path */}
+            <path 
+              d={`M 10,85 L ${jetPosition.x},${jetPosition.y}`}
+              fill="none" 
+              stroke="#facc15" 
+              strokeWidth="12" 
+              strokeLinecap="round"
+              className="opacity-20 animate-pulse"
+            />
+          </svg>
+          
+          {/* Price indicator at jet position */}
           <div 
-            className="absolute bottom-0 left-0 bg-gradient-to-t from-green-500/40 to-green-400/20 transition-all duration-1000 ease-out border-t-2 border-green-400/60"
+            className="absolute text-yellow-400 text-xs font-mono bg-black/50 px-2 py-1 rounded transform -translate-x-1/2 -translate-y-1/2 border border-yellow-400/30"
             style={{
-              height: `${Math.min((bidProgress || ((10 - timeLeft) / 10 * 100)), 100)}%`,
-              width: '100%'
+              left: `${jetPosition.x}%`,
+              top: `${jetPosition.y}%`
             }}
           >
-            {/* Animated price movement effect */}
-            <div className="absolute inset-0 bg-gradient-to-t from-green-600/30 to-transparent animate-pulse"></div>
-            
-            {/* Price level indicators */}
-            <div className="absolute right-2 top-2 text-yellow-400 text-xs font-mono">
-              {currentPrice.toFixed(2)}
-            </div>
+            {currentPrice.toFixed(2)}₮
           </div>
         </div>
 
