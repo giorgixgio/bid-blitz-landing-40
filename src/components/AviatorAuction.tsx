@@ -207,7 +207,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // SIMPLE SMOOTH ANIMATION - Update every 16ms (60fps)
+  // SMOOTH CSS-BASED ANIMATION - Let CSS handle the smoothness
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isExploding && timeLeft > 0) {
@@ -223,7 +223,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           setJetPosition({ x: targetX, y: targetY });
         }
       }
-    }, 16); // 60fps = 1000ms/60 ≈ 16ms
+    }, 100); // Update every 100ms, let CSS smooth the transitions
     
     return () => clearInterval(interval);
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
@@ -529,7 +529,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
               left: isAuctionEnded ? '90%' : `${jetPosition.x}%`, 
               top: isAuctionEnded ? '15%' : `${jetPosition.y}%`,
               transform: 'translate(-50%, -50%)',
-              transition: 'none'
+              transition: 'left 0.1s linear, top 0.1s linear'
             }}
           >
             <div className="relative">
