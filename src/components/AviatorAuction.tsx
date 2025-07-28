@@ -52,6 +52,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
   const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
   
+  // Refs for accessing current values in animation loop
+  const timeLeftRef = useRef(timeLeft);
+  const bidProgressRef = useRef(bidProgress);
+  const userJustBidRef = useRef(userJustBid);
+  const lastBidderRef = useRef(lastBidder);
+  const isExplodingRef = useRef(isExploding);
+  
   // LUCKY COIN STATE
   const [coinPosition, setCoinPosition] = useState({ x: 50, y: 50 });
   const [isCoinVisible, setIsCoinVisible] = useState(false);
@@ -59,6 +66,16 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [userCollectedThisRound, setUserCollectedThisRound] = useState(false);
   const [showBonusMessage, setShowBonusMessage] = useState(false);
   const [bonusCollectorId, setBonusCollectorId] = useState<string | null>(null);
+
+  
+  // Update refs when props change
+  useEffect(() => {
+    timeLeftRef.current = timeLeft;
+    bidProgressRef.current = bidProgress;
+    userJustBidRef.current = userJustBid;
+    lastBidderRef.current = lastBidder;
+    isExplodingRef.current = isExploding;
+  }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -187,22 +204,29 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // TRULY CONTINUOUS ANIMATION - Single animation loop that never stops
+  // CONTINUOUS ANIMATION LOOP - Never stops, uses refs for current values
   useEffect(() => {
     let animationId: number;
     
     const animate = () => {
-      if (!isExploding && timeLeft > 0) {
-        if (userJustBid && lastBidder === 'შენ') {
+      // Use ref values to get current state
+      const currentTimeLeft = timeLeftRef.current;
+      const currentBidProgress = bidProgressRef.current;
+      const currentUserJustBid = userJustBidRef.current;
+      const currentLastBidder = lastBidderRef.current;
+      const currentIsExploding = isExplodingRef.current;
+      
+      if (!currentIsExploding && currentTimeLeft > 0) {
+        if (currentUserJustBid && currentLastBidder === 'შენ') {
           // User bid - animate based on bid progress
-          const progress = Math.min(bidProgress, 100);
+          const progress = Math.min(currentBidProgress || 0, 100);
           const targetX = Math.min(10 + (80 * progress / 100), 90);
           const targetY = Math.max(85 - (70 * progress / 100), 15);
           setJetPosition({ x: targetX, y: targetY });
           setZoomLevel(1 + (progress / 100) * 0.3);
-        } else if (lastBidder !== 'შენ') {
+        } else if (currentLastBidder !== 'შენ') {
           // Other bidders - continuous smooth movement based on time
-          const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100);
+          const timeProgress = Math.min((10 - currentTimeLeft) / 10 * 100, 100);
           const targetX = Math.min(10 + (80 * timeProgress / 100), 90);
           const targetY = Math.max(85 - (70 * timeProgress / 100), 15);
           setJetPosition({ x: targetX, y: targetY });
@@ -210,35 +234,37 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         }
       }
       
-      // Continue animation loop
+      // Continue the animation loop
       animationId = requestAnimationFrame(animate);
     };
     
-    // Start animation loop
+    // Start the continuous animation
     animationId = requestAnimationFrame(animate);
     
-    // Cleanup
     return () => {
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
     };
-  }, []); // Empty dependency array - runs once and continues forever
+  }, []); // Empty deps - runs once and continues forever
 
-  // Update trail points separately at lower frequency
+  // Trail points update at lower frequency
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!isExploding && timeLeft > 0) {
+      const currentIsExploding = isExplodingRef.current;
+      const currentTimeLeft = timeLeftRef.current;
+      
+      if (!currentIsExploding && currentTimeLeft > 0) {
         setTrailPoints(prev => [...prev.slice(-4), { 
           x: jetPosition.x, 
           y: jetPosition.y, 
           id: Date.now() 
         }]);
       }
-    }, 200); // Add trail point every 200ms
+    }, 300); // Add trail point every 300ms
     
     return () => clearInterval(interval);
-  }, [jetPosition.x, jetPosition.y, isExploding, timeLeft]);
+  }, [jetPosition.x, jetPosition.y]);
 
   // LUCKY COIN SPAWNING - Only appear in last 4-5 seconds if not collected this round
   useEffect(() => {
