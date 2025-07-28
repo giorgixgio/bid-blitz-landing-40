@@ -403,48 +403,58 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         </div>
 
-        {/* Jet Trail Path Animation */}
+        {/* Triangular Fill Area - Stake.com Style */}
         <div className="absolute inset-0">
-          {/* Trail that follows jet path */}
           <svg width="100%" height="100%" className="w-full h-full">
             <defs>
-              <linearGradient id="jetTrailGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#eab308" stopOpacity="0.6" />
-                <stop offset="50%" stopColor="#facc15" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#fde047" stopOpacity="0.2" />
+              <linearGradient id="triangleFillGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
+                <stop offset="50%" stopColor="#fbbf24" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#fde047" stopOpacity="0.4" />
+              </linearGradient>
+              <linearGradient id="triangleBorderGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#f59e0b" />
+                <stop offset="100%" stopColor="#fbbf24" />
               </linearGradient>
             </defs>
             
-            {/* Create path from start to current jet position */}
-            <path 
-              d={`M 10,85 L ${jetPosition.x},${jetPosition.y}`}
-              fill="none" 
-              stroke="url(#jetTrailGradient)" 
-              strokeWidth="8" 
-              strokeLinecap="round"
-              className="transition-all duration-300 ease-out"
+            {/* Triangular fill area from bottom-left to jet position */}
+            <polygon
+              points={`0,100 0,100 ${jetPosition.x},${jetPosition.y} 0,100`}
+              fill="url(#triangleFillGradient)"
+              className="transition-all duration-500 ease-out"
             />
             
-            {/* Glow effect along the path */}
+            {/* Border line of the triangle */}
             <path 
-              d={`M 10,85 L ${jetPosition.x},${jetPosition.y}`}
+              d={`M 0,100 L ${jetPosition.x},${jetPosition.y}`}
               fill="none" 
-              stroke="#facc15" 
-              strokeWidth="12" 
+              stroke="url(#triangleBorderGradient)" 
+              strokeWidth="3" 
               strokeLinecap="round"
-              className="opacity-20 animate-pulse"
+              className="transition-all duration-500 ease-out"
+            />
+            
+            {/* Glowing edge effect */}
+            <path 
+              d={`M 0,100 L ${jetPosition.x},${jetPosition.y}`}
+              fill="none" 
+              stroke="#fbbf24" 
+              strokeWidth="6" 
+              strokeLinecap="round"
+              className="opacity-30 animate-pulse"
             />
           </svg>
           
-          {/* Price indicator at jet position */}
+          {/* Current multiplier display */}
           <div 
-            className="absolute text-yellow-400 text-xs font-mono bg-black/50 px-2 py-1 rounded transform -translate-x-1/2 -translate-y-1/2 border border-yellow-400/30"
+            className="absolute text-white text-lg sm:text-xl font-bold bg-black/70 px-3 py-1 rounded transform -translate-x-1/2 -translate-y-1/2 border-2 border-yellow-400"
             style={{
               left: `${jetPosition.x}%`,
               top: `${jetPosition.y}%`
             }}
           >
-            {currentPrice.toFixed(2)}₮
+            {((bidProgress || ((10 - timeLeft) / 10 * 100)) / 100 * 2 + 1).toFixed(2)}x
           </div>
         </div>
 
