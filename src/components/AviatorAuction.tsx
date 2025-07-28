@@ -187,32 +187,57 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // CONTINUOUS ANIMATION - Update jet position based on progress with bounds checking
+  // SMOOTH CONTINUOUS ANIMATION - Update jet position smoothly every frame
   useEffect(() => {
-    if (!isExploding) {
-      if (userJustBid && lastBidder === 'შენ') {
-        // User bid - animate based on bid progress
-        const progress = Math.min(bidProgress, 100); // Ensure max 100%
-        const targetX = Math.min(10 + (80 * progress / 100), 90); // Cap at 90%
-        const targetY = Math.max(85 - (70 * progress / 100), 15); // Cap at 15%
-        setJetPosition({ x: targetX, y: targetY });
-        setZoomLevel(1 + (progress / 100) * 0.3);
-        
-        // Add trail point
-        setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
-      } else if (lastBidder !== 'შენ' && timeLeft > 0) {
-        // Other bidders - animate based on time remaining with bounds checking
-        const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100); // Ensure max 100%
-        const targetX = Math.min(10 + (80 * timeProgress / 100), 90); // Cap at 90%
-        const targetY = Math.max(85 - (70 * timeProgress / 100), 15); // Cap at 15%
-        setJetPosition({ x: targetX, y: targetY });
-        setZoomLevel(1 + (timeProgress / 100) * 0.2);
-        
-        // Add trail point
-        setTrailPoints(prev => [...prev.slice(-4), { x: targetX, y: targetY, id: Date.now() }]);
-      }
+    if (!isExploding && timeLeft > 0) {
+      const animationFrame = requestAnimationFrame(() => {
+        if (userJustBid && lastBidder === 'შენ') {
+          // User bid - animate based on bid progress
+          const progress = Math.min(bidProgress, 100); // Ensure max 100%
+          const targetX = Math.min(10 + (80 * progress / 100), 90); // Cap at 90%
+          const targetY = Math.max(85 - (70 * progress / 100), 15); // Cap at 15%
+          setJetPosition({ x: targetX, y: targetY });
+          setZoomLevel(1 + (progress / 100) * 0.3);
+          
+          // Add trail point less frequently for smoother performance
+          if (Math.random() < 0.3) {
+            setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
+          }
+        } else if (lastBidder !== 'შენ') {
+          // Other bidders - animate based on time remaining with bounds checking
+          const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100); // Ensure max 100%
+          const targetX = Math.min(10 + (80 * timeProgress / 100), 90); // Cap at 90%
+          const targetY = Math.max(85 - (70 * timeProgress / 100), 15); // Cap at 15%
+          setJetPosition({ x: targetX, y: targetY });
+          setZoomLevel(1 + (timeProgress / 100) * 0.2);
+          
+          // Add trail point less frequently for smoother performance
+          if (Math.random() < 0.2) {
+            setTrailPoints(prev => [...prev.slice(-4), { x: targetX, y: targetY, id: Date.now() }]);
+          }
+        }
+      });
+      
+      return () => cancelAnimationFrame(animationFrame);
     }
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
+
+  // SMOOTH MOVEMENT TIMER - Create continuous movement every 50ms
+  useEffect(() => {
+    if (!isExploding && timeLeft > 0) {
+      const interval = setInterval(() => {
+        if (!userJustBid && lastBidder !== 'შენ') {
+          // Continuous smooth movement for other bidders
+          const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100);
+          const targetX = Math.min(10 + (80 * timeProgress / 100), 90);
+          const targetY = Math.max(85 - (70 * timeProgress / 100), 15);
+          setJetPosition({ x: targetX, y: targetY });
+        }
+      }, 50); // Update every 50ms for smooth movement
+      
+      return () => clearInterval(interval);
+    }
+  }, [timeLeft, userJustBid, lastBidder, isExploding]);
 
   // LUCKY COIN SPAWNING - Only appear in last 4-5 seconds if not collected this round
   useEffect(() => {
