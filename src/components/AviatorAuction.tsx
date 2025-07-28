@@ -544,7 +544,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         {/* FLYING JET CAT */}
         <div className="absolute inset-0">
           <div 
-            className="absolute transition-all duration-1000 ease-out transform z-20"
+            className="absolute transform z-20"
             style={{ 
               left: isAuctionEnded ? '90%' : `${jetPosition.x}%`, 
               top: isAuctionEnded ? '15%' : `${jetPosition.y}%`,
