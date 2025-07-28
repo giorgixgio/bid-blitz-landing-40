@@ -187,57 +187,58 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // SMOOTH CONTINUOUS ANIMATION - Update jet position smoothly every frame
+  // TRULY CONTINUOUS ANIMATION - Single animation loop that never stops
   useEffect(() => {
-    if (!isExploding && timeLeft > 0) {
-      const animationFrame = requestAnimationFrame(() => {
+    let animationId: number;
+    
+    const animate = () => {
+      if (!isExploding && timeLeft > 0) {
         if (userJustBid && lastBidder === 'შენ') {
           // User bid - animate based on bid progress
-          const progress = Math.min(bidProgress, 100); // Ensure max 100%
-          const targetX = Math.min(10 + (80 * progress / 100), 90); // Cap at 90%
-          const targetY = Math.max(85 - (70 * progress / 100), 15); // Cap at 15%
+          const progress = Math.min(bidProgress, 100);
+          const targetX = Math.min(10 + (80 * progress / 100), 90);
+          const targetY = Math.max(85 - (70 * progress / 100), 15);
           setJetPosition({ x: targetX, y: targetY });
           setZoomLevel(1 + (progress / 100) * 0.3);
-          
-          // Add trail point less frequently for smoother performance
-          if (Math.random() < 0.3) {
-            setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
-          }
         } else if (lastBidder !== 'შენ') {
-          // Other bidders - animate based on time remaining with bounds checking
-          const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100); // Ensure max 100%
-          const targetX = Math.min(10 + (80 * timeProgress / 100), 90); // Cap at 90%
-          const targetY = Math.max(85 - (70 * timeProgress / 100), 15); // Cap at 15%
-          setJetPosition({ x: targetX, y: targetY });
-          setZoomLevel(1 + (timeProgress / 100) * 0.2);
-          
-          // Add trail point less frequently for smoother performance
-          if (Math.random() < 0.2) {
-            setTrailPoints(prev => [...prev.slice(-4), { x: targetX, y: targetY, id: Date.now() }]);
-          }
-        }
-      });
-      
-      return () => cancelAnimationFrame(animationFrame);
-    }
-  }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
-
-  // SMOOTH MOVEMENT TIMER - Create continuous movement every 50ms
-  useEffect(() => {
-    if (!isExploding && timeLeft > 0) {
-      const interval = setInterval(() => {
-        if (!userJustBid && lastBidder !== 'შენ') {
-          // Continuous smooth movement for other bidders
+          // Other bidders - continuous smooth movement based on time
           const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100);
           const targetX = Math.min(10 + (80 * timeProgress / 100), 90);
           const targetY = Math.max(85 - (70 * timeProgress / 100), 15);
           setJetPosition({ x: targetX, y: targetY });
+          setZoomLevel(1 + (timeProgress / 100) * 0.2);
         }
-      }, 50); // Update every 50ms for smooth movement
+      }
       
-      return () => clearInterval(interval);
-    }
-  }, [timeLeft, userJustBid, lastBidder, isExploding]);
+      // Continue animation loop
+      animationId = requestAnimationFrame(animate);
+    };
+    
+    // Start animation loop
+    animationId = requestAnimationFrame(animate);
+    
+    // Cleanup
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, []); // Empty dependency array - runs once and continues forever
+
+  // Update trail points separately at lower frequency
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isExploding && timeLeft > 0) {
+        setTrailPoints(prev => [...prev.slice(-4), { 
+          x: jetPosition.x, 
+          y: jetPosition.y, 
+          id: Date.now() 
+        }]);
+      }
+    }, 200); // Add trail point every 200ms
+    
+    return () => clearInterval(interval);
+  }, [jetPosition.x, jetPosition.y, isExploding, timeLeft]);
 
   // LUCKY COIN SPAWNING - Only appear in last 4-5 seconds if not collected this round
   useEffect(() => {
