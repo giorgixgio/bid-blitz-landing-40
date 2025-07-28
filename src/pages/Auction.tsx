@@ -42,7 +42,7 @@ import {
 } from 'lucide-react';
 
 // Asset Imports - Bitcoin 3D Image
-import bitcoin3DImage from '@/assets/bitcoin-3d.jpg';
+import bitcoin3DImage from '@/assets/bitcoin-3d-golden.png';
 
 // Component Imports
 import Header from '@/components/Header';
@@ -553,8 +553,8 @@ const Auction = () => {
                 <div className="text-center space-y-2">
                   <h3 className="text-base sm:text-lg font-semibold">Place Your Bid</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Each bid: <span className="font-bold text-primary flex items-center gap-1">{BID_COST} <span className="inline-flex items-center justify-center w-4 h-4 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></span> | 
-                    Price increases: <span className="font-bold text-primary flex items-center gap-1">+{PRICE_INCREMENT.toFixed(2)} <span className="inline-flex items-center justify-center w-4 h-4 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></span>
+                    Each bid: <span className="font-bold text-primary flex items-center gap-1">{BID_COST} <span className="inline-flex items-center justify-center w-4 h-4 bg-yellow-500 rounded-full text-white text-xs font-bold">₮</span></span> | 
+                    Price increases: <span className="font-bold text-primary flex items-center gap-1">+{PRICE_INCREMENT.toFixed(2)} <span className="inline-flex items-center justify-center w-4 h-4 bg-yellow-500 rounded-full text-white text-xs font-bold">₮</span></span>
                   </p>
                 </div>
                 
@@ -788,7 +788,7 @@ const Auction = () => {
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate">Bitcoin Digital Asset Package - $1000 USD</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-bold text-foreground flex items-center gap-1">{currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-3 h-3 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></span>
+                <span className="font-bold text-foreground flex items-center gap-1">{currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-3 h-3 bg-yellow-500 rounded-full text-white text-xs font-bold">₮</span></span>
                 <span>•</span>
                 <span>{String(timeLeft).padStart(2, '0')} sec</span>
               </div>
@@ -799,7 +799,7 @@ const Auction = () => {
               onClick={handleBid}
               disabled={userBidCredits <= 0 || timeLeft <= 0}
               size="sm"
-              className="bg-green-500 hover:bg-green-400 text-white font-bold px-4"
+              className="bg-yellow-500 hover:bg-yellow-400 text-white font-bold px-4"
             >
               ბიდი {/* Bid */}
             </Button>

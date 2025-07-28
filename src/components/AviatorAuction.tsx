@@ -354,7 +354,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           <div className="absolute top-8 inset-x-0 z-40 animate-bounce">
             <div className={`mx-auto w-fit text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg ${
               bonusCollectorId === 'შენ' && lastBidder === 'შენ' 
-                ? 'bg-green-500/90 border border-green-400' 
+                ? 'bg-yellow-500/90 border border-yellow-400' 
                 : 'bg-yellow-500/90 border border-yellow-400'
             }`}>
               <span className="emoji-consistent mr-1">💰</span>
@@ -416,7 +416,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
             <div className="absolute inset-0 bg-gradient-to-t from-green-600/30 to-transparent animate-pulse"></div>
             
             {/* Price level indicators */}
-            <div className="absolute right-2 top-2 text-green-400 text-xs font-mono">
+            <div className="absolute right-2 top-2 text-yellow-400 text-xs font-mono">
               {currentPrice.toFixed(2)}
             </div>
           </div>
@@ -424,16 +424,16 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
         {/* TARGET PRICE LINE */}
         <div 
-          className="absolute right-2 flex flex-col items-center text-green-400 z-20 transition-all duration-1000"
+          className="absolute right-2 flex flex-col items-center text-yellow-400 z-20 transition-all duration-1000"
           style={{
             top: `${15 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 0.1}%`
           }}
         >
-          <div className="w-8 h-8 bg-green-500/80 rounded-full flex items-center justify-center mb-1 border-2 border-green-400">
+          <div className="w-8 h-8 bg-yellow-500/80 rounded-full flex items-center justify-center mb-1 border-2 border-yellow-400">
             <span className="text-white text-sm">₿</span>
           </div>
-          <span className="text-xs font-bold text-green-400">TARGET</span>
-          <div className="absolute -left-10 top-0 w-20 h-0.5 bg-green-400/60 animate-pulse"></div>
+          <span className="text-xs font-bold text-yellow-400">TARGET</span>
+          <div className="absolute -left-10 top-0 w-20 h-0.5 bg-yellow-400/60 animate-pulse"></div>
         </div>
 
         {/* GREEN TRADING TRAIL EFFECTS */}
@@ -450,8 +450,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
               }}
             >
               <div className="flex items-center gap-1">
-                <div className="w-3 h-1 bg-green-400 rounded animate-pulse shadow-lg shadow-green-400/30"></div>
-                <div className="text-green-400 text-xs font-mono">+</div>
+                <div className="w-3 h-1 bg-yellow-400 rounded animate-pulse shadow-lg shadow-yellow-400/30"></div>
+                <div className="text-yellow-400 text-xs font-mono">+</div>
               </div>
             </div>
           ))}
@@ -504,7 +504,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
                 SOLD FOR
               </div>
               <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg flex items-center justify-center gap-1">
-                {currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-6 h-6 bg-green-500 rounded-full text-white text-sm font-bold">₮</span>
+                {currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-500 rounded-full text-white text-sm font-bold">₮</span>
               </div>
             </div>
           ) : (
@@ -536,7 +536,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="text-center">
           <p className="text-xs sm:text-sm text-white/80">Current Price</p>
-          <p className="text-xl sm:text-2xl font-bold text-white flex items-center justify-center gap-1">{currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-5 h-5 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></p>
+          <p className="text-xl sm:text-2xl font-bold text-white flex items-center justify-center gap-1">{currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-5 h-5 bg-yellow-500 rounded-full text-white text-xs font-bold">₮</span></p>
         </div>
         <div className="text-center">
           <p className="text-xs sm:text-sm text-white/80">Multiplier</p>
