@@ -503,8 +503,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
               <div className="text-3xl sm:text-4xl font-bold text-yellow-400 drop-shadow-lg mb-2">
                 SOLD FOR
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
-                {currentPrice.toFixed(2)} ₾
+              <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg flex items-center justify-center gap-1">
+                {currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-6 h-6 bg-green-500 rounded-full text-white text-sm font-bold">₮</span>
               </div>
             </div>
           ) : (
@@ -535,11 +535,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
-          <p className="text-xl sm:text-2xl font-bold text-white">{currentPrice.toFixed(2)} ₾</p>
+          <p className="text-xs sm:text-sm text-white/80">Current Price</p>
+          <p className="text-xl sm:text-2xl font-bold text-white flex items-center justify-center gap-1">{currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-5 h-5 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></p>
         </div>
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-white/80">მულტიპლაიერი</p>
+          <p className="text-xs sm:text-sm text-white/80">Multiplier</p>
           <div className="text-xl sm:text-2xl font-bold text-yellow-400">
             {(currentPrice * 100).toFixed(0)}x
           </div>
@@ -550,15 +550,15 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       <div className="flex items-center justify-between text-xs sm:text-sm text-white/80">
         <div className="flex items-center gap-1">
           <Gavel className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>{totalBidsPlaced} ბიდი</span>
+          <span>{totalBidsPlaced} Bids</span>
         </div>
         <div className="flex items-center gap-1">
           <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>ლიდერი: {lastBidder}</span>
+          <span>Leader: {lastBidder}</span>
         </div>
         <div className="flex items-center gap-1">
           <Coins className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>{userBidCredits} ბიდი</span>
+          <span>{userBidCredits} Bids</span>
         </div>
       </div>
 

@@ -41,11 +41,8 @@ import {
   Bot
 } from 'lucide-react';
 
-// Asset Imports - Bitcoin Images
-import bitcoinMainImage from '@/assets/bitcoin-main.jpg';
-import bitcoinWalletImage from '@/assets/bitcoin-wallet.jpg';
-import bitcoinNetworkImage from '@/assets/bitcoin-network.jpg';
-import bitcoinSecurityImage from '@/assets/bitcoin-security.jpg';
+// Asset Imports - Bitcoin 3D Image
+import bitcoin3DImage from '@/assets/bitcoin-3d.jpg';
 
 // Component Imports
 import Header from '@/components/Header';
@@ -88,8 +85,8 @@ const Auction = () => {
    * CONSTANTS & CONFIGURATION
    * ================================ */
 
-  const BID_COST = 0.60; // Cost per bid in Georgian Lari (₾)
-  const PRICE_INCREMENT = 0.01; // Item price increase per bid (1 cent)
+  const BID_COST = 0.60; // Cost per bid in USDT
+  const PRICE_INCREMENT = 0.01; // Item price increase per bid (0.01 USDT)
   const TIME_EXTENSION = 10; // Seconds added when bid is placed
 
   // Pool of dummy bidder names for automated bids
@@ -98,12 +95,9 @@ const Auction = () => {
     'keti15', 'temo88', 'sophie_g', 'alex_tbilisi', 'maka_cute', 'oto_king', 'nata_geo'
   ];
 
-  // Product image array for carousel
+  // Product image - single 3D Bitcoin image
   const productImages = [
-    bitcoinMainImage,
-    bitcoinWalletImage, 
-    bitcoinNetworkImage,
-    bitcoinSecurityImage
+    bitcoin3DImage
   ];
 
   /* ================================
@@ -557,10 +551,10 @@ const Auction = () => {
               <div className="space-y-3 sm:space-y-4">
                 {/* Section Header */}
                 <div className="text-center space-y-2">
-                  <h3 className="text-base sm:text-lg font-semibold">ბიდის განთავსება</h3> {/* Place Bid */}
+                  <h3 className="text-base sm:text-lg font-semibold">Place Your Bid</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    ყოველი ბიდი: <span className="font-bold text-primary">{BID_COST} ₾</span> | 
-                    ფასი იზრდება: <span className="font-bold text-primary">+{PRICE_INCREMENT.toFixed(2)} ₾</span>
+                    Each bid: <span className="font-bold text-primary flex items-center gap-1">{BID_COST} <span className="inline-flex items-center justify-center w-4 h-4 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></span> | 
+                    Price increases: <span className="font-bold text-primary flex items-center gap-1">+{PRICE_INCREMENT.toFixed(2)} <span className="inline-flex items-center justify-center w-4 h-4 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></span>
                   </p>
                 </div>
                 
@@ -590,22 +584,22 @@ const Auction = () => {
                   
                   {/* Button Text - Positioned Above Everything */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
-                    <span className="flex items-center justify-center gap-2 text-lg sm:text-xl font-bold text-white drop-shadow-lg">
-                      {isAuctionEnded ? (
-                        "აუქციონი დასრულდა" /* Auction Ended */
-                      ) : timeLeft <= 0 ? (
-                        "აუქციონი დასრულდა" /* Auction Ended */
-                      ) : userBidCredits <= 0 ? (
-                        "არ გაქვს ბიდები" /* No Bids */
-                        ) : userJustBid ? (
-                        "YOU ARE WINNING!"
-                       ) : (
-                         <>
-                           <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
-                           <span>ბიდი ({BID_COST} ₾)</span>
-                         </>
-                       )}
-                     </span>
+                     <span className="flex items-center justify-center gap-2 text-lg sm:text-xl font-bold text-white drop-shadow-lg">
+                       {isAuctionEnded ? (
+                         "AUCTION ENDED"
+                       ) : timeLeft <= 0 ? (
+                         "AUCTION ENDED"
+                       ) : userBidCredits <= 0 ? (
+                         "NO BIDS LEFT"
+                         ) : userJustBid ? (
+                         "YOU ARE WINNING!"
+                        ) : (
+                          <>
+                            <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+                            <span className="flex items-center gap-1">BID ({BID_COST} <span className="inline-flex items-center justify-center w-4 h-4 bg-white/20 rounded-full text-white text-xs font-bold">₮</span>)</span>
+                          </>
+                        )}
+                      </span>
                    </div>
                  </div>
 
@@ -625,11 +619,11 @@ const Auction = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  <span className="font-medium text-sm sm:text-base text-white">შენი ბიდები</span> {/* Your Bids */}
+                  <span className="font-medium text-sm sm:text-base text-white">Your Bids</span>
                 </div>
                 <div className="text-right">
                   <p className="text-xl sm:text-2xl font-bold text-white">{userBidCredits}</p>
-                  <p className="text-xs text-white/80">დარჩენილი</p> {/* Remaining */}
+                  <p className="text-xs text-white/80">Remaining</p>
                 </div>
               </div>
             </Card>
@@ -794,9 +788,9 @@ const Auction = () => {
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-sm truncate">Bitcoin Digital Asset Package - $1000 USD</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-bold text-foreground">{currentPrice.toFixed(2)} ₾</span>
+                <span className="font-bold text-foreground flex items-center gap-1">{currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-3 h-3 bg-green-500 rounded-full text-white text-xs font-bold">₮</span></span>
                 <span>•</span>
-                <span>{String(timeLeft).padStart(2, '0')} წამი</span> {/* seconds */}
+                <span>{String(timeLeft).padStart(2, '0')} sec</span>
               </div>
             </div>
             
