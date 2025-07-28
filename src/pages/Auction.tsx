@@ -41,11 +41,11 @@ import {
   Bot
 } from 'lucide-react';
 
-// Asset Imports - Samsung Galaxy S25 Ultra Images
-import galaxyMainImage from '@/assets/samsung-galaxy-s25-ultra.jpg';
-import galaxyBackImage from '@/assets/samsung-galaxy-s25-ultra-back.jpg';
-import galaxySideImage from '@/assets/samsung-galaxy-s25-ultra-side.jpg';
-import galaxySPenImage from '@/assets/samsung-galaxy-s25-ultra-spen.jpg';
+// Asset Imports - Bitcoin Images
+import bitcoinMainImage from '@/assets/bitcoin-main.jpg';
+import bitcoinWalletImage from '@/assets/bitcoin-wallet.jpg';
+import bitcoinNetworkImage from '@/assets/bitcoin-network.jpg';
+import bitcoinSecurityImage from '@/assets/bitcoin-security.jpg';
 
 // Component Imports
 import Header from '@/components/Header';
@@ -100,10 +100,10 @@ const Auction = () => {
 
   // Product image array for carousel
   const productImages = [
-    galaxyMainImage,
-    galaxyBackImage, 
-    galaxySideImage,
-    galaxySPenImage
+    bitcoinMainImage,
+    bitcoinWalletImage, 
+    bitcoinNetworkImage,
+    bitcoinSecurityImage
   ];
 
   /* ================================
@@ -419,7 +419,7 @@ const Auction = () => {
                 {/* Main Product Image */}
                 <img
                   src={productImages[currentImageIndex]} 
-                  alt="Samsung Galaxy S25 Ultra"
+                  alt="Bitcoin Digital Asset Package"
                   className="w-full h-full object-cover"
                 />
                 
@@ -484,37 +484,37 @@ const Auction = () => {
               <div className="space-y-3 sm:space-y-4">
                 {/* Product Title and Badge */}
                 <div className="flex items-start justify-between gap-2">
-                  <h1 className="text-lg sm:text-2xl font-bold leading-tight">Samsung S938B Galaxy S25 Ultra</h1>
+                  <h1 className="text-lg sm:text-2xl font-bold leading-tight">Bitcoin Digital Asset Package - $1000 USD</h1>
                   <Badge variant="secondary" className="ml-2 text-xs">
                     <TrendingUp className="w-3 h-3 mr-1" />
-                    ტოპ
+                    HOT
                   </Badge>
                 </div>
                 
                 {/* Product Specifications Grid */}
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                   <div>
-                    <span className="font-medium">საცალო ფასი:</span> 3599 ₾
+                    <span className="font-medium">Market Value:</span> $1000 USD
                   </div>
                   <div>
-                    <span className="font-medium">მდგომარეობა:</span> ახალი
+                    <span className="font-medium">Status:</span> Active
                   </div>
                   <div>
-                    <span className="font-medium">კატეგორია:</span> სმარტფონები
+                    <span className="font-medium">Category:</span> Cryptocurrency
                   </div>
                   <div>
-                    <span className="font-medium">ბრენდი:</span> Samsung
+                    <span className="font-medium">Asset:</span> Bitcoin (BTC)
                   </div>
                 </div>
 
                 {/* Features List */}
                 <div className="pt-3 sm:pt-4 border-t">
-                  <h3 className="font-semibold mb-2 text-sm sm:text-base">მახასიათებლები</h3>
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">Package Includes</h3>
                   <ul className="text-xs sm:text-sm text-muted-foreground space-y-1">
-                    <li>• 256GB მეხსიერება</li>
-                    <li>• 12GB RAM</li>
-                    <li>• 200MP კამერა</li>
-                    <li>• S Pen-ით</li>
+                    <li>• $1000 USD worth of Bitcoin</li>
+                    <li>• Secure hardware wallet</li>
+                    <li>• Private key management</li>
+                    <li>• 24/7 customer support</li>
                   </ul>
                 </div>
               </div>
@@ -785,14 +785,14 @@ const Auction = () => {
             <div className="flex-shrink-0">
               <img 
                 src={productImages[currentImageIndex]} 
-                alt="Samsung Galaxy S25 Ultra"
+                alt="Bitcoin Digital Asset Package"
                 className="w-12 h-12 rounded-lg object-cover border border-border"
               />
             </div>
             
             {/* Product Info */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm truncate">Samsung S938B Galaxy S25 Ultra</h3>
+              <h3 className="font-semibold text-sm truncate">Bitcoin Digital Asset Package - $1000 USD</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="font-bold text-foreground">{currentPrice.toFixed(2)} ₾</span>
                 <span>•</span>
