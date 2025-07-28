@@ -430,7 +430,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           }}
         >
           <div className="w-8 h-8 bg-green-500/80 rounded-full flex items-center justify-center mb-1 border-2 border-green-400">
-            <span className="text-white text-xs font-bold">$</span>
+            <span className="text-white text-sm">₿</span>
           </div>
           <span className="text-xs font-bold text-green-400">TARGET</span>
           <div className="absolute -left-10 top-0 w-20 h-0.5 bg-green-400/60 animate-pulse"></div>
