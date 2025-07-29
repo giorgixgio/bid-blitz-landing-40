@@ -6,9 +6,11 @@ export interface User {
   username: string;
   email: string;
   balance: number;
+  bidCredits: number;
   totalWinnings: number;
   auctionsWon: number;
   totalBids: number;
+  totalSpentOnBids: number;
 }
 
 export interface Bid {
@@ -65,7 +67,8 @@ interface GameState {
   logout: () => void;
   
   // Auction Actions
-  placeBid: (auctionId: string, amount: number) => boolean;
+  placeBid: (auctionId: string) => boolean;
+  buyBidCredits: (amount: number) => boolean;
   updateAuctionTimer: (auctionId: string) => void;
   endAuction: (auctionId: string) => void;
   createAuction: (title: string, description: string, bidIncrement: number) => void;
@@ -77,10 +80,10 @@ interface GameState {
 
 // Mock users data
 const mockUsers: User[] = [
-  { id: '1', username: 'CryptoKing', email: 'king@crypto.com', balance: 50.0, totalWinnings: 125.5, auctionsWon: 8, totalBids: 45 },
-  { id: '2', username: 'BitMaster', email: 'master@bit.com', balance: 75.2, totalWinnings: 89.3, auctionsWon: 5, totalBids: 32 },
-  { id: '3', username: 'TokenTrader', email: 'trader@token.com', balance: 32.1, totalWinnings: 67.8, auctionsWon: 3, totalBids: 28 },
-  { id: '4', username: 'NFTCollector', email: 'collector@nft.com', balance: 98.7, totalWinnings: 234.1, auctionsWon: 12, totalBids: 67 },
+  { id: '1', username: 'CryptoKing', email: 'king@crypto.com', balance: 50.0, bidCredits: 100, totalWinnings: 125.5, auctionsWon: 8, totalBids: 45, totalSpentOnBids: 12.5 },
+  { id: '2', username: 'BitMaster', email: 'master@bit.com', balance: 75.2, bidCredits: 75, totalWinnings: 89.3, auctionsWon: 5, totalBids: 32, totalSpentOnBids: 8.2 },
+  { id: '3', username: 'TokenTrader', email: 'trader@token.com', balance: 32.1, bidCredits: 150, totalWinnings: 67.8, auctionsWon: 3, totalBids: 28, totalSpentOnBids: 6.8 },
+  { id: '4', username: 'NFTCollector', email: 'collector@nft.com', balance: 98.7, bidCredits: 200, totalWinnings: 234.1, auctionsWon: 12, totalBids: 67, totalSpentOnBids: 18.3 },
 ];
 
 // Calculate prize distribution
@@ -190,9 +193,11 @@ export const useGameStore = create<GameState>()(
           username,
           email,
           balance: 10.0, // Starting balance
+          bidCredits: 50, // Starting bid credits
           totalWinnings: 0,
           auctionsWon: 0,
           totalBids: 0,
+          totalSpentOnBids: 0,
         };
         
         mockUsers.push(newUser);
@@ -205,44 +210,80 @@ export const useGameStore = create<GameState>()(
       },
       
       // Auction actions
-      placeBid: (auctionId: string, amount: number) => {
+      placeBid: (auctionId: string) => {
         const state = get();
         if (!state.currentUser) return false;
         
         const auction = state.auctions.find(a => a.id === auctionId);
-        if (!auction || !auction.isActive || amount < auction.currentBid + auction.bidIncrement) {
-          return false;
-        }
+        if (!auction || !auction.isActive) return false;
         
-        if (state.currentUser.balance < amount) return false;
+        // Check if user has bid credits (each bid costs 1 credit)
+        if (state.currentUser.bidCredits < 1) return false;
+        
+        const newBidAmount = auction.currentBid + auction.bidIncrement;
+        const bidCost = 0.25; // Each bid costs $0.25
         
         const newBid: Bid = {
           id: Date.now().toString(),
           userId: state.currentUser.id,
           username: state.currentUser.username,
-          amount,
+          amount: newBidAmount,
           timestamp: Date.now(),
           auctionId,
         };
+        
+        // Update user's bid credits in mockUsers array
+        const userIndex = mockUsers.findIndex(u => u.id === state.currentUser!.id);
+        if (userIndex !== -1) {
+          mockUsers[userIndex].bidCredits -= 1;
+          mockUsers[userIndex].totalBids += 1;
+          mockUsers[userIndex].totalSpentOnBids += bidCost;
+        }
         
         set(state => ({
           auctions: state.auctions.map(a => 
             a.id === auctionId 
               ? { 
                   ...a, 
-                  currentBid: amount,
-                  prizePool: a.prizePool + a.bidIncrement,
-                  timeLeft: Math.max(a.timeLeft, 30), // Extend by 30 seconds or keep current
+                  currentBid: newBidAmount,
+                  prizePool: a.prizePool + bidCost, // Add bid cost to prize pool
+                  timeLeft: Math.max(a.timeLeft, 10), // Extend by 10 seconds
                   bids: [...a.bids, newBid],
                 }
               : a
           ),
           currentUser: state.currentUser ? {
             ...state.currentUser,
-            balance: state.currentUser.balance - amount,
+            bidCredits: state.currentUser.bidCredits - 1,
             totalBids: state.currentUser.totalBids + 1,
+            totalSpentOnBids: state.currentUser.totalSpentOnBids + bidCost,
           } : null,
-          globalJackpot: state.globalJackpot + (amount * 0.02), // 2% goes to jackpot
+          globalJackpot: state.globalJackpot + (bidCost * 0.1), // 10% goes to jackpot
+        }));
+        
+        return true;
+      },
+
+      buyBidCredits: (amount: number) => {
+        const state = get();
+        if (!state.currentUser) return false;
+        
+        const cost = amount * 0.5; // Each bid credit costs $0.50
+        if (state.currentUser.balance < cost) return false;
+        
+        // Update user in mockUsers array
+        const userIndex = mockUsers.findIndex(u => u.id === state.currentUser!.id);
+        if (userIndex !== -1) {
+          mockUsers[userIndex].balance -= cost;
+          mockUsers[userIndex].bidCredits += amount;
+        }
+        
+        set(state => ({
+          currentUser: state.currentUser ? {
+            ...state.currentUser,
+            balance: state.currentUser.balance - cost,
+            bidCredits: state.currentUser.bidCredits + amount,
+          } : null,
         }));
         
         return true;

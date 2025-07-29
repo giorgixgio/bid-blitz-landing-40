@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Clock, Users, Zap, TrendingUp, Trophy } from 'lucide-react';
+import { Clock, Users, Zap, TrendingUp, Trophy, Coins, DollarSign } from 'lucide-react';
 import { useGameStore } from '@/hooks/useGameStore';
 import { toast } from '@/hooks/use-toast';
 import confetti from 'canvas-confetti';
@@ -15,8 +15,8 @@ interface LiveAuctionProps {
 }
 
 export const LiveAuction = ({ auction }: LiveAuctionProps) => {
-  const [bidAmount, setBidAmount] = useState('');
-  const { currentUser, placeBid, updateAuctionTimer } = useGameStore();
+  const { currentUser, placeBid, updateAuctionTimer, buyBidCredits } = useGameStore();
+  const [creditsToBuy, setCreditsToBuy] = useState('');
   
   // Update timer every second
   useEffect(() => {
@@ -35,22 +35,21 @@ export const LiveAuction = ({ auction }: LiveAuctionProps) => {
       return;
     }
 
-    const amount = parseFloat(bidAmount);
-    if (isNaN(amount) || amount < auction.currentBid + auction.bidIncrement) {
+    if (currentUser.bidCredits < 1) {
       toast({ 
-        title: 'Invalid bid', 
-        description: `Minimum bid: ₿ ${(auction.currentBid + auction.bidIncrement).toFixed(3)}`,
+        title: 'No bid credits', 
+        description: 'You need bid credits to place bids. Buy some below!',
         variant: 'destructive'
       });
       return;
     }
 
-    if (placeBid(auction.id, amount)) {
+    if (placeBid(auction.id)) {
+      const newPrice = auction.currentBid + auction.bidIncrement;
       toast({ 
         title: 'Bid placed!', 
-        description: `₿ ${amount.toFixed(3)} bid placed successfully` 
+        description: `Price increased to ₿ ${newPrice.toFixed(3)}. Cost: 1 bid credit ($0.25)` 
       });
-      setBidAmount('');
       
       // Small confetti for successful bid
       confetti({
@@ -62,7 +61,35 @@ export const LiveAuction = ({ auction }: LiveAuctionProps) => {
     } else {
       toast({ 
         title: 'Bid failed', 
-        description: 'Insufficient balance or invalid bid',
+        description: 'Insufficient bid credits or auction ended',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleBuyCredits = () => {
+    if (!currentUser) return;
+    
+    const amount = parseInt(creditsToBuy);
+    if (isNaN(amount) || amount < 1) {
+      toast({ 
+        title: 'Invalid amount', 
+        description: 'Please enter a valid number of credits to buy',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (buyBidCredits(amount)) {
+      toast({ 
+        title: 'Credits purchased!', 
+        description: `${amount} bid credits purchased for $${(amount * 0.5).toFixed(2)}` 
+      });
+      setCreditsToBuy('');
+    } else {
+      toast({ 
+        title: 'Purchase failed', 
+        description: 'Insufficient balance',
         variant: 'destructive'
       });
     }
@@ -74,7 +101,7 @@ export const LiveAuction = ({ auction }: LiveAuctionProps) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const timeProgress = auction.timeLeft > 0 ? (auction.timeLeft / 300) * 100 : 0; // Assuming 5 min max
+  const timeProgress = auction.timeLeft > 0 ? (auction.timeLeft / 300) * 100 : 0;
   const isUrgent = auction.timeLeft <= 30;
   const lastBidder = auction.bids[auction.bids.length - 1];
 
@@ -124,15 +151,30 @@ export const LiveAuction = ({ auction }: LiveAuctionProps) => {
           />
         </div>
 
+        {/* Penny Auction Info */}
+        <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Coins className="h-4 w-4 text-yellow-600" />
+            <span className="font-semibold text-yellow-800 dark:text-yellow-200">Penny Auction Rules</span>
+          </div>
+          <div className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
+            <p>• Each bid costs 1 credit ($0.25) and increases price by ₿ {auction.bidIncrement.toFixed(3)}</p>
+            <p>• Timer extends by 10 seconds with each bid</p>
+            <p>• Winner pays final price + gets prize pool minus their bid costs</p>
+          </div>
+        </div>
+
         {/* Current Bid Info */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Current Bid</p>
+            <p className="text-sm text-muted-foreground">Current Price</p>
             <p className="text-2xl font-bold text-primary">₿ {auction.currentBid.toFixed(3)}</p>
+            <p className="text-xs text-muted-foreground">Next: ₿ {(auction.currentBid + auction.bidIncrement).toFixed(3)}</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">Prize Pool</p>
             <p className="text-2xl font-bold text-green-600">₿ {auction.prizePool.toFixed(3)}</p>
+            <p className="text-xs text-muted-foreground">From bid fees</p>
           </div>
         </div>
 
@@ -141,44 +183,87 @@ export const LiveAuction = ({ auction }: LiveAuctionProps) => {
           <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
             <Trophy className="h-4 w-4 text-yellow-500" />
             <span className="text-sm">
-              <strong>{lastBidder.username}</strong> leads with ₿ {lastBidder.amount.toFixed(3)}
+              <strong>{lastBidder.username}</strong> leads at ₿ {lastBidder.amount.toFixed(3)}
             </span>
+          </div>
+        )}
+
+        {/* User Bid Credits */}
+        {currentUser && (
+          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Coins className="h-4 w-4 text-blue-600" />
+                  <span className="font-semibold">Your Bid Credits: {currentUser.bidCredits}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Balance: ${currentUser.balance.toFixed(2)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">Spent on bids</p>
+                <p className="font-semibold">${currentUser.totalSpentOnBids.toFixed(2)}</p>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Bidding Section */}
         {auction.isActive && (
           <div className="space-y-3">
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                step="0.001"
-                min={auction.currentBid + auction.bidIncrement}
-                value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
-                placeholder={`Min: ₿ ${(auction.currentBid + auction.bidIncrement).toFixed(3)}`}
-                disabled={!currentUser}
-              />
-              <Button 
-                onClick={handlePlaceBid}
-                disabled={!currentUser || !bidAmount}
-                className="min-w-24"
-              >
-                Bid
-              </Button>
-            </div>
+            <Button 
+              onClick={handlePlaceBid}
+              disabled={!currentUser || (currentUser && currentUser.bidCredits < 1)}
+              className="w-full h-12 text-lg font-bold"
+              size="lg"
+            >
+              {!currentUser ? 'Login to Bid' : 
+               currentUser.bidCredits < 1 ? 'No Bid Credits' :
+               `Bid Now (1 Credit = $0.25)`}
+            </Button>
             
             {!currentUser && (
               <p className="text-sm text-muted-foreground text-center">
-                Login to place bids
+                Login to participate in auctions
               </p>
             )}
-            
-            {currentUser && (
-              <p className="text-sm text-muted-foreground text-center">
-                Balance: ₿ {currentUser.balance.toFixed(3)}
-              </p>
-            )}
+          </div>
+        )}
+
+        {/* Buy Credits Section */}
+        {currentUser && (
+          <div className="space-y-3 border-t pt-4">
+            <h4 className="font-semibold text-sm flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Buy Bid Credits ($0.50 each)
+            </h4>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                min="1"
+                value={creditsToBuy}
+                onChange={(e) => setCreditsToBuy(e.target.value)}
+                placeholder="Amount"
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleBuyCredits}
+                disabled={!creditsToBuy || parseInt(creditsToBuy) < 1}
+                variant="outline"
+              >
+                Buy ${(parseInt(creditsToBuy) * 0.5 || 0).toFixed(2)}
+              </Button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button variant="outline" size="sm" onClick={() => setCreditsToBuy('10')}>
+                10 Credits ($5)
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setCreditsToBuy('25')}>
+                25 Credits ($12.50)
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setCreditsToBuy('50')}>
+                50 Credits ($25)
+              </Button>
+            </div>
           </div>
         )}
 
@@ -199,8 +284,8 @@ export const LiveAuction = ({ auction }: LiveAuctionProps) => {
             <div className="text-muted-foreground">Total Bids</div>
           </div>
           <div className="p-2 bg-muted/50 rounded">
-            <div className="font-semibold">₿ {auction.bidIncrement.toFixed(3)}</div>
-            <div className="text-muted-foreground">Min Increment</div>
+            <div className="font-semibold">${(auction.bids.length * 0.25).toFixed(2)}</div>
+            <div className="text-muted-foreground">Revenue</div>
           </div>
         </div>
 
@@ -212,7 +297,10 @@ export const LiveAuction = ({ auction }: LiveAuctionProps) => {
               {auction.bids.slice(-5).reverse().map((bid) => (
                 <div key={bid.id} className="flex justify-between text-sm p-2 bg-muted/30 rounded">
                   <span className="font-medium">{bid.username}</span>
-                  <span>₿ {bid.amount.toFixed(3)}</span>
+                  <div className="text-right">
+                    <div>₿ {bid.amount.toFixed(3)}</div>
+                    <div className="text-xs text-muted-foreground">-$0.25</div>
+                  </div>
                 </div>
               ))}
             </div>
