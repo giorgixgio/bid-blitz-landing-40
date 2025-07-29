@@ -1,11 +1,18 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { Clock, TrendingUp, TrendingDown, Users, Zap, Activity, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Clock, TrendingUp, TrendingDown, Users, Zap, Activity, ArrowUpRight, ArrowDownRight, LogIn, User } from 'lucide-react';
+import { useGameStore } from '@/hooks/useGameStore';
+import { AuthModal } from '@/components/AuthModal';
+import { GameLeaderboard } from '@/components/GameLeaderboard';
+import { JackpotMeter } from '@/components/JackpotMeter';
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { auctions, currentUser, logout, isAuthenticated } = useGameStore();
 
   // Mock trading pairs data
   const tradingPairs = [
@@ -16,51 +23,22 @@ const Index = () => {
     { pair: 'DOT/USD', price: '7.82', change: '-2.15%', volume: '123M', isUp: false },
   ];
 
-  // Mock auction lots with trading-style data
-  const auctionLots = [
-    {
-      id: 383,
-      title: 'Samsung Galaxy S25 Ultra',
-      pair: 'PHONE/BTC',
-      currentBid: 2.45,
-      highBid: 2.67,
-      lowBid: 2.12,
-      change: '+0.23',
-      changePercent: '+10.4%',
-      volume: 45,
-      timeLeft: '2h 15m',
-      bidders: 23,
-      isUp: true
-    },
-    {
-      id: 384,
-      title: 'Bitcoin Mining Hardware',
-      pair: 'ASIC/BTC',
-      currentBid: 1.8,
-      highBid: 1.95,
-      lowBid: 1.65,
-      change: '-0.05',
-      changePercent: '-2.7%',
-      volume: 28,
-      timeLeft: '4h 32m',
-      bidders: 15,
-      isUp: false
-    },
-    {
-      id: 385,
-      title: 'Crypto Security Vault',
-      pair: 'VAULT/BTC',
-      currentBid: 0.75,
-      highBid: 0.89,
-      lowBid: 0.71,
-      change: '+0.04',
-      changePercent: '+5.6%',
-      volume: 12,
-      timeLeft: '1h 8m',
-      bidders: 8,
-      isUp: true
-    }
-  ];
+  // Convert auctions to trading-style format
+  const auctionMarkets = auctions.map(auction => ({
+    id: auction.id,
+    title: auction.title,
+    pair: `${auction.title.split(' ')[0].toUpperCase()}/BTC`,
+    currentBid: auction.currentBid,
+    highBid: auction.prizePool,
+    lowBid: auction.currentBid * 0.8,
+    change: '+0.23',
+    changePercent: '+10.4%',
+    volume: auction.bids.length,
+    timeLeft: auction.timeLeft,
+    bidders: new Set(auction.bids.map(b => b.userId)).size,
+    isUp: true,
+    isActive: auction.isActive
+  }));
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,8 +61,28 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button variant="outline" size="sm">Login</Button>
-              <Button size="sm">Register</Button>
+              {isAuthenticated && currentUser ? (
+                <div className="flex items-center space-x-3">
+                  <div className="text-right">
+                    <div className="text-sm font-medium">{currentUser.username}</div>
+                    <div className="text-xs text-muted-foreground">₿ {currentUser.balance.toFixed(3)}</div>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={logout}>
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => setShowAuthModal(true)}>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Login
+                  </Button>
+                  <Button size="sm" onClick={() => setShowAuthModal(true)}>
+                    <User className="h-4 w-4 mr-2" />
+                    Register
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -108,90 +106,79 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Market Overview */}
-          <div className="lg:col-span-1">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium">Market Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {tradingPairs.map((pair, index) => (
-                  <div key={index} className="flex items-center justify-between py-1">
-                    <div className="text-xs text-muted-foreground">{pair.pair}</div>
-                    <div className="text-right">
-                      <div className="text-xs font-medium">${pair.price}</div>
-                      <div className={`text-xs ${pair.isUp ? 'text-green-500' : 'text-red-500'}`}>
-                        {pair.change}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            <JackpotMeter />
+            <GameLeaderboard />
           </div>
 
-          {/* Auction Markets */}
+          {/* Main Content */}
           <div className="lg:col-span-3">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Auction Markets</h2>
+              <h2 className="text-lg font-semibold">Live Auction Markets</h2>
               <div className="flex items-center space-x-2">
                 <Badge variant="secondary" className="text-xs">
                   <Activity className="h-3 w-3 mr-1" />
                   Live Trading
                 </Badge>
                 <Badge variant="outline" className="text-xs">
-                  {auctionLots.length} Active
+                  {auctionMarkets.filter(a => a.isActive).length} Active
                 </Badge>
               </div>
             </div>
 
-            {/* Trading Table Header */}
+            {/* Trading Table */}
             <Card>
               <CardContent className="p-0">
                 <div className="grid grid-cols-7 gap-4 p-4 bg-muted/30 text-xs font-medium text-muted-foreground border-b">
                   <div>Market</div>
-                  <div className="text-right">Last Price</div>
-                  <div className="text-right">24h Change</div>
-                  <div className="text-right">24h High</div>
-                  <div className="text-right">24h Low</div>
-                  <div className="text-right">Volume</div>
+                  <div className="text-right">Current Bid</div>
+                  <div className="text-right">Time Left</div>
+                  <div className="text-right">Prize Pool</div>
+                  <div className="text-right">Min Bid</div>
+                  <div className="text-right">Bidders</div>
                   <div className="text-center">Action</div>
                 </div>
 
-                {/* Trading Rows */}
-                {auctionLots.map((lot) => (
-                  <div key={lot.id} className="grid grid-cols-7 gap-4 p-4 border-b last:border-b-0 hover:bg-muted/20 transition-colors">
+                {auctionMarkets.map((market) => (
+                  <div key={market.id} className="grid grid-cols-7 gap-4 p-4 border-b last:border-b-0 hover:bg-muted/20 transition-colors">
                     <div>
-                      <div className="font-medium text-sm">{lot.pair}</div>
-                      <div className="text-xs text-muted-foreground">{lot.title}</div>
+                      <div className="font-medium text-sm">{market.pair}</div>
+                      <div className="text-xs text-muted-foreground">{market.title}</div>
+                      {market.isActive && (
+                        <Badge variant="secondary" className="text-xs mt-1">LIVE</Badge>
+                      )}
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">₿ {lot.currentBid}</div>
-                      <div className="text-xs text-muted-foreground">{lot.timeLeft}</div>
+                      <div className="font-medium">₿ {market.currentBid.toFixed(3)}</div>
                     </div>
-                    <div className={`text-right font-medium ${lot.isUp ? 'text-green-500' : 'text-red-500'}`}>
-                      <div className="flex items-center justify-end">
-                        {lot.isUp ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                        {lot.changePercent}
+                    <div className="text-right">
+                      <div className={`text-sm ${market.timeLeft <= 30 ? 'text-red-500 font-bold' : ''}`}>
+                        {Math.floor(market.timeLeft / 60)}:{(market.timeLeft % 60).toString().padStart(2, '0')}
                       </div>
-                      <div className="text-xs">{lot.change}</div>
+                      {market.timeLeft <= 30 && (
+                        <Badge variant="destructive" className="text-xs">URGENT</Badge>
+                      )}
                     </div>
-                    <div className="text-right text-sm">₿ {lot.highBid}</div>
-                    <div className="text-right text-sm">₿ {lot.lowBid}</div>
+                    <div className="text-right text-sm font-medium text-green-600">
+                      ₿ {market.highBid.toFixed(3)}
+                    </div>
+                    <div className="text-right text-sm">₿ {market.lowBid.toFixed(3)}</div>
                     <div className="text-right">
-                      <div className="text-sm font-medium">{lot.volume}</div>
+                      <div className="text-sm font-medium">{market.bidders}</div>
                       <div className="text-xs text-muted-foreground flex items-center justify-end">
                         <Users className="h-3 w-3 mr-1" />
-                        {lot.bidders}
+                        bidders
                       </div>
                     </div>
                     <div className="flex justify-center">
                       <Button 
                         size="sm" 
-                        onClick={() => navigate(`/auction/${lot.id}`)}
+                        onClick={() => navigate(`/auction/${market.id}`)}
                         className="px-6"
+                        disabled={!market.isActive}
                       >
-                        Trade
+                        {market.isActive ? 'Bid Now' : 'View Results'}
                       </Button>
                     </div>
                   </div>
@@ -203,32 +190,42 @@ const Index = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-500">₿ 45.2</div>
-                  <div className="text-xs text-muted-foreground">24h Volume</div>
+                  <div className="text-2xl font-bold text-green-500">
+                    ₿ {auctions.reduce((sum, a) => sum + a.prizePool, 0).toFixed(1)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Total Prize Pools</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">156</div>
-                  <div className="text-xs text-muted-foreground">Active Traders</div>
+                  <div className="text-2xl font-bold">
+                    {auctions.reduce((sum, a) => sum + new Set(a.bids.map(b => b.userId)).size, 0)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Active Bidders</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-orange-500">12</div>
+                  <div className="text-2xl font-bold text-orange-500">
+                    {auctionMarkets.filter(a => a.isActive).length}
+                  </div>
                   <div className="text-xs text-muted-foreground">Live Auctions</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-500">98.7%</div>
-                  <div className="text-xs text-muted-foreground">Uptime</div>
+                  <div className="text-2xl font-bold text-blue-500">
+                    {auctions.reduce((sum, a) => sum + a.bids.length, 0)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Total Bids</div>
                 </CardContent>
               </Card>
             </div>
           </div>
         </div>
       </div>
+
+      <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );
 };
