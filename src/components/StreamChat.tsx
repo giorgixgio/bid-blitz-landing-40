@@ -31,6 +31,7 @@ const StreamChat = () => {
   const [onlineUsers, setOnlineUsers] = useState(127);
   const [messageInput, setMessageInput] = useState('');
   const [showEmojiPanel, setShowEmojiPanel] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -176,16 +177,29 @@ const StreamChat = () => {
   }, []);
 
   return (
-    <Card className="h-96 flex flex-col">
+    <Card className={`flex flex-col transition-all duration-300 ${isExpanded ? 'h-96' : 'h-64'}`}>
       {/* Chat Header */}
-      <div className="p-3 border-b bg-muted/20 flex items-center justify-between">
+      <div className="p-3 border-b bg-gradient-to-r from-primary/10 to-primary/5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-primary" />
-          <span className="font-medium text-sm">ლაივ ჩატი</span>
+          <MessageCircle className="w-4 h-4 text-primary animate-pulse" />
+          <span className="font-medium text-sm">🔥 ლაივ ჩატი</span>
+          <Badge variant="secondary" className="text-xs px-2 py-0 bg-primary/20 text-primary">
+            LIVE
+          </Badge>
         </div>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Users className="w-3 h-3" />
-          <span>{onlineUsers}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Users className="w-3 h-3" />
+            <span>{onlineUsers}</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-6 w-6 p-0 hover:bg-primary/10"
+          >
+            <span className="text-xs">{isExpanded ? '−' : '+'}</span>
+          </Button>
         </div>
       </div>
 
