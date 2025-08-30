@@ -409,10 +409,10 @@ const Auction = () => {
       
       <div className="container mx-auto p-3 sm:p-4 lg:p-8 max-w-7xl">
         {/* Main Content Grid - Mobile-first responsive layout */}
-        <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-2 min-w-0 overflow-hidden">
           
           {/* LEFT COLUMN - Product Details (Order 2 on mobile, 1 on desktop) */}
-          <div className="order-2 lg:order-1 space-y-4 sm:space-y-6 mt-16">
+          <div className="order-2 lg:order-1 space-y-4 sm:space-y-6 mt-16 min-w-0">
             
             {/* Product Image Carousel */}
             <Card className="overflow-hidden">
@@ -523,7 +523,7 @@ const Auction = () => {
           </div>
 
           {/* RIGHT COLUMN - Bidding Interface (Order 1 on mobile, 2 on desktop) */}
-          <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
+          <div className="order-1 lg:order-2 space-y-4 sm:space-y-6 min-w-0">
             
             {/* Aviator-Style Game Component */}
             <AviatorAuction
