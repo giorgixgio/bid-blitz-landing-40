@@ -640,24 +640,13 @@ const Auction = () => {
         </div>
 
         {/* Sticky Bottom Bid Button */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-3 shadow-lg z-50 max-w-full">
-          <div className="container mx-auto max-w-md flex items-center gap-3">
-            {/* Product Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-bold text-foreground text-lg">{currentPrice.toFixed(2)} ₾</span>
-                <span>•</span>
-                <span className="font-medium">{String(timeLeft).padStart(2, '0')}წმ</span>
-                <span>•</span>
-                <span className="text-primary font-medium">{userBidCredits} ბიდი</span>
-              </div>
-            </div>
-            
-            {/* Main Bid Button */}
+        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-4 shadow-lg z-50">
+          <div className="container mx-auto max-w-sm">
+            {/* Main Bid Button - Full Width */}
             <Button 
               onClick={handleBid}
               disabled={userBidCredits <= 0 || timeLeft <= 0 || isAuctionEnded}
-              className={`h-12 px-6 text-white font-bold shadow-lg transform transition-transform active:scale-95 ${
+              className={`w-full h-14 text-xl font-bold shadow-lg text-white transform transition-transform active:scale-95 ${
                 isAuctionEnded || timeLeft <= 0
                   ? 'bg-gray-400 opacity-50 cursor-not-allowed' 
                   : userBidCredits <= 0
@@ -666,16 +655,32 @@ const Auction = () => {
               }`}
             >
               {isAuctionEnded || timeLeft <= 0 ? (
-                "დასრულდა"
+                "აუქციონი დასრულდა"
               ) : userBidCredits <= 0 ? (
-                "ბიდები ნ/ა"
+                "ბიდები არ გაქვს"
               ) : (
                 <>
-                  <Zap className="w-4 h-4 mr-1" />
-                  ბიდი
+                  <Zap className="w-5 h-5 mr-2" />
+                  ბიდი ({BID_COST} ₾)
                 </>
               )}
             </Button>
+            
+            {/* Stats Row Under Button */}
+            <div className="flex justify-center items-center gap-4 mt-3 text-sm">
+              <div className="text-center">
+                <div className="text-xs text-muted-foreground">ფასი</div>
+                <div className="font-bold text-primary">{currentPrice.toFixed(2)} ₾</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-muted-foreground">დრო</div>
+                <div className="font-bold text-destructive">{String(timeLeft).padStart(2, '0')}წმ</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs text-muted-foreground">ბიდები</div>
+                <div className="font-bold text-green-600">{userBidCredits}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

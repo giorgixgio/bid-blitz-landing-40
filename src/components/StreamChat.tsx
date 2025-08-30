@@ -177,7 +177,7 @@ const StreamChat = () => {
   }, []);
 
   return (
-    <Card className={`flex flex-col transition-all duration-300 ${isExpanded ? 'h-96' : 'h-64'}`}>
+    <Card className={`flex flex-col transition-all duration-300 overflow-hidden ${isExpanded ? 'h-96' : 'h-64'}`}>
       {/* Chat Header */}
       <div className="p-3 border-b bg-gradient-to-r from-primary/10 to-primary/5 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -248,7 +248,7 @@ const StreamChat = () => {
       </div>
 
       {/* Quick Emoji Reactions */}
-      <div className="px-3 py-2 border-t bg-muted/5">
+      <div className="px-3 py-2 border-t bg-muted/5 overflow-hidden">
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
           <span className="text-xs text-muted-foreground mr-2 flex-shrink-0">სწრაფი:</span>
           {quickEmojis.map((emoji, index) => (
@@ -267,7 +267,7 @@ const StreamChat = () => {
 
       {/* Emoji Panel */}
       {showEmojiPanel && (
-        <div className="px-3 pb-2 border-t bg-muted/5">
+        <div className="px-3 pb-2 border-t bg-muted/5 overflow-hidden">
           <div className="grid grid-cols-8 gap-1 max-h-32 overflow-y-auto scrollbar-thin">
             {allEmojis.map((emoji, index) => (
               <Button
@@ -285,14 +285,14 @@ const StreamChat = () => {
       )}
 
       {/* Chat Input */}
-      <div className="p-3 border-t bg-background">
+      <div className="p-3 border-t bg-background overflow-hidden">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          <div className="flex-1 relative">
+          <div className="flex-1 relative min-w-0">
             <Input
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               placeholder="დაწერე მესიჯი..."
-              className="pr-10 text-sm"
+              className="pr-10 text-sm w-full"
               maxLength={100}
             />
             <Button
@@ -309,7 +309,7 @@ const StreamChat = () => {
             type="submit"
             size="sm"
             disabled={!messageInput.trim()}
-            className="h-9 w-9 p-0"
+            className="h-9 w-9 p-0 flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </Button>
