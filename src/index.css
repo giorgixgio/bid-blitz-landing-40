@@ -123,6 +123,23 @@ All colors MUST be HSL.
   }
 }
 
+/* Custom scrollbar styles for chat */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded-full;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
 @layer base {
   * {
     @apply border-border;

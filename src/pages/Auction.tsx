@@ -50,6 +50,7 @@ import galaxySPenImage from '@/assets/samsung-galaxy-s25-ultra-spen.jpg';
 // Component Imports
 import Header from '@/components/Header';
 import { AviatorAuction } from '@/components/AviatorAuction';
+import StreamChat from '@/components/StreamChat';
 
 const Auction = () => {
   // HEADER VISIBILITY STATE
@@ -775,6 +776,9 @@ const Auction = () => {
                 ))}
               </div>
             </Card>
+
+            {/* Live Stream Chat */}
+            <StreamChat />
           </div>
         </div>
 
