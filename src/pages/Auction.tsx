@@ -403,13 +403,13 @@ const Auction = () => {
    * ================================ */
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 pt-16 pb-20 overflow-x-hidden">
       {/* Site Header */}
       <Header />
       
-      <div className="container mx-auto p-3 sm:p-4 lg:p-8">
+      <div className="container mx-auto p-3 sm:p-4 lg:p-8 max-w-7xl">
         {/* Main Content Grid - Mobile-first responsive layout */}
-        <div className="grid gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-2">
           
           {/* LEFT COLUMN - Product Details (Order 2 on mobile, 1 on desktop) */}
           <div className="order-2 lg:order-1 space-y-4 sm:space-y-6 mt-16">
@@ -639,36 +639,42 @@ const Auction = () => {
           </div>
         </div>
 
-        {/* Sticky Top Bar - Quick Bidding Interface */}
-        <div className={`fixed left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-2 shadow-lg transition-all duration-300 z-40 ${isHeaderVisible ? 'top-16' : 'top-0'}`}>
-          <div className="container mx-auto flex items-center gap-3">
-            {/* Product Thumbnail */}
-            <div className="flex-shrink-0">
-              <img 
-                src={productImages[currentImageIndex]} 
-                alt="Samsung Galaxy S25 Ultra"
-                className="w-12 h-12 rounded-lg object-cover border border-border"
-              />
-            </div>
-            
+        {/* Sticky Bottom Bid Button */}
+        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-3 shadow-lg z-50 max-w-full">
+          <div className="container mx-auto max-w-md flex items-center gap-3">
             {/* Product Info */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm truncate">Samsung S938B Galaxy S25 Ultra</h3>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-bold text-foreground">{currentPrice.toFixed(2)} ₾</span>
+                <span className="font-bold text-foreground text-lg">{currentPrice.toFixed(2)} ₾</span>
                 <span>•</span>
-                <span>{String(timeLeft).padStart(2, '0')} წამი</span> {/* seconds */}
+                <span className="font-medium">{String(timeLeft).padStart(2, '0')}წმ</span>
+                <span>•</span>
+                <span className="text-primary font-medium">{userBidCredits} ბიდი</span>
               </div>
             </div>
             
-            {/* Quick Bid Button */}
+            {/* Main Bid Button */}
             <Button 
               onClick={handleBid}
-              disabled={userBidCredits <= 0 || timeLeft <= 0}
-              size="sm"
-              className="bg-green-500 hover:bg-green-400 text-white font-bold px-4"
+              disabled={userBidCredits <= 0 || timeLeft <= 0 || isAuctionEnded}
+              className={`h-12 px-6 text-white font-bold shadow-lg transform transition-transform active:scale-95 ${
+                isAuctionEnded || timeLeft <= 0
+                  ? 'bg-gray-400 opacity-50 cursor-not-allowed' 
+                  : userBidCredits <= 0
+                  ? 'bg-red-500 hover:bg-red-400'
+                  : 'bg-green-500 hover:bg-green-400'
+              }`}
             >
-              ბიდი {/* Bid */}
+              {isAuctionEnded || timeLeft <= 0 ? (
+                "დასრულდა"
+              ) : userBidCredits <= 0 ? (
+                "ბიდები ნ/ა"
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 mr-1" />
+                  ბიდი
+                </>
+              )}
             </Button>
           </div>
         </div>
