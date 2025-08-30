@@ -639,6 +639,35 @@ const Auction = () => {
           </div>
         </div>
 
+        {/* Sticky Top Bar - Quick Bidding Interface */}
+        <div className={`fixed left-0 right-0 bg-background/95 backdrop-blur-sm border-b border-border/50 p-2 shadow-lg transition-all duration-300 z-40 ${isHeaderVisible ? 'top-16' : 'top-0'}`}>
+          <div className="container mx-auto flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <img 
+                src={productImages[currentImageIndex]} 
+                alt="Samsung Galaxy S25 Ultra"
+                className="w-12 h-12 rounded-lg object-cover border border-border"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm truncate">Samsung S938B Galaxy S25 Ultra</h3>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="font-bold text-foreground">{currentPrice.toFixed(2)} ₾</span>
+                <span>•</span>
+                <span>{String(timeLeft).padStart(2, '0')} წამი</span>
+              </div>
+            </div>
+            <Button 
+              onClick={handleBid}
+              disabled={userBidCredits <= 0 || timeLeft <= 0 || isAuctionEnded}
+              size="sm"
+              className="bg-green-500 hover:bg-green-400 text-white font-bold px-4"
+            >
+              ბიდი
+            </Button>
+          </div>
+        </div>
+
         {/* Sticky Bottom Bid Button */}
         <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border/50 p-4 shadow-lg z-50">
           <div className="container mx-auto max-w-sm">
