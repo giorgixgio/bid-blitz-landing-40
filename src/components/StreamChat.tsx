@@ -13,7 +13,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { MessageCircle, Users } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { MessageCircle, Users, Send, Smile } from 'lucide-react';
 
 interface ChatMessage {
   id: string;
@@ -27,6 +29,8 @@ interface ChatMessage {
 const StreamChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [onlineUsers, setOnlineUsers] = useState(127);
+  const [messageInput, setMessageInput] = useState('');
+  const [showEmojiPanel, setShowEmojiPanel] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -66,8 +70,17 @@ const StreamChat = () => {
     "ბედი გამიღიმოს! 🌟"
   ];
 
-  // Emoji reactions
-  const reactions = ['🔥', '💰', '⚡', '👏', '😍', '🎯', '💪', '🚀', '👑', '🍀'];
+  // Quick emoji reactions for easy replies
+  const quickEmojis = ['🔥', '💰', '⚡', '👏', '😍', '🎯', '💪', '🚀', '👑', '🍀'];
+  
+  // Extended emoji panel
+  const allEmojis = [
+    '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃',
+    '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '☺️', '😚',
+    '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
+    '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
+    '🔥', '💰', '⚡', '👏', '🎯', '💪', '🚀', '👑', '🍀', '💎'
+  ];
 
   // Generate random message
   const generateRandomMessage = (): ChatMessage => {
@@ -78,7 +91,7 @@ const StreamChat = () => {
     // 20% chance for just emoji, 80% for text message
     let message;
     if (Math.random() < 0.2) {
-      message = reactions[Math.floor(Math.random() * reactions.length)];
+      message = quickEmojis[Math.floor(Math.random() * quickEmojis.length)];
     } else {
       message = messageTemplates[Math.floor(Math.random() * messageTemplates.length)];
     }
@@ -91,6 +104,39 @@ const StreamChat = () => {
       isVip,
       isModerator
     };
+  };
+
+  // Send user message
+  const sendMessage = (text: string) => {
+    if (!text.trim()) return;
+    
+    const userMessage: ChatMessage = {
+      id: Date.now().toString() + '_user',
+      username: 'შენ',
+      message: text,
+      timestamp: new Date(),
+      isVip: true, // Make user appear as VIP
+      isModerator: false
+    };
+    
+    setMessages(prev => [...prev, userMessage].slice(-50));
+    setMessageInput('');
+    setShowEmojiPanel(false);
+  };
+
+  // Handle input submit
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage(messageInput);
+  };
+
+  // Handle emoji click
+  const handleEmojiClick = (emoji: string) => {
+    if (showEmojiPanel) {
+      sendMessage(emoji);
+    } else {
+      setMessageInput(prev => prev + emoji);
+    }
   };
 
   // Auto-scroll to bottom within chat container only
@@ -187,11 +233,73 @@ const StreamChat = () => {
         <div ref={chatEndRef} />
       </div>
 
-      {/* Chat Input Placeholder */}
-      <div className="p-3 border-t bg-muted/10">
-        <div className="text-xs text-muted-foreground text-center py-2 px-4 bg-muted/30 rounded-md">
-          რეგისტრაცია საჭიროა ჩატისთვის
+      {/* Quick Emoji Reactions */}
+      <div className="px-3 py-2 border-t bg-muted/5">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+          <span className="text-xs text-muted-foreground mr-2 flex-shrink-0">სწრაფი:</span>
+          {quickEmojis.map((emoji, index) => (
+            <Button
+              key={index}
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-primary/10 flex-shrink-0"
+              onClick={() => handleEmojiClick(emoji)}
+            >
+              {emoji}
+            </Button>
+          ))}
         </div>
+      </div>
+
+      {/* Emoji Panel */}
+      {showEmojiPanel && (
+        <div className="px-3 pb-2 border-t bg-muted/5">
+          <div className="grid grid-cols-8 gap-1 max-h-32 overflow-y-auto scrollbar-thin">
+            {allEmojis.map((emoji, index) => (
+              <Button
+                key={index}
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-primary/10"
+                onClick={() => handleEmojiClick(emoji)}
+              >
+                {emoji}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Chat Input */}
+      <div className="p-3 border-t bg-background">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <div className="flex-1 relative">
+            <Input
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              placeholder="დაწერე მესიჯი..."
+              className="pr-10 text-sm"
+              maxLength={100}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+              onClick={() => setShowEmojiPanel(!showEmojiPanel)}
+            >
+              <Smile className="w-4 h-4" />
+            </Button>
+          </div>
+          <Button
+            type="submit"
+            size="sm"
+            disabled={!messageInput.trim()}
+            className="h-9 w-9 p-0"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </form>
       </div>
     </Card>
   );
