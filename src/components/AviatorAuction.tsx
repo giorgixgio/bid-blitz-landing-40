@@ -42,7 +42,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   onBonusBidCollected
 }) => {
   // ANIMATION STATE
-  const [jetPosition, setJetPosition] = useState({ x: 10, y: 85 }); // For SVG polygon only
+  const [jetPosition, setJetPosition] = useState({ x: 10, y: 85 }); // Jet position (x: left-right, y: top-bottom)
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentLeader, setCurrentLeader] = useState(lastBidder);
   const [zoomLevel, setZoomLevel] = useState(1); // Zoom effect for excitement
@@ -52,33 +52,12 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   const [showBlowUpMessage, setShowBlowUpMessage] = useState(false); // Show "YOU BLEW UP JET" message
   const [soundEnabled, setSoundEnabled] = useState(true); // Sound effects toggle
   
-  // Direct DOM reference for smooth animation
-  const jetElementRef = useRef<HTMLDivElement>(null);
-  
-  // Refs for accessing current values in animation loop
-  const timeLeftRef = useRef(timeLeft);
-  const bidProgressRef = useRef(bidProgress);
-  const userJustBidRef = useRef(userJustBid);
-  const lastBidderRef = useRef(lastBidder);
-  const isExplodingRef = useRef(isExploding);
-  
   // LUCKY COIN STATE
   const [coinPosition, setCoinPosition] = useState({ x: 50, y: 50 });
   const [isCoinVisible, setIsCoinVisible] = useState(false);
   const [coinCollectedThisRound, setCoinCollectedThisRound] = useState(false);
   const [userCollectedThisRound, setUserCollectedThisRound] = useState(false);
   const [showBonusMessage, setShowBonusMessage] = useState(false);
-  const [bonusCollectorId, setBonusCollectorId] = useState<string | null>(null);
-
-  
-  // Update refs when props change
-  useEffect(() => {
-    timeLeftRef.current = timeLeft;
-    bidProgressRef.current = bidProgress;
-    userJustBidRef.current = userJustBid;
-    lastBidderRef.current = lastBidder;
-    isExplodingRef.current = isExploding;
-  }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
 
   // MILLISECONDS COUNTDOWN - Creates smooth timer animation
   useEffect(() => {
@@ -94,19 +73,13 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Reset states when main timer resets (force rebuild)
+  // Reset states when main timer resets
   useEffect(() => {
     if (timeLeft === 10) { // When timer resets to full
       setMilliseconds(99);
       setCoinCollectedThisRound(false);
       setUserCollectedThisRound(false); // Reset user collection flag
       setShowBonusMessage(false);
-      setBonusCollectorId(null); // Reset collector ID
-      
-      // Reset jet position to start when timer resets
-      setJetPosition({ x: 10, y: 85 });
-      setZoomLevel(1); // Reset zoom level
-      setTrailPoints([]); // Clear trail points
     }
   }, [timeLeft]);
 
@@ -207,44 +180,32 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     }
   }, [lastBidder, currentLeader, bidProgress]);
 
-  // SMOOTH CSS-BASED ANIMATION - Let CSS handle the smoothness
+  // CONTINUOUS ANIMATION - Update jet position based on progress with bounds checking
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isExploding && timeLeft > 0) {
-        if (userJustBid && lastBidder === 'შენ') {
-          const progress = Math.min(bidProgress || 0, 100);
-          const targetX = Math.min(10 + (80 * progress / 100), 90);
-          const targetY = Math.max(85 - (70 * progress / 100), 15);
-          setJetPosition({ x: targetX, y: targetY });
-        } else if (lastBidder !== 'შენ') {
-          const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100);
-          const targetX = Math.min(10 + (80 * timeProgress / 100), 90);
-          const targetY = Math.max(85 - (70 * timeProgress / 100), 15);
-          setJetPosition({ x: targetX, y: targetY });
-        }
+    if (!isExploding) {
+      if (userJustBid && lastBidder === 'შენ') {
+        // User bid - animate based on bid progress
+        const progress = Math.min(bidProgress, 100); // Ensure max 100%
+        const targetX = Math.min(10 + (80 * progress / 100), 90); // Cap at 90%
+        const targetY = Math.max(85 - (70 * progress / 100), 15); // Cap at 15%
+        setJetPosition({ x: targetX, y: targetY });
+        setZoomLevel(1 + (progress / 100) * 0.3);
+        
+        // Add trail point
+        setTrailPoints(prev => [...prev.slice(-5), { x: targetX, y: targetY, id: Date.now() }]);
+      } else if (lastBidder !== 'შენ' && timeLeft > 0) {
+        // Other bidders - animate based on time remaining with bounds checking
+        const timeProgress = Math.min((10 - timeLeft) / 10 * 100, 100); // Ensure max 100%
+        const targetX = Math.min(10 + (80 * timeProgress / 100), 90); // Cap at 90%
+        const targetY = Math.max(85 - (70 * timeProgress / 100), 15); // Cap at 15%
+        setJetPosition({ x: targetX, y: targetY });
+        setZoomLevel(1 + (timeProgress / 100) * 0.2);
+        
+        // Add trail point
+        setTrailPoints(prev => [...prev.slice(-4), { x: targetX, y: targetY, id: Date.now() }]);
       }
-    }, 100); // Update every 100ms, let CSS smooth the transitions
-    
-    return () => clearInterval(interval);
+    }
   }, [timeLeft, bidProgress, userJustBid, lastBidder, isExploding]);
-
-  // Trail points update at lower frequency
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const currentIsExploding = isExplodingRef.current;
-      const currentTimeLeft = timeLeftRef.current;
-      
-      if (!currentIsExploding && currentTimeLeft > 0) {
-        setTrailPoints(prev => [...prev.slice(-4), { 
-          x: jetPosition.x, 
-          y: jetPosition.y, 
-          id: Date.now() 
-        }]);
-      }
-    }, 300); // Add trail point every 300ms
-    
-    return () => clearInterval(interval);
-  }, [jetPosition.x, jetPosition.y]);
 
   // LUCKY COIN SPAWNING - Only appear in last 4-5 seconds if not collected this round
   useEffect(() => {
@@ -272,49 +233,46 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
     // Spawn coin immediately when entering the 1-5 second window
     spawnCoin();
     
-  }, [isAuctionEnded, isCoinVisible, bidProgress, timeLeft, coinCollectedThisRound, onBonusBidCollected]);
+  }, [isAuctionEnded, isCoinVisible, jetPosition.x, jetPosition.y, bidProgress, timeLeft, coinCollectedThisRound]);
 
-  // COLLISION DETECTION - First determine WHO will collect
+  // COLLISION DETECTION - Check which specific user hits the coin
   useEffect(() => {
     if (!isCoinVisible || coinCollectedThisRound) return;
     
-    // STEP 1: At timeLeft = 3, decide if other user gets it (60% chance)
-    if (timeLeft === 3 && lastBidder !== 'შენ' && Math.random() < 0.6) {
-      // OTHER USER gets the coin - NO collision detection for current user
-      console.log('❌ OTHER USER GETS COIN:', lastBidder);
+    // Check if CURRENT USER hits the coin
+    const userJetX = isAuctionEnded ? 90 : jetPosition.x;
+    const userJetY = isAuctionEnded ? 15 : jetPosition.y;
+    const userDistance = Math.sqrt(
+      Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
+    );
+    
+    if (userDistance < 8) {
+      // CURRENT USER collected the coin
+      console.log('✅ CURRENT USER (შენ) COLLECTED COIN');
       setIsCoinVisible(false);
       setCoinCollectedThisRound(true);
-      setBonusCollectorId(lastBidder); // Track who collected it
+      setUserCollectedThisRound(true);
+      setShowBonusMessage(true);
+      setTimeout(() => setShowBonusMessage(false), 3000);
+      playWinningSound();
+      
+      if (onBonusBidCollected) {
+        onBonusBidCollected('შენ'); // Only current user gets credit
+      }
+      return;
+    }
+    
+    // Simulate OTHER USERS hitting the coin
+    if (lastBidder !== 'შენ' && timeLeft <= 3 && Math.random() < 0.4) {
+      // Another user (not current user) collected the coin
+      console.log('❌ OTHER USER COLLECTED COIN:', lastBidder);
+      setIsCoinVisible(false);
+      setCoinCollectedThisRound(true);
       setShowBonusMessage(true);
       setTimeout(() => setShowBonusMessage(false), 3000);
       
       if (onBonusBidCollected) {
-        onBonusBidCollected(lastBidder); // OTHER user gets credit
-      }
-      return; // STOP HERE - other user collected
-    }
-    
-    // STEP 2: ONLY if other user didn't collect, check current user collision
-    if (timeLeft !== 3) { // Don't check collision at timeLeft=3 to avoid conflicts
-      const userJetX = isAuctionEnded ? 90 : jetPosition.x;
-      const userJetY = isAuctionEnded ? 15 : jetPosition.y;
-      const userDistance = Math.sqrt(
-        Math.pow(userJetX - coinPosition.x, 2) + Math.pow(userJetY - coinPosition.y, 2)
-      );
-      
-      if (userDistance < 8) {
-        console.log('✅ CURRENT USER GETS COIN');
-        setIsCoinVisible(false);
-        setCoinCollectedThisRound(true);
-        setUserCollectedThisRound(true);
-        setBonusCollectorId('შენ'); // Track that current user collected it
-        setShowBonusMessage(true);
-        setTimeout(() => setShowBonusMessage(false), 3000);
-        playWinningSound();
-        
-        if (onBonusBidCollected) {
-          onBonusBidCollected('შენ'); // Current user gets credit
-        }
+        onBonusBidCollected(lastBidder); // THAT user gets credit, NOT current user
       }
     }
   }, [jetPosition, coinPosition, isCoinVisible, isAuctionEnded, coinCollectedThisRound, lastBidder, timeLeft, onBonusBidCollected]);
@@ -351,7 +309,7 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
   }, [isAuctionEnded]);
 
   return (
-    <Card className="p-4 sm:p-6 bg-gradient-to-br from-gray-900 to-black border-green-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
+    <Card className="p-4 sm:p-6 bg-gradient-to-br from-blue-900/90 to-purple-900/90 border-blue-500/20 shadow-lg overflow-hidden relative z-10 mt-16">
       {/* SOUND TOGGLE - Top left corner */}
       <div className="absolute top-2 left-2 z-50">
         <button
@@ -367,8 +325,8 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         </button>
       </div>
 
-      {/* GAME AREA - Crypto/Forex Style */}
-      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-gray-900 to-gray-800 rounded-lg mb-4 overflow-hidden z-10 border border-green-500/30">
+      {/* GAME AREA */}
+      <div className="relative h-48 sm:h-56 bg-gradient-to-t from-blue-800/30 to-transparent rounded-lg mb-4 overflow-hidden z-10">
         
         {/* "YOU BLEW UP JET" MESSAGE - At the very top center of animation */}
         {showBlowUpMessage && (
@@ -381,14 +339,10 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         )}
 
-        {/* BONUS MESSAGE - Green for highest bidder, yellow for others */}
+        {/* BONUS MESSAGE - Small notification for all bonus collections */}
         {showBonusMessage && (
           <div className="absolute top-8 inset-x-0 z-40 animate-bounce">
-            <div className={`mx-auto w-fit text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg ${
-              bonusCollectorId === 'შენ' && lastBidder === 'შენ' 
-                ? 'bg-yellow-500/90 border border-yellow-400' 
-                : 'bg-yellow-500/90 border border-yellow-400'
-            }`}>
+            <div className="mx-auto w-fit bg-yellow-500/90 text-white px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg border border-yellow-400">
               <span className="emoji-consistent mr-1">💰</span>
               GOT BONUS BID
               <span className="emoji-consistent ml-1">🎰✨</span>
@@ -396,104 +350,33 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         )}
 
-        {/* Parallax Background Effect */}
+        {/* Background with zoom effect */}
         <div 
-          className="absolute inset-0 transition-transform duration-1000 ease-out origin-bottom"
-          style={{ 
-            transform: `translateY(${(bidProgress || ((10 - timeLeft) / 10 * 100)) * -0.3}px) scale(${zoomLevel})` 
-          }}
+          className="absolute inset-0 transition-transform duration-1000 ease-out origin-bottom-left"
+          style={{ transform: `scale(${zoomLevel})` }}
         >
-          {/* Trading Grid Background */}
-          <div className="absolute inset-0 opacity-10">
+          {/* Grid pattern background */}
+          <div className="absolute inset-0 opacity-20">
             <svg width="100%" height="100%" className="w-full h-full">
               <defs>
-                <pattern id="tradingGrid" width="40" height="30" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 30" fill="none" stroke="#10b981" strokeWidth="0.5"/>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.5"/>
                 </pattern>
               </defs>
-              <rect width="100%" height="100%" fill="url(#tradingGrid)" />
-            </svg>
-          </div>
-          
-          {/* Price Chart Lines */}
-          <div className="absolute inset-0">
-            <svg width="100%" height="100%" className="w-full h-full">
-              <path 
-                d={`M 0,${200 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 1.5} L 100,${150 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 1.2} L 200,${180 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 1.8} L 300,${120 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 2}`}
-                fill="none" 
-                stroke="url(#priceGradient)" 
-                strokeWidth="2" 
-                className="opacity-30"
-              />
-              <defs>
-                <linearGradient id="priceGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="100%" stopColor="#34d399" />
-                </linearGradient>
-              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
             </svg>
           </div>
         </div>
 
-        {/* Triangular Mountain Fill - Crash Game Style */}
-        <div className="absolute inset-0">
-          <svg width="100%" height="100%" className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="mountainFillGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
-                <stop offset="50%" stopColor="#fbbf24" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#fde047" stopOpacity="0.4" />
-              </linearGradient>
-              <linearGradient id="mountainBorderGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#f59e0b" />
-                <stop offset="100%" stopColor="#fbbf24" />
-              </linearGradient>
-            </defs>
-            
-            {/* Mountain fill area - triangle from bottom-left, up to jet, back down */}
-            <polygon
-              points={`0,100 ${jetPosition.x},${jetPosition.y} ${jetPosition.x},100 0,100`}
-              fill="url(#mountainFillGradient)"
-              className="transition-all duration-500 ease-out"
-            />
-            
-            {/* Rising line border */}
-            <path 
-              d={`M 0,100 L ${jetPosition.x},${jetPosition.y}`}
-              fill="none" 
-              stroke="url(#mountainBorderGradient)" 
-              strokeWidth="0.8" 
-              strokeLinecap="round"
-              className="transition-all duration-500 ease-out"
-            />
-            
-            {/* Glowing edge effect */}
-            <path 
-              d={`M 0,100 L ${jetPosition.x},${jetPosition.y}`}
-              fill="none" 
-              stroke="#fbbf24" 
-              strokeWidth="1.5" 
-              strokeLinecap="round"
-              className="opacity-50 animate-pulse"
-            />
-          </svg>
-        </div>
-
-        {/* TARGET PRICE LINE */}
-        <div 
-          className="absolute right-2 flex flex-col items-center text-yellow-400 z-20 transition-all duration-1000"
-          style={{
-            top: `${15 - (bidProgress || ((10 - timeLeft) / 10 * 100)) * 0.1}%`
-          }}
-        >
-          <div className="w-8 h-8 bg-yellow-500/80 rounded-full flex items-center justify-center mb-1 border-2 border-yellow-400">
-            <span className="text-white text-sm">₿</span>
+        {/* FINISH LINE */}
+        <div className="absolute top-2 right-2 flex flex-col items-center text-white/80 z-20">
+          <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center mb-1">
+            🏁
           </div>
-          <span className="text-xs font-bold text-yellow-400">TARGET</span>
-          <div className="absolute -left-10 top-0 w-20 h-0.5 bg-yellow-400/60 animate-pulse"></div>
+          <span className="text-xs font-bold">FINISH</span>
         </div>
 
-        {/* GREEN TRADING TRAIL EFFECTS */}
+        {/* TRAIL EFFECTS */}
         <div className="absolute inset-0">
           {trailPoints.map((point, index) => (
             <div
@@ -503,13 +386,10 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
                 left: `${point.x}%`,
                 top: `${point.y}%`,
                 transform: 'translate(-50%, -50%)',
-                opacity: (index + 1) / trailPoints.length * 0.8
+                opacity: (index + 1) / trailPoints.length * 0.6
               }}
             >
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-1 bg-yellow-400 rounded animate-pulse shadow-lg shadow-yellow-400/30"></div>
-                <div className="text-yellow-400 text-xs font-mono">+</div>
-              </div>
+              <div className="w-2 h-1 bg-orange-400 rounded opacity-80 animate-pulse"></div>
             </div>
           ))}
         </div>
@@ -524,12 +404,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
         {/* FLYING JET CAT */}
         <div className="absolute inset-0">
           <div 
-            className="absolute transform z-20"
+            className="absolute transition-all duration-1000 ease-out transform z-20"
             style={{ 
               left: isAuctionEnded ? '90%' : `${jetPosition.x}%`, 
               top: isAuctionEnded ? '15%' : `${jetPosition.y}%`,
-              transform: 'translate(-50%, -50%)',
-              transition: 'left 0.1s linear, top 0.1s linear'
+              transform: 'translate(-50%, -50%)'
             }}
           >
             <div className="relative">
@@ -554,15 +433,15 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
           </div>
         </div>
 
-        {/* CENTER TIMER OR AUCTION ENDED - Moved lower to avoid jet path */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center z-30">
+        {/* CENTER TIMER OR AUCTION ENDED */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-30">
           {isAuctionEnded ? (
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-yellow-400 drop-shadow-lg mb-2">
                 SOLD FOR
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg flex items-center justify-center gap-1">
-                {currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-500 rounded-full text-white text-sm font-bold">₮</span>
+              <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
+                {currentPrice.toFixed(2)} ₾
               </div>
             </div>
           ) : (
@@ -593,11 +472,11 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-white/80">Current Price</p>
-          <p className="text-xl sm:text-2xl font-bold text-white flex items-center justify-center gap-1">{currentPrice.toFixed(2)} <span className="inline-flex items-center justify-center w-5 h-5 bg-yellow-500 rounded-full text-white text-xs font-bold">₮</span></p>
+          <p className="text-xs sm:text-sm text-white/80">მიმდინარე ფასი</p>
+          <p className="text-xl sm:text-2xl font-bold text-white">{currentPrice.toFixed(2)} ₾</p>
         </div>
         <div className="text-center">
-          <p className="text-xs sm:text-sm text-white/80">Multiplier</p>
+          <p className="text-xs sm:text-sm text-white/80">მულტიპლაიერი</p>
           <div className="text-xl sm:text-2xl font-bold text-yellow-400">
             {(currentPrice * 100).toFixed(0)}x
           </div>
@@ -608,15 +487,15 @@ export const AviatorAuction: React.FC<AviatorAuctionProps> = ({
       <div className="flex items-center justify-between text-xs sm:text-sm text-white/80">
         <div className="flex items-center gap-1">
           <Gavel className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>{totalBidsPlaced} Bids</span>
+          <span>{totalBidsPlaced} ბიდი</span>
         </div>
         <div className="flex items-center gap-1">
           <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>Leader: {lastBidder}</span>
+          <span>ლიდერი: {lastBidder}</span>
         </div>
         <div className="flex items-center gap-1">
           <Coins className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>{userBidCredits} Bids</span>
+          <span>{userBidCredits} ბიდი</span>
         </div>
       </div>
 

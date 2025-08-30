@@ -66,33 +66,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 210 30% 8%;
+    --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
-    --card: 210 25% 12%;
+    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 210 25% 12%;
+    --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 160 84% 39%;
+    --primary: 0 84% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 16%;
-    --secondary-foreground: 210 40% 85%;
+    --secondary: 45 93% 47%;
+    --secondary-foreground: 222.2 84% 4.9%;
 
-    --muted: 210 25% 16%;
+    --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 160 80% 25%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 270 95% 75%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 60%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 20% 20%;
-    --input: 210 20% 18%;
-    --ring: 160 84% 39%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 0 84% 60%;
 
     --success: 120 61% 50%;
     --success-foreground: 0 0% 100%;
@@ -103,15 +103,14 @@ All colors MUST be HSL.
     --auction-urgent: 0 100% 50%;
     --auction-gold: 45 100% 51%;
     --auction-premium: 270 95% 75%;
-    
-    --sidebar-background: 210 30% 10%;
-    --sidebar-foreground: 210 40% 85%;
-    --sidebar-primary: 160 84% 39%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 25% 14%;
-    --sidebar-accent-foreground: 210 40% 85%;
-    --sidebar-border: 210 20% 18%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   /* Hide scrollbar but keep functionality for mobile */
@@ -122,19 +121,6 @@ All colors MUST be HSL.
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-}
-
-@keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-scroll {
-  animation: scroll 30s linear infinite;
 }
 
 @layer base {
