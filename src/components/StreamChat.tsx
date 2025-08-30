@@ -28,6 +28,7 @@ const StreamChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [onlineUsers, setOnlineUsers] = useState(127);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Dummy usernames pool
   const dummyUsers = [
@@ -92,9 +93,11 @@ const StreamChat = () => {
     };
   };
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom within chat container only
   const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -141,7 +144,10 @@ const StreamChat = () => {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+      <div 
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+      >
         {messages.map((msg) => (
           <div key={msg.id} className="flex items-start gap-2 text-xs">
             <Avatar className="w-6 h-6 flex-shrink-0">
