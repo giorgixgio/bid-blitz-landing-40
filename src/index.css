@@ -121,6 +121,22 @@ All colors MUST be HSL.
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Bomb flight animation */
+  @keyframes bomb-flight {
+    0% {
+      transform: translate(-50%, 0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translate(200px, -200px) rotate(180deg) scale(1.2);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(400px, -300px) rotate(360deg) scale(0.5);
+      opacity: 0;
+    }
+  }
 }
 
 /* Prevent zoom and horizontal scroll */

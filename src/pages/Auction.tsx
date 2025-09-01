@@ -79,6 +79,9 @@ const Auction = () => {
   // AUTOBIDDER STATE
   const [autoBidderEnabled, setAutoBidderEnabled] = useState(false); // Auto-bidding toggle
   
+  // BOMB ANIMATION STATE
+  const [bombAnimation, setBombAnimation] = useState({ active: false, id: 0 });
+  
   // AUCTION ENDED STATE (temporary for testing)
   const isAuctionEnded = false; // Set to false to resume bidding
 
@@ -361,6 +364,10 @@ const Auction = () => {
     setTimeLeft(TIME_EXTENSION); // Reset countdown timer
     setLastBidder('შენ'); // Set user as highest bidder (Russian: "Ты")
     
+    // Trigger bomb animation
+    setBombAnimation({ active: true, id: Date.now() });
+    setTimeout(() => setBombAnimation({ active: false, id: 0 }), 2000);
+    
     // Start progress animation
     setBidProgress(0);
     setUserJustBid(true);
@@ -406,6 +413,24 @@ const Auction = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 pt-16 pb-20 overflow-x-hidden">
       {/* Site Header */}
       <Header />
+
+      {/* Flying Plane Target */}
+      <div className="fixed top-20 right-10 z-30 text-4xl">
+        ✈️
+      </div>
+
+      {/* Bomb Animation */}
+      {bombAnimation.active && (
+        <div 
+          key={bombAnimation.id}
+          className="fixed bottom-28 left-1/2 transform -translate-x-1/2 z-40 text-3xl pointer-events-none"
+          style={{
+            animation: 'bomb-flight 2s ease-out forwards'
+          }}
+        >
+          💣
+        </div>
+      )}
       
       <div className="container mx-auto p-3 sm:p-4 lg:p-8 max-w-7xl">
         {/* Main Content Grid - Mobile-first responsive layout */}
