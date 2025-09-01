@@ -13,6 +13,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { 
   Search, 
   Bell, 
@@ -101,6 +102,9 @@ const Header = () => {
               <span className="text-sm font-bold text-white">45</span>
               <span className="text-xs text-white/80">ბიდი</span>
             </div>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {/* User Profile */}
             <Button variant="ghost" size="icon">
