@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      auctions: {
+        Row: {
+          created_at: string
+          current_price: number
+          description: string | null
+          end_time: string
+          id: string
+          image_url: string | null
+          starting_price: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_price?: number
+          description?: string | null
+          end_time: string
+          id?: string
+          image_url?: string | null
+          starting_price?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_price?: number
+          description?: string | null
+          end_time?: string
+          id?: string
+          image_url?: string | null
+          starting_price?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bids: {
+        Row: {
+          amount: number
+          auction_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          auction_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          auction_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bids_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

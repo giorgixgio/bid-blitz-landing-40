@@ -43,7 +43,7 @@ const Index = () => {
         )}
         
         <Button 
-          onClick={() => navigate('/auction/383')}
+          onClick={() => navigate('/auction/383e4567-e89b-12d3-a456-426614174000')}
           size="lg"
           className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
         >
