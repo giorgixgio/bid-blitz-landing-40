@@ -1,14 +1,47 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center space-y-6">
         <h1 className="text-4xl font-bold mb-4">მანეკი აუქციონი</h1>
         <p className="text-xl text-muted-foreground">Georgian Auction Platform</p>
+        
+        {/* Auth Section */}
+        {!user ? (
+          <div className="space-y-4">
+            <Button 
+              onClick={() => navigate('/auth')}
+              size="lg"
+              variant="outline"
+              className="mr-4"
+            >
+              Sign In / Sign Up
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              Join to participate in auctions
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-lg text-foreground">
+              Welcome back!
+            </p>
+            <Button variant="outline" onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          </div>
+        )}
+        
         <Button 
           onClick={() => navigate('/auction/383')}
           size="lg"
